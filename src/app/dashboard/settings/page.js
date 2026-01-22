@@ -1,0 +1,289 @@
+"use client";
+
+import { useState } from "react";
+import { Settings as SettingsIcon, User, Bell, Shield, Globe, Save, Loader2 } from "lucide-react";
+import { Card } from "@/components/ui/card";
+
+export default function SettingsPage() {
+    const [loading, setLoading] = useState(false);
+    const [settings, setSettings] = useState({
+        organizationName: "My Organization",
+        email: "admin@organization.com",
+        notifications: {
+            email: true,
+            push: false,
+            projectUpdates: true,
+            creditAlerts: true,
+        },
+        preferences: {
+            language: "en",
+            timezone: "UTC",
+            theme: "light",
+        },
+        security: {
+            twoFactor: false,
+            sessionTimeout: 30,
+        },
+    });
+
+    const handleSave = async () => {
+        setLoading(true);
+        // In real app, save to API
+        setTimeout(() => {
+            setLoading(false);
+            alert("Settings saved successfully!");
+        }, 1000);
+    };
+
+    return (
+        <div className="p-8">
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
+                <p className="text-gray-600">Manage your organization settings and preferences</p>
+            </div>
+
+            <div className="space-y-6 max-w-4xl">
+                {/* Organization Settings */}
+                <Card className="p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <User className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-semibold text-gray-900">Organization Information</h2>
+                            <p className="text-sm text-gray-600">Update your organization details</p>
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Organization Name</label>
+                            <input
+                                type="text"
+                                value={settings.organizationName}
+                                onChange={(e) =>
+                                    setSettings((prev) => ({ ...prev, organizationName: e.target.value }))
+                                }
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input
+                                type="email"
+                                value={settings.email}
+                                onChange={(e) => setSettings((prev) => ({ ...prev, email: e.target.value }))}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                    </div>
+                </Card>
+
+                {/* Notifications */}
+                <Card className="p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                            <Bell className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-semibold text-gray-900">Notifications</h2>
+                            <p className="text-sm text-gray-600">Configure your notification preferences</p>
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <label className="flex items-center justify-between cursor-pointer">
+                            <div>
+                                <span className="text-sm font-medium text-gray-900">Email Notifications</span>
+                                <p className="text-xs text-gray-600">Receive notifications via email</p>
+                            </div>
+                            <input
+                                type="checkbox"
+                                checked={settings.notifications.email}
+                                onChange={(e) =>
+                                    setSettings((prev) => ({
+                                        ...prev,
+                                        notifications: { ...prev.notifications, email: e.target.checked },
+                                    }))
+                                }
+                                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                        </label>
+                        <label className="flex items-center justify-between cursor-pointer">
+                            <div>
+                                <span className="text-sm font-medium text-gray-900">Push Notifications</span>
+                                <p className="text-xs text-gray-600">Receive browser push notifications</p>
+                            </div>
+                            <input
+                                type="checkbox"
+                                checked={settings.notifications.push}
+                                onChange={(e) =>
+                                    setSettings((prev) => ({
+                                        ...prev,
+                                        notifications: { ...prev.notifications, push: e.target.checked },
+                                    }))
+                                }
+                                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                        </label>
+                        <label className="flex items-center justify-between cursor-pointer">
+                            <div>
+                                <span className="text-sm font-medium text-gray-900">Project Updates</span>
+                                <p className="text-xs text-gray-600">Get notified about project changes</p>
+                            </div>
+                            <input
+                                type="checkbox"
+                                checked={settings.notifications.projectUpdates}
+                                onChange={(e) =>
+                                    setSettings((prev) => ({
+                                        ...prev,
+                                        notifications: { ...prev.notifications, projectUpdates: e.target.checked },
+                                    }))
+                                }
+                                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                        </label>
+                        <label className="flex items-center justify-between cursor-pointer">
+                            <div>
+                                <span className="text-sm font-medium text-gray-900">Credit Alerts</span>
+                                <p className="text-xs text-gray-600">Get notified when credits are low</p>
+                            </div>
+                            <input
+                                type="checkbox"
+                                checked={settings.notifications.creditAlerts}
+                                onChange={(e) =>
+                                    setSettings((prev) => ({
+                                        ...prev,
+                                        notifications: { ...prev.notifications, creditAlerts: e.target.checked },
+                                    }))
+                                }
+                                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                        </label>
+                    </div>
+                </Card>
+
+                {/* Preferences */}
+                <Card className="p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <Globe className="w-5 h-5 text-purple-600" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-semibold text-gray-900">Preferences</h2>
+                            <p className="text-sm text-gray-600">Customize your experience</p>
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
+                            <select
+                                value={settings.preferences.language}
+                                onChange={(e) =>
+                                    setSettings((prev) => ({
+                                        ...prev,
+                                        preferences: { ...prev.preferences, language: e.target.value },
+                                    }))
+                                }
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="en">English</option>
+                                <option value="es">Spanish</option>
+                                <option value="fr">French</option>
+                                <option value="de">German</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
+                            <select
+                                value={settings.preferences.timezone}
+                                onChange={(e) =>
+                                    setSettings((prev) => ({
+                                        ...prev,
+                                        preferences: { ...prev.preferences, timezone: e.target.value },
+                                    }))
+                                }
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="UTC">UTC</option>
+                                <option value="America/New_York">Eastern Time</option>
+                                <option value="America/Chicago">Central Time</option>
+                                <option value="America/Denver">Mountain Time</option>
+                                <option value="America/Los_Angeles">Pacific Time</option>
+                            </select>
+                        </div>
+                    </div>
+                </Card>
+
+                {/* Security */}
+                <Card className="p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                            <Shield className="w-5 h-5 text-red-600" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-semibold text-gray-900">Security</h2>
+                            <p className="text-sm text-gray-600">Manage your security settings</p>
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <label className="flex items-center justify-between cursor-pointer">
+                            <div>
+                                <span className="text-sm font-medium text-gray-900">Two-Factor Authentication</span>
+                                <p className="text-xs text-gray-600">Add an extra layer of security</p>
+                            </div>
+                            <input
+                                type="checkbox"
+                                checked={settings.security.twoFactor}
+                                onChange={(e) =>
+                                    setSettings((prev) => ({
+                                        ...prev,
+                                        security: { ...prev.security, twoFactor: e.target.checked },
+                                    }))
+                                }
+                                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                        </label>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Session Timeout (minutes)
+                            </label>
+                            <input
+                                type="number"
+                                value={settings.security.sessionTimeout}
+                                onChange={(e) =>
+                                    setSettings((prev) => ({
+                                        ...prev,
+                                        security: { ...prev.security, sessionTimeout: parseInt(e.target.value) },
+                                    }))
+                                }
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                min="5"
+                                max="120"
+                            />
+                        </div>
+                    </div>
+                </Card>
+
+                {/* Save Button */}
+                <div className="flex justify-end">
+                    <button
+                        onClick={handleSave}
+                        disabled={loading}
+                        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {loading ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                Saving...
+                            </>
+                        ) : (
+                            <>
+                                <Save className="w-5 h-5" />
+                                Save Settings
+                            </>
+                        )}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
