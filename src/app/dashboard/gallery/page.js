@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Grid, Download, RefreshCw, Eye, Loader2 } from "lucide-react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { Grid, Download, RefreshCw, Eye, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { organizationAPI } from "@/lib/api";
 
 const getImageCategory = (imageType) => {
@@ -23,14 +23,21 @@ const getDaysAgo = (dateString) => {
     return `${diffDays} days ago`;
 };
 
+const ITEMS_PER_PAGE = 18;
+
 export default function GalleryPage() {
     const [images, setImages] = useState([]);
     const [filter, setFilter] = useState("all");
     const [loading, setLoading] = useState(true);
     const [organizationId, setOrganizationId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [totalCount, setTotalCount] = useState(0);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const observerTarget = useRef(null);
 
     useEffect(() => {
-        const fetchImages = async () => {
+        const fetchInitialData = async () => {
             try {
                 const orgId = localStorage.getItem("org_organization_id");
                 if (!orgId) {
@@ -39,31 +46,95 @@ export default function GalleryPage() {
                 }
 
                 setOrganizationId(orgId);
-                const data = await organizationAPI.getOrganizationImages(orgId);
-                if (data.images) {
-                    setImages(data.images);
-                }
+                await fetchImages(orgId, 1);
             } catch (error) {
-                console.error("Error fetching images:", error);
+                console.error("Error fetching data:", error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchImages();
+        fetchInitialData();
     }, []);
 
-    const filteredImages =
-        filter === "all"
-            ? images
-            : images.filter((img) => {
-                  if (filter === "plain") return img.image_type === "white_background";
-                  if (filter === "themed") return img.image_type === "background_change";
-                  if (filter === "model")
-                      return img.image_type === "model_with_ornament" || img.image_type === "real_model_with_ornament";
-                  if (filter === "campaign") return img.image_type === "campaign_shot_advanced";
-                  return true;
-              });
+    const fetchImages = async (orgId, page = 1, append = false) => {
+        if (append) setLoadingMore(true);
+        try {
+            const offset = (page - 1) * ITEMS_PER_PAGE;
+            const params = {
+                limit: ITEMS_PER_PAGE,
+                offset: offset,
+            };
+            
+            if (filter !== "all") {
+                if (filter === "plain") {
+                    params.image_type = "white_background";
+                } else if (filter === "themed") {
+                    params.image_type = "background_change";
+                } else if (filter === "campaign") {
+                    params.image_type = "campaign_shot_advanced";
+                }
+                // Note: "model" filter needs special handling as it includes both model_with_ornament and real_model_with_ornament
+                // We'll filter on the frontend for model type since backend doesn't support OR queries easily
+            }
+
+            const data = await organizationAPI.getOrganizationImages(orgId, params);
+            if (data.images) {
+                if (append) {
+                    setImages((prev) => [...prev, ...data.images]);
+                } else {
+                    setImages(data.images);
+                }
+                setTotalCount(data.total_count || 0);
+                setHasMore(data.images.length === ITEMS_PER_PAGE && (offset + data.images.length) < (data.total_count || 0));
+            }
+        } catch (error) {
+            console.error("Error fetching images:", error);
+        } finally {
+            if (append) setLoadingMore(false);
+        }
+    };
+
+    useEffect(() => {
+        if (organizationId) {
+            setCurrentPage(1);
+            fetchImages(organizationId, 1, false);
+        }
+    }, [filter]);
+
+    // Intersection Observer for lazy loading
+    const lastImageElementRef = useCallback(
+        (node) => {
+            if (loadingMore) return;
+            if (observerTarget.current) observerTarget.current.disconnect();
+            observerTarget.current = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && hasMore) {
+                    const nextPage = currentPage + 1;
+                    setCurrentPage(nextPage);
+                    fetchImages(organizationId, nextPage, true);
+                }
+            });
+            if (node) observerTarget.current.observe(node);
+        },
+        [loadingMore, hasMore, currentPage, organizationId]
+    );
+
+    // Filter images - handle model type specially since it includes two image types
+    const filteredImages = useMemo(() => {
+        if (filter === "all") return images;
+        if (filter === "model") {
+            return images.filter(
+                (img) =>
+                    img.image_type === "model_with_ornament" || img.image_type === "real_model_with_ornament"
+            );
+        }
+        return images.filter((img) => {
+            if (filter === "plain") return img.image_type === "white_background";
+            if (filter === "themed") return img.image_type === "background_change";
+            if (filter === "campaign") return img.image_type === "campaign_shot_advanced";
+            return true;
+        });
+    }, [images, filter]);
 
     const handleDownload = (image) => {
         window.open(image.image_url, "_blank");
@@ -117,57 +188,74 @@ export default function GalleryPage() {
                         </p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                        {filteredImages.map((image) => (
-                            <div key={image.id} className="group cursor-pointer">
-                                <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-2">
-                                    <img
-                                        src={image.image_url}
-                                        alt={getImageCategory(image.image_type)}
-                                        className="w-full h-full object-cover"
-                                        onError={(e) => {
-                                            e.target.style.display = "none";
-                                            e.target.nextSibling.style.display = "flex";
-                                        }}
-                                    />
-                                    <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center hidden">
-                                        <Grid className="w-12 h-12 text-gray-400" />
+                    <>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                            {filteredImages.map((image, index) => (
+                                <div
+                                    key={image.id}
+                                    ref={index === filteredImages.length - 1 ? lastImageElementRef : null}
+                                    className="group cursor-pointer"
+                                >
+                                    <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-2">
+                                        <img
+                                            src={image.image_url}
+                                            alt={getImageCategory(image.image_type)}
+                                            className="w-full h-full object-cover"
+                                            loading="lazy"
+                                            onError={(e) => {
+                                                e.target.style.display = "none";
+                                                e.target.nextSibling.style.display = "flex";
+                                            }}
+                                        />
+                                        <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center hidden">
+                                            <Grid className="w-12 h-12 text-gray-400" />
+                                        </div>
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300"></div>
+                                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 bg-black/40">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleView(image);
+                                                }}
+                                                className="p-2.5 bg-white rounded-full hover:bg-gray-100 transition-all shadow-lg"
+                                                title="View in new tab"
+                                            >
+                                                <Eye size={16} className="text-gray-700" />
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDownload(image);
+                                                }}
+                                                className="p-2.5 bg-white rounded-full hover:bg-gray-100 transition-all shadow-lg"
+                                                title="Download"
+                                            >
+                                                <Download size={16} className="text-gray-700" />
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300"></div>
-                                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 bg-black/40">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleView(image);
-                                            }}
-                                            className="p-2.5 bg-white rounded-full hover:bg-gray-100 transition-all shadow-lg"
-                                            title="View in new tab"
-                                        >
-                                            <Eye size={16} className="text-gray-700" />
-                                        </button>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDownload(image);
-                                            }}
-                                            className="p-2.5 bg-white rounded-full hover:bg-gray-100 transition-all shadow-lg"
-                                            title="Download"
-                                        >
-                                            <Download size={16} className="text-gray-700" />
-                                        </button>
+                                    <div className="bg-white rounded-lg p-2">
+                                        <p className="text-sm font-medium text-gray-700 mb-1">
+                                            {getImageCategory(image.image_type)}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                            Generated {getDaysAgo(image.created_at)}
+                                        </p>
                                     </div>
                                 </div>
-                                <div className="bg-white rounded-lg p-2">
-                                    <p className="text-sm font-medium text-gray-700 mb-1">
-                                        {getImageCategory(image.image_type)}
-                                    </p>
-                                    <p className="text-xs text-gray-500">
-                                        Generated {getDaysAgo(image.created_at)}
-                                    </p>
-                                </div>
+                            ))}
+                        </div>
+                        {loadingMore && (
+                            <div className="flex justify-center items-center py-8">
+                                <Loader2 className="w-8 h-8 text-[#884cff] animate-spin" />
                             </div>
-                        ))}
-                    </div>
+                        )}
+                        {!hasMore && filteredImages.length > 0 && (
+                            <div className="text-center py-8 text-gray-500">
+                                <p>All {totalCount} images loaded</p>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

@@ -5,6 +5,8 @@ import { Users, Coins, FolderKanban, Image as ImageIcon, Loader2 } from "lucide-
 import {
     LineChart,
     Line,
+    AreaChart,
+    Area,
     BarChart,
     Bar,
     XAxis,
@@ -26,6 +28,15 @@ export default function Dashboard() {
     });
     const [organizationId, setOrganizationId] = useState(null);
     const [organizationName, setOrganizationName] = useState("");
+    
+    // Graph states
+    const [creditGraphTimeRange, setCreditGraphTimeRange] = useState("day");
+    const [creditGraphCustomRange, setCreditGraphCustomRange] = useState({ startDate: "", endDate: "" });
+    const [creditGraphData, setCreditGraphData] = useState([]);
+    
+    const [imageGraphTimeRange, setImageGraphTimeRange] = useState("day");
+    const [imageGraphCustomRange, setImageGraphCustomRange] = useState({ startDate: "", endDate: "" });
+    const [imageGraphData, setImageGraphData] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -51,6 +62,10 @@ export default function Dashboard() {
                     });
                     setOrganizationName(statsData.organization_name || "");
                 }
+                
+                // Fetch data for graphs
+                await fetchCreditGraphData(orgId);
+                await fetchImageGraphData(orgId);
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
             } finally {
@@ -60,6 +75,257 @@ export default function Dashboard() {
 
         fetchData();
     }, []);
+
+    useEffect(() => {
+        if (organizationId) {
+            fetchCreditGraphData(organizationId);
+        }
+    }, [creditGraphTimeRange, creditGraphCustomRange]);
+
+    useEffect(() => {
+        if (organizationId) {
+            fetchImageGraphData(organizationId);
+        }
+    }, [imageGraphTimeRange, imageGraphCustomRange]);
+
+    const fetchCreditGraphData = async (orgId) => {
+        try {
+            const params = {};
+            const now = new Date();
+            
+            if (creditGraphTimeRange === "custom" && creditGraphCustomRange.startDate && creditGraphCustomRange.endDate) {
+                params.start_date = creditGraphCustomRange.startDate;
+                params.end_date = creditGraphCustomRange.endDate;
+            } else if (creditGraphTimeRange === "day") {
+                const startDate = new Date(now);
+                startDate.setDate(startDate.getDate() - 7);
+                params.start_date = startDate.toISOString().split("T")[0];
+            } else if (creditGraphTimeRange === "week") {
+                const startDate = new Date(now);
+                startDate.setDate(startDate.getDate() - 28);
+                params.start_date = startDate.toISOString().split("T")[0];
+            } else if (creditGraphTimeRange === "month") {
+                const startDate = new Date(now);
+                startDate.setMonth(startDate.getMonth() - 6);
+                params.start_date = startDate.toISOString().split("T")[0];
+            }
+            
+            const usageData = await organizationAPI.getOrganizationCreditUsage(orgId, params);
+            if (usageData.usage_data) {
+                processCreditGraphData(usageData.usage_data);
+            }
+        } catch (error) {
+            console.error("Error fetching credit graph data:", error);
+        }
+    };
+
+    const fetchImageGraphData = async (orgId) => {
+        try {
+            const params = {
+                limit: 1000,
+                offset: 0,
+            };
+            
+            const data = await organizationAPI.getOrganizationImages(orgId, params);
+            if (data.images) {
+                processImageGraphData(data.images);
+            }
+        } catch (error) {
+            console.error("Error fetching image graph data:", error);
+        }
+    };
+
+    const processCreditGraphData = (usageData) => {
+        if (!usageData || usageData.length === 0) {
+            setCreditGraphData([]);
+            return;
+        }
+
+        const now = new Date();
+        let startDate;
+        let groupBy;
+
+        switch (creditGraphTimeRange) {
+            case "day":
+                startDate = new Date(now);
+                startDate.setDate(startDate.getDate() - 7);
+                groupBy = "day";
+                break;
+            case "week":
+                startDate = new Date(now);
+                startDate.setDate(startDate.getDate() - 28);
+                groupBy = "week";
+                break;
+            case "month":
+                startDate = new Date(now);
+                startDate.setMonth(startDate.getMonth() - 6);
+                groupBy = "month";
+                break;
+            case "custom":
+                if (creditGraphCustomRange.startDate && creditGraphCustomRange.endDate) {
+                    startDate = new Date(creditGraphCustomRange.startDate);
+                    const endDate = new Date(creditGraphCustomRange.endDate);
+                    const diffDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                    if (diffDays <= 30) {
+                        groupBy = "day";
+                    } else if (diffDays <= 90) {
+                        groupBy = "week";
+                    } else {
+                        groupBy = "month";
+                    }
+                } else {
+                    setCreditGraphData([]);
+                    return;
+                }
+                break;
+            default:
+                startDate = new Date(now);
+                startDate.setMonth(startDate.getMonth() - 6);
+                groupBy = "month";
+        }
+
+        const filteredData = usageData.filter((entry) => {
+            if (!entry.date) return false;
+            const entryDate = new Date(entry.date);
+            return entryDate >= startDate;
+        });
+
+        const grouped = {};
+        filteredData.forEach((entry) => {
+            const date = new Date(entry.date);
+            let key;
+
+            if (groupBy === "day") {
+                key = date.toISOString().split("T")[0];
+            } else if (groupBy === "week") {
+                const weekStart = new Date(date);
+                weekStart.setDate(date.getDate() - date.getDay());
+                key = weekStart.toISOString().split("T")[0];
+            } else {
+                key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+            }
+
+            if (!grouped[key]) {
+                grouped[key] = { date: key, credits: 0, debits: 0 };
+            }
+
+            if (entry.change_type === "credit") {
+                grouped[key].credits += entry.credits_changed;
+            } else {
+                grouped[key].debits += entry.credits_changed;
+            }
+        });
+
+        const graphDataArray = Object.values(grouped).sort((a, b) => a.date.localeCompare(b.date));
+        
+        graphDataArray.forEach((item) => {
+            if (groupBy === "day") {
+                // Format as YYYY-MM-DD for day view
+                item.date = item.date;
+            } else if (groupBy === "week") {
+                item.date = `Week of ${new Date(item.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+            } else {
+                const [year, month] = item.date.split("-");
+                item.date = new Date(year, parseInt(month) - 1).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+            }
+        });
+
+        setCreditGraphData(graphDataArray);
+    };
+
+    const processImageGraphData = (imagesData) => {
+        if (!imagesData || imagesData.length === 0) {
+            setImageGraphData([]);
+            return;
+        }
+
+        const now = new Date();
+        let startDate;
+        let groupBy;
+
+        switch (imageGraphTimeRange) {
+            case "day":
+                startDate = new Date(now);
+                startDate.setDate(startDate.getDate() - 7);
+                groupBy = "day";
+                break;
+            case "week":
+                startDate = new Date(now);
+                startDate.setDate(startDate.getDate() - 28);
+                groupBy = "week";
+                break;
+            case "month":
+                startDate = new Date(now);
+                startDate.setMonth(startDate.getMonth() - 6);
+                groupBy = "month";
+                break;
+            case "custom":
+                if (imageGraphCustomRange.startDate && imageGraphCustomRange.endDate) {
+                    startDate = new Date(imageGraphCustomRange.startDate);
+                    const endDate = new Date(imageGraphCustomRange.endDate);
+                    const diffDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                    if (diffDays <= 30) {
+                        groupBy = "day";
+                    } else if (diffDays <= 90) {
+                        groupBy = "week";
+                    } else {
+                        groupBy = "month";
+                    }
+                } else {
+                    setImageGraphData([]);
+                    return;
+                }
+                break;
+            default:
+                startDate = new Date(now);
+                startDate.setMonth(startDate.getMonth() - 6);
+                groupBy = "month";
+        }
+
+        const filteredData = imagesData.filter((img) => {
+            if (!img.created_at) return false;
+            const imgDate = new Date(img.created_at);
+            return imgDate >= startDate;
+        });
+
+        const grouped = {};
+        filteredData.forEach((img) => {
+            const date = new Date(img.created_at);
+            let key;
+
+            if (groupBy === "day") {
+                key = date.toISOString().split("T")[0];
+            } else if (groupBy === "week") {
+                const weekStart = new Date(date);
+                weekStart.setDate(date.getDate() - date.getDay());
+                key = weekStart.toISOString().split("T")[0];
+            } else {
+                key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+            }
+
+            if (!grouped[key]) {
+                grouped[key] = { date: key, count: 0 };
+            }
+
+            grouped[key].count += 1;
+        });
+
+        const graphDataArray = Object.values(grouped).sort((a, b) => a.date.localeCompare(b.date));
+        
+        graphDataArray.forEach((item) => {
+            if (groupBy === "day") {
+                // Format as YYYY-MM-DD for day view
+                item.date = item.date;
+            } else if (groupBy === "week") {
+                item.date = `Week of ${new Date(item.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+            } else {
+                const [year, month] = item.date.split("-");
+                item.date = new Date(year, parseInt(month) - 1).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+            }
+        });
+
+        setImageGraphData(graphDataArray);
+    };
 
     const StatCard = ({ icon: Icon, title, value, color }) => (
         <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
@@ -125,12 +391,260 @@ export default function Dashboard() {
                 />
             </div>
 
-            {/* Placeholder for charts - can be enhanced later */}
-            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Activity Overview</h2>
-                <p className="text-gray-600">
-                    Charts and detailed analytics will be available here soon.
-                </p>
+            {/* Graphs Side by Side */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                {/* Credit Consumption Graph */}
+                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="mb-6">
+                        <h2 className="text-xl font-bold text-gray-900 mb-1">Credit Consumption Analytics</h2>
+                        <p className="text-sm text-gray-500">Track credit usage trends over time</p>
+                    </div>
+                    <div className="flex items-center gap-2 mb-6">
+                        <button
+                            onClick={() => setCreditGraphTimeRange("custom")}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                creditGraphTimeRange === "custom"
+                                    ? "bg-blue-600 text-white shadow-md"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }`}
+                        >
+                            Custom Dates
+                        </button>
+                        <button
+                            onClick={() => setCreditGraphTimeRange("day")}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                creditGraphTimeRange === "day"
+                                    ? "bg-blue-600 text-white shadow-md"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }`}
+                        >
+                            Daily
+                        </button>
+                        <button
+                            onClick={() => setCreditGraphTimeRange("week")}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                creditGraphTimeRange === "week"
+                                    ? "bg-blue-600 text-white shadow-md"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }`}
+                        >
+                            Weekly
+                        </button>
+                        <button
+                            onClick={() => setCreditGraphTimeRange("month")}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                creditGraphTimeRange === "month"
+                                    ? "bg-blue-600 text-white shadow-md"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }`}
+                        >
+                            Monthly
+                        </button>
+                    </div>
+                    {creditGraphTimeRange === "custom" && (
+                        <div className="flex items-center gap-2 mb-6">
+                            <input
+                                type="date"
+                                value={creditGraphCustomRange.startDate}
+                                onChange={(e) =>
+                                    setCreditGraphCustomRange((prev) => ({ ...prev, startDate: e.target.value }))
+                                }
+                                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <span className="text-gray-500">to</span>
+                            <input
+                                type="date"
+                                value={creditGraphCustomRange.endDate}
+                                onChange={(e) =>
+                                    setCreditGraphCustomRange((prev) => ({ ...prev, endDate: e.target.value }))
+                                }
+                                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                    )}
+                    {creditGraphData.length > 0 ? (
+                        <ResponsiveContainer width="100%" height={300}>
+                            <AreaChart data={creditGraphData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="colorCredits" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                                    </linearGradient>
+                                    <linearGradient id="colorDebits" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
+                                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis 
+                                    dataKey="date" 
+                                    stroke="#888"
+                                    fontSize={12}
+                                    tickLine={false}
+                                />
+                                <YAxis 
+                                    stroke="#888"
+                                    fontSize={12}
+                                    tickLine={false}
+                                />
+                                <Tooltip 
+                                    contentStyle={{ 
+                                        backgroundColor: 'white', 
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '8px',
+                                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                    }}
+                                />
+                                <Legend 
+                                    wrapperStyle={{ paddingTop: '20px' }}
+                                    iconType="line"
+                                />
+                                <Area 
+                                    type="monotone" 
+                                    dataKey="credits" 
+                                    stroke="#10b981" 
+                                    fillOpacity={1} 
+                                    fill="url(#colorCredits)" 
+                                    strokeWidth={2.5}
+                                    name="Credits Added" 
+                                />
+                                <Area 
+                                    type="monotone" 
+                                    dataKey="debits" 
+                                    stroke="#ef4444" 
+                                    fillOpacity={1} 
+                                    fill="url(#colorDebits)" 
+                                    strokeWidth={2.5}
+                                    name="Credits Used" 
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="h-64 flex items-center justify-center text-gray-500">
+                            No data available for the selected time range
+                        </div>
+                    )}
+                </div>
+
+                {/* Images Generated Graph */}
+                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="mb-6">
+                        <h2 className="text-xl font-bold text-gray-900 mb-1">Image Generation Analytics</h2>
+                        <p className="text-sm text-gray-500">Track image generation trends over time</p>
+                    </div>
+                    <div className="flex items-center gap-2 mb-6">
+                        <button
+                            onClick={() => setImageGraphTimeRange("custom")}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                imageGraphTimeRange === "custom"
+                                    ? "bg-blue-600 text-white shadow-md"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }`}
+                        >
+                            Custom Dates
+                        </button>
+                        <button
+                            onClick={() => setImageGraphTimeRange("day")}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                imageGraphTimeRange === "day"
+                                    ? "bg-blue-600 text-white shadow-md"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }`}
+                        >
+                            Daily
+                        </button>
+                        <button
+                            onClick={() => setImageGraphTimeRange("week")}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                imageGraphTimeRange === "week"
+                                    ? "bg-blue-600 text-white shadow-md"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }`}
+                        >
+                            Weekly
+                        </button>
+                        <button
+                            onClick={() => setImageGraphTimeRange("month")}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                imageGraphTimeRange === "month"
+                                    ? "bg-blue-600 text-white shadow-md"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }`}
+                        >
+                            Monthly
+                        </button>
+                    </div>
+                    {imageGraphTimeRange === "custom" && (
+                        <div className="flex items-center gap-2 mb-6">
+                            <input
+                                type="date"
+                                value={imageGraphCustomRange.startDate}
+                                onChange={(e) =>
+                                    setImageGraphCustomRange((prev) => ({ ...prev, startDate: e.target.value }))
+                                }
+                                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <span className="text-gray-500">to</span>
+                            <input
+                                type="date"
+                                value={imageGraphCustomRange.endDate}
+                                onChange={(e) =>
+                                    setImageGraphCustomRange((prev) => ({ ...prev, endDate: e.target.value }))
+                                }
+                                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                    )}
+                    {imageGraphData.length > 0 ? (
+                        <ResponsiveContainer width="100%" height={300}>
+                            <AreaChart data={imageGraphData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="colorImages" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis 
+                                    dataKey="date" 
+                                    stroke="#888"
+                                    fontSize={12}
+                                    tickLine={false}
+                                />
+                                <YAxis 
+                                    stroke="#888"
+                                    fontSize={12}
+                                    tickLine={false}
+                                />
+                                <Tooltip 
+                                    contentStyle={{ 
+                                        backgroundColor: 'white', 
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '8px',
+                                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                    }}
+                                />
+                                <Legend 
+                                    wrapperStyle={{ paddingTop: '20px' }}
+                                    iconType="line"
+                                />
+                                <Area 
+                                    type="monotone" 
+                                    dataKey="count" 
+                                    stroke="#3b82f6" 
+                                    fillOpacity={1} 
+                                    fill="url(#colorImages)" 
+                                    strokeWidth={2.5}
+                                    name="Images Generated" 
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="h-64 flex items-center justify-center text-gray-500">
+                            No data available for the selected time range
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

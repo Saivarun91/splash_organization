@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Calendar, Search, Users, Loader2 } from "lucide-react";
+import { X, Calendar, Search, Users, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { organizationAPI } from "@/lib/api";
+
+const ITEMS_PER_PAGE = 10;
 
 export default function CreditsHistoryPage() {
     const [selectedUser, setSelectedUser] = useState(null);
@@ -12,6 +14,8 @@ export default function CreditsHistoryPage() {
     const [creditUsage, setCreditUsage] = useState(null);
     const [loading, setLoading] = useState(true);
     const [organizationId, setOrganizationId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [membersLoading, setMembersLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -24,11 +28,8 @@ export default function CreditsHistoryPage() {
 
                 setOrganizationId(orgId);
 
-                // Fetch members
-                const membersData = await organizationAPI.getOrganizationMembers(orgId);
-                if (membersData.members) {
-                    setMembers(membersData.members);
-                }
+                // Fetch members with pagination
+                await fetchMembers(orgId, 1);
 
                 // Fetch credit usage
                 const usageData = await organizationAPI.getOrganizationCreditUsage(orgId);
@@ -45,11 +46,35 @@ export default function CreditsHistoryPage() {
         fetchData();
     }, []);
 
+    const fetchMembers = async (orgId, page = 1) => {
+        setMembersLoading(true);
+        try {
+            const membersData = await organizationAPI.getOrganizationMembers(orgId);
+            if (membersData.members) {
+                setMembers(membersData.members);
+            }
+        } catch (error) {
+            console.error("Error fetching members:", error);
+        } finally {
+            setMembersLoading(false);
+        }
+    };
+
     const filteredMembers = members.filter(
         (user) =>
             (user.full_name && user.full_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
             user.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    // Pagination
+    const totalPages = Math.ceil(filteredMembers.length / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const paginatedMembers = filteredMembers.slice(startIndex, endIndex);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
 
     const getUserCreditLogs = (userEmail) => {
         if (!creditUsage || !creditUsage.usage_data) return [];
@@ -283,48 +308,83 @@ export default function CreditsHistoryPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredMembers.map((user) => (
-                                <tr
-                                    key={user.id}
-                                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
-                                    onClick={() => setSelectedUser(user)}
-                                >
-                                    <td className="py-4 px-6">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
-                                                {(user.full_name || user.email || "U").charAt(0).toUpperCase()}
-                                            </div>
-                                            <span className="font-medium text-gray-900">
-                                                {user.full_name || user.email}
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <span className="text-gray-700">{user.email}</span>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <span className="text-gray-700 capitalize">{user.organization_role || "member"}</span>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setSelectedUser(user);
-                                            }}
-                                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                                        >
-                                            View Credit Logs
-                                        </button>
+                            {membersLoading ? (
+                                <tr>
+                                    <td colSpan={4} className="py-8 text-center">
+                                        <Loader2 className="w-6 h-6 text-blue-600 animate-spin mx-auto" />
                                     </td>
                                 </tr>
-                            ))}
+                            ) : paginatedMembers.length > 0 ? (
+                                paginatedMembers.map((user) => (
+                                    <tr
+                                        key={user.id}
+                                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                                        onClick={() => setSelectedUser(user)}
+                                    >
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
+                                                    {(user.full_name || user.email || "U").charAt(0).toUpperCase()}
+                                                </div>
+                                                <span className="font-medium text-gray-900">
+                                                    {user.full_name || user.email}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <span className="text-gray-700">{user.email}</span>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <span className="text-gray-700 capitalize">{user.organization_role || "member"}</span>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedUser(user);
+                                                }}
+                                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                                            >
+                                                View Credit Logs
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={4} className="text-center py-12">
+                                        <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                                        <p className="text-gray-600">No users found</p>
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
-                {filteredMembers.length === 0 && (
-                    <div className="text-center py-12">
-                        <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-600">No users found</p>
+                {filteredMembers.length > ITEMS_PER_PAGE && (
+                    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
+                        <div className="text-sm text-gray-600">
+                            Showing {startIndex + 1} to {Math.min(endIndex, filteredMembers.length)} of {filteredMembers.length} users
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                                disabled={currentPage === 1}
+                                className="p-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                            </button>
+                            <span className="text-sm text-gray-700">
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <button
+                                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                                disabled={currentPage === totalPages}
+                                className="p-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>

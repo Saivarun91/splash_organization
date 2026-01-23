@@ -81,6 +81,11 @@ export const organizationAPI = {
     apiRequest(`/api/organizations/${organizationId}/members/`),
   getOrganizationStats: (organizationId) =>
     apiRequest(`/api/organizations/${organizationId}/stats/`),
+  addUser: (organizationId, email, role) =>
+    apiRequest(`/api/organizations/${organizationId}/add-user/`, {
+      method: "POST",
+      body: JSON.stringify({ email, role }),
+    }),
 };
 
 /**

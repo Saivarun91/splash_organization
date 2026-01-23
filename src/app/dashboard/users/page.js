@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Users, Search, FolderKanban, Image as ImageIcon, User, Shield, Crown, Loader2 } from "lucide-react";
+import { Users, Search, FolderKanban, Image as ImageIcon, User, Shield, Crown, Loader2, UserPlus, X, Mail } from "lucide-react";
 import { organizationAPI } from "@/lib/api";
 
 const getRoleIcon = (role) => {
@@ -54,6 +54,12 @@ export default function UsersPage() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [organizationId, setOrganizationId] = useState(null);
+    const [showAddUserModal, setShowAddUserModal] = useState(false);
+    const [newUserEmail, setNewUserEmail] = useState("");
+    const [newUserRole, setNewUserRole] = useState("member");
+    const [addingUser, setAddingUser] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -98,6 +104,52 @@ export default function UsersPage() {
 
     const handleUserClick = (userId) => {
         router.push(`/dashboard/users/${userId}`);
+    };
+
+    const handleAddUser = async (e) => {
+        e.preventDefault();
+        setError("");
+        setSuccess("");
+
+        if (!newUserEmail.trim()) {
+            setError("Email is required");
+            return;
+        }
+
+        if (!organizationId) {
+            setError("Organization ID not found");
+            return;
+        }
+
+        setAddingUser(true);
+
+        try {
+            const response = await organizationAPI.addUser(organizationId, newUserEmail.trim(), newUserRole);
+            
+            if (response.success) {
+                setSuccess(response.user_created 
+                    ? `User created successfully! An email with temporary password has been sent to ${newUserEmail}.`
+                    : `User added to organization successfully!`);
+                
+                // Reset form
+                setNewUserEmail("");
+                setNewUserRole("member");
+                setShowAddUserModal(false);
+                
+                // Refresh users list
+                const data = await organizationAPI.getOrganizationMembers(organizationId);
+                if (data.members) {
+                    setUsers(data.members);
+                }
+                
+                // Clear success message after 5 seconds
+                setTimeout(() => setSuccess(""), 5000);
+            }
+        } catch (err) {
+            setError(err.message || "Failed to add user. Please try again.");
+        } finally {
+            setAddingUser(false);
+        }
     };
 
     const UserCard = ({ user }) => (
@@ -160,10 +212,115 @@ export default function UsersPage() {
 
     return (
         <div className="p-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Users</h1>
-                <p className="text-gray-600">Manage organization users and their roles</p>
+            <div className="mb-8 flex justify-between items-center">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Users</h1>
+                    <p className="text-gray-600">Manage organization users and their roles</p>
+                </div>
+                <button
+                    onClick={() => setShowAddUserModal(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                    <UserPlus className="w-5 h-5" />
+                    Add User
+                </button>
             </div>
+
+            {/* Success/Error Messages */}
+            {success && (
+                <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800">{success}</p>
+                </div>
+            )}
+            {error && (
+                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-800">{error}</p>
+                </div>
+            )}
+
+            {/* Add User Modal */}
+            {showAddUserModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-2xl font-bold text-gray-900">Add User to Organization</h2>
+                            <button
+                                onClick={() => {
+                                    setShowAddUserModal(false);
+                                    setNewUserEmail("");
+                                    setNewUserRole("member");
+                                    setError("");
+                                }}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleAddUser} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Email <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                    <input
+                                        type="email"
+                                        value={newUserEmail}
+                                        onChange={(e) => setNewUserEmail(e.target.value)}
+                                        placeholder="user@example.com"
+                                        required
+                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Role <span className="text-red-500">*</span>
+                                </label>
+                                <select
+                                    value={newUserRole}
+                                    onChange={(e) => setNewUserRole(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                    <option value="member">Member</option>
+                                    <option value="chief_editor">Chief Editor</option>
+                                    <option value="creative_head">Creative Head</option>
+                                </select>
+                            </div>
+
+                            {error && (
+                                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                                    <p className="text-sm text-red-600">{error}</p>
+                                </div>
+                            )}
+
+                            <div className="flex gap-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowAddUserModal(false);
+                                        setNewUserEmail("");
+                                        setNewUserRole("member");
+                                        setError("");
+                                    }}
+                                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={addingUser}
+                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {addingUser ? "Adding..." : "Add User"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             {/* Search and Filters */}
             <div className="mb-6 space-y-4">
