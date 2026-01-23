@@ -84,13 +84,29 @@ export const organizationAPI = {
 };
 
 /**
+ * Plans API functions
+ */
+export const plansAPI = {
+  getAll: (activeOnly = true) => {
+    const params = activeOnly ? '?active_only=true' : '';
+    return apiRequest(`/api/plans/${params}`);
+  },
+  getById: (planId) => apiRequest(`/api/plans/${planId}/`),
+};
+
+/**
  * Payment API functions
  */
 export const paymentAPI = {
-  createRazorpayOrder: (organizationId, amount, credits) =>
+  createRazorpayOrder: (organizationId, amount, credits, planId = null) =>
     apiRequest("/api/payments/razorpay/create-order/", {
       method: "POST",
-      body: JSON.stringify({ organization_id: organizationId, amount, credits }),
+      body: JSON.stringify({ 
+        organization_id: organizationId, 
+        amount, 
+        credits,
+        plan_id: planId 
+      }),
     }),
   verifyPayment: (orderId, paymentId, signature) =>
     apiRequest("/api/payments/razorpay/verify/", {

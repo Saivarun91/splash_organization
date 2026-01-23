@@ -2,19 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { CreditCard, Check, X, Calendar, DollarSign, Loader2, AlertCircle } from "lucide-react";
-import { paymentAPI, organizationAPI } from "@/lib/api";
-
-const CREDIT_PACKAGES = [
-    { id: 1, name: "Starter", credits: 1000, price: 99, popular: false },
-    { id: 2, name: "Professional", credits: 5000, price: 449, popular: true },
-    { id: 3, name: "Enterprise", credits: 15000, price: 1299, popular: false },
-];
+import { paymentAPI, plansAPI, organizationAPI } from "@/lib/api";
 
 export default function PaymentsPage() {
     const [activeTab, setActiveTab] = useState("plans");
     const [loading, setLoading] = useState(false);
+    const [plans, setPlans] = useState([]);
+    const [plansLoading, setPlansLoading] = useState(true);
     const [paymentHistory, setPaymentHistory] = useState([]);
     const [organizationId, setOrganizationId] = useState(null);
+    const [currentPlan, setCurrentPlan] = useState(null);
     const [razorpayLoaded, setRazorpayLoaded] = useState(false);
     const [processingPayment, setProcessingPayment] = useState(false);
 
@@ -23,7 +20,11 @@ export default function PaymentsPage() {
         if (orgId) {
             setOrganizationId(orgId);
             fetchPaymentHistory(orgId);
+            fetchOrganizationPlan(orgId);
         }
+
+        // Fetch plans from API
+        fetchPlans();
 
         // Load Razorpay script
         const script = document.createElement("script");
@@ -32,9 +33,49 @@ export default function PaymentsPage() {
         document.body.appendChild(script);
 
         return () => {
-            document.body.removeChild(script);
+            const scriptElement = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+            if (scriptElement) {
+                document.body.removeChild(scriptElement);
+            }
         };
     }, []);
+
+    const fetchPlans = async () => {
+        setPlansLoading(true);
+        try {
+            const response = await plansAPI.getAll(true); // Fetch only active plans
+            if (response.success && response.plans) {
+                setPlans(response.plans);
+            } else if (response.plans) {
+                // Handle case where response might not have success field
+                setPlans(Array.isArray(response.plans) ? response.plans : []);
+            }
+        } catch (error) {
+            console.error("Error fetching plans:", error);
+            setPlans([]);
+        } finally {
+            setPlansLoading(false);
+        }
+    };
+
+    const fetchOrganizationPlan = async (orgId) => {
+        try {
+            const orgData = await organizationAPI.getOrganization(orgId);
+            if (orgData && orgData.plan) {
+                const planId = typeof orgData.plan === 'object' ? orgData.plan.id : orgData.plan;
+                if (planId) {
+                    const planResponse = await plansAPI.getById(planId);
+                    if (planResponse.success && planResponse.plan) {
+                        setCurrentPlan(planResponse.plan);
+                    } else if (planResponse.plan) {
+                        setCurrentPlan(planResponse.plan);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching organization plan:", error);
+        }
+    };
 
     const fetchPaymentHistory = async (orgId) => {
         try {
@@ -47,7 +88,7 @@ export default function PaymentsPage() {
         }
     };
 
-    const handlePurchaseCredits = async (packageItem) => {
+    const handlePurchasePlan = async (plan) => {
         if (!organizationId || !razorpayLoaded) {
             alert("Please wait for payment gateway to load");
             return;
@@ -55,11 +96,12 @@ export default function PaymentsPage() {
 
         setProcessingPayment(true);
         try {
-            // Create Razorpay order
+            // Create Razorpay order with plan information
             const orderData = await paymentAPI.createRazorpayOrder(
                 organizationId,
-                packageItem.price,
-                packageItem.credits
+                plan.price,
+                plan.credits_per_month || 0,
+                plan.id
             );
 
             if (!orderData.success) {
@@ -71,7 +113,7 @@ export default function PaymentsPage() {
                 amount: orderData.amount * 100, // Convert to paise
                 currency: "INR",
                 name: "Splash AI Studio",
-                description: `Purchase ${packageItem.credits} credits`,
+                description: `Subscribe to ${plan.name} plan`,
                 order_id: orderData.order_id,
                 handler: async function (response) {
                     try {
@@ -83,11 +125,17 @@ export default function PaymentsPage() {
                         );
 
                         if (verifyData.success) {
-                            alert(`Payment successful! ${packageItem.credits} credits added to your account.`);
-                            // Refresh payment history
+                            const creditsAdded = plan.credits_per_month || 0;
+                            alert(`Payment successful! ${plan.name} plan activated. ${creditsAdded} credits added to your account.`);
+                            // Refresh payment history and organization data
                             fetchPaymentHistory(organizationId);
-                            // Refresh organization data
-                            window.location.reload();
+                            fetchOrganizationPlan(organizationId);
+                            // Refresh plans to show updated status
+                            fetchPlans();
+                            // Reload page to show updated plan
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
                         } else {
                             alert("Payment verification failed: " + (verifyData.error || "Unknown error"));
                         }
@@ -169,6 +217,9 @@ export default function PaymentsPage() {
                                             <tr className="border-b border-gray-200">
                                                 <th className="text-left py-3 px-4 font-semibold text-gray-900">Date</th>
                                                 <th className="text-left py-3 px-4 font-semibold text-gray-900">
+                                                    Plan/Type
+                                                </th>
+                                                <th className="text-left py-3 px-4 font-semibold text-gray-900">
                                                     Credits
                                                 </th>
                                                 <th className="text-left py-3 px-4 font-semibold text-gray-900">
@@ -197,8 +248,13 @@ export default function PaymentsPage() {
                                                         </div>
                                                     </td>
                                                     <td className="py-4 px-4">
+                                                        <span className="text-gray-900 font-medium">
+                                                            {payment.plan_name || 'Credit Purchase'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-4 px-4">
                                                         <span className="text-gray-900 font-semibold">
-                                                            {payment.credits}
+                                                            {payment.credits?.toLocaleString() || 0}
                                                         </span>
                                                     </td>
                                                     <td className="py-4 px-4">
@@ -242,74 +298,148 @@ export default function PaymentsPage() {
                         </div>
                     ) : (
                         <div>
-                            <h2 className="text-xl font-semibold text-gray-900 mb-6">Purchase Credits</h2>
+                            <h2 className="text-xl font-semibold text-gray-900 mb-6">Plans & Subscriptions</h2>
+                            
+                            {currentPlan && (
+                                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm text-blue-700 font-medium">Current Plan</p>
+                                            <p className="text-lg font-bold text-blue-900">{currentPlan.name}</p>
+                                            <p className="text-sm text-blue-600">
+                                                {currentPlan.credits_per_month?.toLocaleString() || 0} credits/month • 
+                                                {(currentPlan.currency === 'INR' ? '₹' : '$')}{currentPlan.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/{currentPlan.billing_cycle === 'yearly' ? 'year' : 'month'}
+                                            </p>
+                                        </div>  
+                                        <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-medium">
+                                            Active
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+
                             {!razorpayLoaded && (
                                 <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
                                     <AlertCircle className="w-5 h-5 text-yellow-600" />
                                     <p className="text-yellow-700 text-sm">Loading payment gateway...</p>
                                 </div>
                             )}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                {CREDIT_PACKAGES.map((plan) => (
-                                    <div
-                                        key={plan.id}
-                                        className={`border rounded-lg p-6 relative ${
-                                            plan.popular
-                                                ? "border-blue-500 shadow-lg scale-105"
-                                                : "border-gray-200 hover:shadow-md"
-                                        }`}
-                                    >
-                                        {plan.popular && (
-                                            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                                                <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
-                                                    Most Popular
-                                                </span>
+
+                            {plansLoading ? (
+                                <div className="flex items-center justify-center py-12">
+                                    <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                                    <span className="ml-3 text-gray-600">Loading plans...</span>
+                                </div>
+                            ) : plans.length === 0 ? (
+                                <div className="text-center py-12">
+                                    <CreditCard className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                                    <p className="text-gray-600">No plans available at the moment</p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    {plans.map((plan) => {
+                                        const isCurrentPlan = currentPlan && currentPlan.id === plan.id;
+                                        const originalPrice = plan.original_price || plan.price;
+                                        const hasDiscount = originalPrice > plan.price;
+                                        
+                                        return (
+                                            <div
+                                                key={plan.id}
+                                                className={`border rounded-lg p-6 relative ${
+                                                    plan.is_popular
+                                                        ? "border-blue-500 shadow-lg scale-105"
+                                                        : isCurrentPlan
+                                                        ? "border-green-500 shadow-md"
+                                                        : "border-gray-200 hover:shadow-md"
+                                                }`}
+                                            >
+                                                {plan.is_popular && (
+                                                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                                        <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                                                            Most Popular
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                {isCurrentPlan && (
+                                                    <div className="absolute top-4 right-4">
+                                                        <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                                                            Current
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                <div className="text-center mb-6">
+                                                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                                                    <div className="flex items-baseline justify-center gap-2">
+                                                        {hasDiscount && (
+                                                            <span className="text-lg text-gray-500 line-through">
+                                                                {(plan.currency === 'INR' ? '₹' : '$')}{originalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                            </span>
+                                                        )}
+                                                        <span className="text-4xl font-bold text-gray-900">
+                                                            {(plan.currency === 'INR' ? '₹' : '$')}{plan.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                        </span>
+                                                        <span className="text-gray-600">
+                                                            /{plan.billing_cycle === 'yearly' ? 'year' : 'month'}
+                                                        </span>
+                                                    </div>
+                                                    {plan.description && (
+                                                        <p className="text-gray-600 mt-2 text-sm">{plan.description}</p>
+                                                    )}
+                                                    <p className="text-gray-700 mt-2 font-semibold">
+                                                        {plan.credits_per_month?.toLocaleString() || 0} Credits/month
+                                                    </p>
+                                                </div>
+                                                {plan.features && plan.features.length > 0 && (
+                                                    <ul className="space-y-3 mb-6">
+                                                        {plan.features.map((feature, index) => (
+                                                            <li key={index} className="flex items-start gap-2">
+                                                                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                                                                <span className="text-gray-700">{feature}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                )}
+                                                {/* <div className="space-y-2 mb-6">
+                                                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                        <Check className="w-4 h-4 text-green-500" />
+                                                        <span>Up to {plan.max_projects || 'Unlimited'} projects</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                        <Check className="w-4 h-4 text-green-500" />
+                                                        <span>AI features {plan.ai_features_enabled ? 'enabled' : 'disabled'}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                        <Check className="w-4 h-4 text-green-500" />
+                                                        <span>Secure payment via Razorpay</span>
+                                                    </div>
+                                                </div> */}
+                                                <button
+                                                    onClick={() => handlePurchasePlan(plan)}
+                                                    disabled={processingPayment || !razorpayLoaded || isCurrentPlan}
+                                                    className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
+                                                        isCurrentPlan
+                                                            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                                                            : plan.is_popular
+                                                            ? "bg-blue-600 text-white hover:bg-blue-700"
+                                                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                                                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                                >
+                                                    {processingPayment ? (
+                                                        <>
+                                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                                            Processing...
+                                                        </>
+                                                    ) : isCurrentPlan ? (
+                                                        "Current Plan"
+                                                    ) : (
+                                                        `Subscribe to ${plan.name}`
+                                                    )}
+                                                </button>
                                             </div>
-                                        )}
-                                        <div className="text-center mb-6">
-                                            <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                                            <div className="flex items-baseline justify-center gap-1">
-                                                <span className="text-4xl font-bold text-gray-900">₹{plan.price}</span>
-                                            </div>
-                                            <p className="text-gray-600 mt-2">{plan.credits.toLocaleString()} Credits</p>
-                                        </div>
-                                        <ul className="space-y-3 mb-6">
-                                            <li className="flex items-start gap-2">
-                                                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                                                <span className="text-gray-700">
-                                                    {plan.credits.toLocaleString()} Credits
-                                                </span>
-                                            </li>
-                                            <li className="flex items-start gap-2">
-                                                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                                                <span className="text-gray-700">Instant credit addition</span>
-                                            </li>
-                                            <li className="flex items-start gap-2">
-                                                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                                                <span className="text-gray-700">Secure payment via Razorpay</span>
-                                            </li>
-                                        </ul>
-                                        <button
-                                            onClick={() => handlePurchaseCredits(plan)}
-                                            disabled={processingPayment || !razorpayLoaded}
-                                            className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
-                                                plan.popular
-                                                    ? "bg-blue-600 text-white hover:bg-blue-700"
-                                                    : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                                            } disabled:opacity-50 disabled:cursor-not-allowed`}
-                                        >
-                                            {processingPayment ? (
-                                                <>
-                                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                                    Processing...
-                                                </>
-                                            ) : (
-                                                "Purchase Credits"
-                                            )}
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
