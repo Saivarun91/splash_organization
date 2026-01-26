@@ -121,3 +121,26 @@ export const paymentAPI = {
   getPaymentHistory: (organizationId) =>
     apiRequest(`/api/payments/history/?organization_id=${organizationId}`),
 };
+
+/**
+ * Invoice API functions
+ */
+export const invoiceAPI = {
+  getInvoice: (transactionId) =>
+    apiRequest(`/api/invoices/${transactionId}/`),
+  getConfig: () =>
+    apiRequest(`/api/invoices/config/`),
+  downloadInvoice: (transactionId) => {
+    const url = `${API_BASE_URL}/api/invoices/${transactionId}/download/`;
+    const token = typeof window !== "undefined" ? localStorage.getItem("org_auth_token") : null;
+    
+    return fetch(url, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    }).then((response) => {
+      if (!response.ok) throw new Error("Failed to download invoice");
+      return response.blob();
+    });
+  },
+};

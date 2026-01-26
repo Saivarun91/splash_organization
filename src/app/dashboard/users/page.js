@@ -155,16 +155,16 @@ export default function UsersPage() {
     const UserCard = ({ user }) => (
         <div
             onClick={() => handleUserClick(user.id)}
-            className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all cursor-pointer"
+            className="bg-card text-card-foreground border border-border rounded-xl p-6 hover:shadow-md transition-all cursor-pointer"
         >
             <div className="flex flex-col items-center text-center">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-2xl mb-4">
                     {(user.full_name || user.email || "U").charAt(0).toUpperCase()}
                 </div>
-                <h3 className="font-semibold text-gray-900 text-lg mb-1">
+                <h3 className="font-semibold text-foreground text-lg mb-1">
                     {user.full_name || user.email || "Unknown User"}
                 </h3>
-                <p className="text-sm text-gray-600 mb-3">{user.email}</p>
+                <p className="text-sm text-muted-foreground mb-3">{user.email}</p>
                 <div className="flex items-center gap-2 mb-4">
                     <span
                         className={`px-3 py-1 rounded text-sm font-medium border flex items-center gap-1 ${getRoleColor(
@@ -175,22 +175,22 @@ export default function UsersPage() {
                         {getRoleDisplayName(user.organization_role)}
                     </span>
                 </div>
-                <div className="w-full grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                <div className="w-full grid grid-cols-2 gap-4 pt-4 border-t border-border">
                     <div className="text-center">
                         <div className="flex items-center justify-center gap-2 mb-1">
-                            <FolderKanban className="w-4 h-4 text-gray-600" />
-                            <span className="text-sm text-gray-600">Projects</span>
+                            <FolderKanban className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm text-muted-foreground">Projects</span>
                         </div>
-                        <div className="text-xl font-bold text-gray-900">
+                        <div className="text-xl font-bold text-foreground">
                             {user.projects_count || 0}
                         </div>
                     </div>
                     <div className="text-center">
                         <div className="flex items-center justify-center gap-2 mb-1">
-                            <ImageIcon className="w-4 h-4 text-gray-600" />
-                            <span className="text-sm text-gray-600">Images</span>
+                            <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm text-muted-foreground">Images</span>
                         </div>
-                        <div className="text-xl font-bold text-gray-900">
+                        <div className="text-xl font-bold text-foreground">
                             {user.images_generated || 0}
                         </div>
                     </div>
@@ -203,23 +203,23 @@ export default function UsersPage() {
         return (
             <div className="p-8 flex items-center justify-center min-h-screen">
                 <div className="text-center">
-                    <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-                    <p className="text-gray-600">Loading users...</p>
+                    <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+                    <p className="text-muted-foreground">Loading users...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="p-8">
+        <div className="space-y-6 animate-fadeIn">
             <div className="mb-8 flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Users</h1>
-                    <p className="text-gray-600">Manage organization users and their roles</p>
+                    <h1 className="text-3xl font-bold text-foreground mb-2">Users</h1>
+                    <p className="text-muted-foreground">Manage organization users and their roles</p>
                 </div>
                 <button
                     onClick={() => setShowAddUserModal(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
                 >
                     <UserPlus className="w-5 h-5" />
                     Add User
@@ -241,9 +241,9 @@ export default function UsersPage() {
             {/* Add User Modal */}
             {showAddUserModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                    <div className="bg-card text-card-foreground rounded-xl shadow-sm p-6 w-full max-w-md border border-border">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl font-bold text-gray-900">Add User to Organization</h2>
+                            <h2 className="text-2xl font-bold text-foreground">Add User to Organization</h2>
                             <button
                                 onClick={() => {
                                     setShowAddUserModal(false);
@@ -251,7 +251,7 @@ export default function UsersPage() {
                                     setNewUserRole("member");
                                     setError("");
                                 }}
-                                className="text-gray-400 hover:text-gray-600"
+                                className="text-muted-foreground hover:text-foreground"
                             >
                                 <X className="w-6 h-6" />
                             </button>
@@ -259,30 +259,30 @@ export default function UsersPage() {
 
                         <form onSubmit={handleAddUser} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-foreground mb-2">
                                     Email <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                                     <input
                                         type="email"
                                         value={newUserEmail}
                                         onChange={(e) => setNewUserEmail(e.target.value)}
                                         placeholder="user@example.com"
                                         required
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full pl-10 pr-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-foreground mb-2">
                                     Role <span className="text-red-500">*</span>
                                 </label>
                                 <select
                                     value={newUserRole}
                                     onChange={(e) => setNewUserRole(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                                 >
                                     <option value="member">Member</option>
                                     <option value="chief_editor">Chief Editor</option>

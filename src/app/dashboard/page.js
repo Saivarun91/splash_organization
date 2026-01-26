@@ -328,15 +328,15 @@ export default function Dashboard() {
     };
 
     const StatCard = ({ icon: Icon, title, value, color }) => (
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        <div className="bg-card text-card-foreground rounded-xl shadow-sm p-6 border border-border hover:shadow-md transition-all duration-300">
             <div className="flex items-center justify-between">
                 <div>
-                    <p className="text-gray-600 text-sm font-medium mb-1">{title}</p>
-                    <p className="text-3xl font-bold text-gray-900">
+                    <p className="text-muted-foreground text-sm font-medium mb-1">{title}</p>
+                    <p className="text-3xl font-bold text-foreground">
                         {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : value.toLocaleString()}
                     </p>
                 </div>
-                <div className={`p-3 rounded-lg ${color}`}>
+                <div className={`p-3 rounded-xl ${color}`}>
                     <Icon className="w-6 h-6 text-white" />
                 </div>
             </div>
@@ -345,20 +345,20 @@ export default function Dashboard() {
 
     if (loading) {
         return (
-            <div className="p-8 flex items-center justify-center min-h-screen">
+            <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
-                    <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-                    <p className="text-gray-600">Loading dashboard...</p>
+                    <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+                    <p className="text-muted-foreground">Loading dashboard...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="p-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-                <p className="text-gray-600">
+        <div className="space-y-6 animate-fadeIn">
+            <div className="mb-6">
+                <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
+                <p className="text-muted-foreground">
                     Welcome to {organizationName || "your organization"} dashboard
                 </p>
             </div>
@@ -394,18 +394,18 @@ export default function Dashboard() {
             {/* Graphs Side by Side */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 {/* Credit Consumption Graph */}
-                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                <div className="bg-card text-card-foreground rounded-xl shadow-sm p-6 border border-border">
                     <div className="mb-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-1">Credit Consumption Analytics</h2>
-                        <p className="text-sm text-gray-500">Track credit usage trends over time</p>
+                        <h2 className="text-xl font-bold text-foreground mb-1">Credit Consumption Analytics</h2>
+                        <p className="text-sm text-muted-foreground">Track credit usage trends over time</p>
                     </div>
                     <div className="flex items-center gap-2 mb-6">
                         <button
                             onClick={() => setCreditGraphTimeRange("custom")}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                                 creditGraphTimeRange === "custom"
-                                    ? "bg-blue-600 text-white shadow-md"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    ? "bg-primary text-primary-foreground shadow-md"
+                                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
                             Custom Dates
@@ -414,8 +414,8 @@ export default function Dashboard() {
                             onClick={() => setCreditGraphTimeRange("day")}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                                 creditGraphTimeRange === "day"
-                                    ? "bg-blue-600 text-white shadow-md"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    ? "bg-primary text-primary-foreground shadow-md"
+                                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
                             Daily
@@ -424,8 +424,8 @@ export default function Dashboard() {
                             onClick={() => setCreditGraphTimeRange("week")}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                                 creditGraphTimeRange === "week"
-                                    ? "bg-blue-600 text-white shadow-md"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    ? "bg-primary text-primary-foreground shadow-md"
+                                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
                             Weekly
@@ -434,8 +434,8 @@ export default function Dashboard() {
                             onClick={() => setCreditGraphTimeRange("month")}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                                 creditGraphTimeRange === "month"
-                                    ? "bg-blue-600 text-white shadow-md"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    ? "bg-primary text-primary-foreground shadow-md"
+                                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
                             Monthly
@@ -449,7 +449,7 @@ export default function Dashboard() {
                                 onChange={(e) =>
                                     setCreditGraphCustomRange((prev) => ({ ...prev, startDate: e.target.value }))
                                 }
-                                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="px-3 py-2 border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                             />
                             <span className="text-gray-500">to</span>
                             <input
@@ -458,7 +458,7 @@ export default function Dashboard() {
                                 onChange={(e) =>
                                     setCreditGraphCustomRange((prev) => ({ ...prev, endDate: e.target.value }))
                                 }
-                                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="px-3 py-2 border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                             />
                         </div>
                     )}
@@ -520,25 +520,25 @@ export default function Dashboard() {
                             </AreaChart>
                         </ResponsiveContainer>
                     ) : (
-                        <div className="h-64 flex items-center justify-center text-gray-500">
+                        <div className="h-64 flex items-center justify-center text-muted-foreground">
                             No data available for the selected time range
                         </div>
                     )}
                 </div>
 
                 {/* Images Generated Graph */}
-                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                <div className="bg-card text-card-foreground rounded-xl shadow-sm p-6 border border-border">
                     <div className="mb-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-1">Image Generation Analytics</h2>
-                        <p className="text-sm text-gray-500">Track image generation trends over time</p>
+                        <h2 className="text-xl font-bold text-foreground mb-1">Image Generation Analytics</h2>
+                        <p className="text-sm text-muted-foreground">Track image generation trends over time</p>
                     </div>
                     <div className="flex items-center gap-2 mb-6">
                         <button
                             onClick={() => setImageGraphTimeRange("custom")}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                                 imageGraphTimeRange === "custom"
-                                    ? "bg-blue-600 text-white shadow-md"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    ? "bg-primary text-primary-foreground shadow-md"
+                                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
                             Custom Dates
@@ -547,8 +547,8 @@ export default function Dashboard() {
                             onClick={() => setImageGraphTimeRange("day")}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                                 imageGraphTimeRange === "day"
-                                    ? "bg-blue-600 text-white shadow-md"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    ? "bg-primary text-primary-foreground shadow-md"
+                                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
                             Daily
@@ -557,8 +557,8 @@ export default function Dashboard() {
                             onClick={() => setImageGraphTimeRange("week")}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                                 imageGraphTimeRange === "week"
-                                    ? "bg-blue-600 text-white shadow-md"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    ? "bg-primary text-primary-foreground shadow-md"
+                                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
                             Weekly
@@ -567,8 +567,8 @@ export default function Dashboard() {
                             onClick={() => setImageGraphTimeRange("month")}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                                 imageGraphTimeRange === "month"
-                                    ? "bg-blue-600 text-white shadow-md"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    ? "bg-primary text-primary-foreground shadow-md"
+                                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
                             Monthly
@@ -582,7 +582,7 @@ export default function Dashboard() {
                                 onChange={(e) =>
                                     setImageGraphCustomRange((prev) => ({ ...prev, startDate: e.target.value }))
                                 }
-                                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="px-3 py-2 border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                             />
                             <span className="text-gray-500">to</span>
                             <input
@@ -591,7 +591,7 @@ export default function Dashboard() {
                                 onChange={(e) =>
                                     setImageGraphCustomRange((prev) => ({ ...prev, endDate: e.target.value }))
                                 }
-                                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="px-3 py-2 border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                             />
                         </div>
                     )}
@@ -640,7 +640,7 @@ export default function Dashboard() {
                             </AreaChart>
                         </ResponsiveContainer>
                     ) : (
-                        <div className="h-64 flex items-center justify-center text-gray-500">
+                        <div className="h-64 flex items-center justify-center text-muted-foreground">
                             No data available for the selected time range
                         </div>
                     )}

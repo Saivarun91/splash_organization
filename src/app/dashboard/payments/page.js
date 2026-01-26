@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CreditCard, Check, X, Calendar, DollarSign, Loader2, AlertCircle } from "lucide-react";
+import { CreditCard, Check, X, Calendar, DollarSign, Loader2, AlertCircle, Eye } from "lucide-react";
 import { paymentAPI, plansAPI, organizationAPI } from "@/lib/api";
+import { InvoiceView } from "@/components/InvoiceView";
+import { Button } from "@/components/ui/button";
 
 export default function PaymentsPage() {
     const [activeTab, setActiveTab] = useState("plans");
@@ -14,6 +16,7 @@ export default function PaymentsPage() {
     const [currentPlan, setCurrentPlan] = useState(null);
     const [razorpayLoaded, setRazorpayLoaded] = useState(false);
     const [processingPayment, setProcessingPayment] = useState(false);
+    const [selectedInvoice, setSelectedInvoice] = useState(null);
 
     useEffect(() => {
         const orgId = localStorage.getItem("org_organization_id");
@@ -171,20 +174,20 @@ export default function PaymentsPage() {
     };
 
     return (
-        <div className="p-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Payments and Subscriptions</h1>
-                <p className="text-gray-600">Manage your payments and purchase credits</p>
+        <div className="space-y-6 animate-fadeIn">
+            <div className="mb-6">
+                <h1 className="text-3xl font-bold text-foreground mb-2">Payments and Subscriptions</h1>
+                <p className="text-muted-foreground">Manage your payments and purchase credits</p>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md border border-gray-200 mb-6">
-                <div className="flex border-b border-gray-200">
+            <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border mb-6">
+                <div className="flex border-b border-border">
                     <button
                         onClick={() => setActiveTab("plans")}
                         className={`px-6 py-4 font-medium transition-colors ${
                             activeTab === "plans"
-                                ? "text-blue-600 border-b-2 border-blue-600"
-                                : "text-gray-600 hover:text-gray-900"
+                                ? "text-primary border-b-2 border-primary"
+                                : "text-muted-foreground hover:text-foreground"
                         }`}
                     >
                         Purchase Credits
@@ -193,8 +196,8 @@ export default function PaymentsPage() {
                         onClick={() => setActiveTab("history")}
                         className={`px-6 py-4 font-medium transition-colors ${
                             activeTab === "history"
-                                ? "text-blue-600 border-b-2 border-blue-600"
-                                : "text-gray-600 hover:text-gray-900"
+                                ? "text-primary border-b-2 border-primary"
+                                : "text-muted-foreground hover:text-foreground"
                         }`}
                     >
                         Payment History
@@ -204,30 +207,33 @@ export default function PaymentsPage() {
                 <div className="p-6">
                     {activeTab === "history" ? (
                         <div>
-                            <h2 className="text-xl font-semibold text-gray-900 mb-6">Payment History</h2>
+                            <h2 className="text-xl font-semibold text-foreground mb-6">Payment History</h2>
                             {paymentHistory.length === 0 ? (
                                 <div className="text-center py-12">
-                                    <CreditCard className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-600">No payment history found</p>
+                                    <CreditCard className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                                    <p className="text-muted-foreground">No payment history found</p>
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
                                     <table className="w-full">
                                         <thead>
-                                            <tr className="border-b border-gray-200">
-                                                <th className="text-left py-3 px-4 font-semibold text-gray-900">Date</th>
-                                                <th className="text-left py-3 px-4 font-semibold text-gray-900">
+                                            <tr className="border-b border-border">
+                                                <th className="text-left py-3 px-4 font-semibold text-foreground">Date</th>
+                                                <th className="text-left py-3 px-4 font-semibold text-foreground">
                                                     Plan/Type
                                                 </th>
-                                                <th className="text-left py-3 px-4 font-semibold text-gray-900">
+                                                <th className="text-left py-3 px-4 font-semibold text-foreground">
                                                     Credits
                                                 </th>
-                                                <th className="text-left py-3 px-4 font-semibold text-gray-900">
+                                                <th className="text-left py-3 px-4 font-semibold text-foreground">
                                                     Amount
                                                 </th>
-                                                <th className="text-left py-3 px-4 font-semibold text-gray-900">Status</th>
-                                                <th className="text-left py-3 px-4 font-semibold text-gray-900">
+                                                <th className="text-left py-3 px-4 font-semibold text-foreground">Status</th>
+                                                <th className="text-left py-3 px-4 font-semibold text-foreground">
                                                     Transaction ID
+                                                </th>
+                                                <th className="text-left py-3 px-4 font-semibold text-foreground">
+                                                    Actions
                                                 </th>
                                             </tr>
                                         </thead>
@@ -235,12 +241,12 @@ export default function PaymentsPage() {
                                             {paymentHistory.map((payment) => (
                                                 <tr
                                                     key={payment.id}
-                                                    className="border-b border-gray-100 hover:bg-gray-50"
+                                                    className="border-b border-border hover:bg-accent/50"
                                                 >
                                                     <td className="py-4 px-4">
                                                         <div className="flex items-center gap-2">
-                                                            <Calendar className="w-4 h-4 text-gray-400" />
-                                                            <span className="text-gray-900">
+                                                            <Calendar className="w-4 h-4 text-muted-foreground" />
+                                                            <span className="text-foreground">
                                                                 {payment.created_at
                                                                     ? new Date(payment.created_at).toLocaleDateString()
                                                                     : "N/A"}
@@ -248,19 +254,19 @@ export default function PaymentsPage() {
                                                         </div>
                                                     </td>
                                                     <td className="py-4 px-4">
-                                                        <span className="text-gray-900 font-medium">
+                                                        <span className="text-foreground font-medium">
                                                             {payment.plan_name || 'Credit Purchase'}
                                                         </span>
                                                     </td>
                                                     <td className="py-4 px-4">
-                                                        <span className="text-gray-900 font-semibold">
+                                                        <span className="text-foreground font-semibold">
                                                             {payment.credits?.toLocaleString() || 0}
                                                         </span>
                                                     </td>
                                                     <td className="py-4 px-4">
                                                         <div className="flex items-center gap-2">
-                                                            <DollarSign className="w-4 h-4 text-gray-400" />
-                                                            <span className="text-gray-900 font-semibold">
+                                                            <DollarSign className="w-4 h-4 text-muted-foreground" />
+                                                            <span className="text-foreground font-semibold">
                                                                 ₹{payment.amount}
                                                             </span>
                                                         </div>
@@ -285,9 +291,23 @@ export default function PaymentsPage() {
                                                         </span>
                                                     </td>
                                                     <td className="py-4 px-4">
-                                                        <span className="text-gray-600 font-mono text-sm">
+                                                        <span className="text-muted-foreground font-mono text-sm">
                                                             {payment.razorpay_order_id || "N/A"}
                                                         </span>
+                                                    </td>
+                                                    <td className="py-4 px-4">
+                                                        <Button
+                                                            onClick={() => setSelectedInvoice({
+                                                                transactionId: payment.razorpay_order_id || payment.id,
+                                                                paymentData: payment
+                                                            })}
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="flex items-center gap-2"
+                                                        >
+                                                            <Eye className="w-4 h-4" />
+                                                            View Invoice
+                                                        </Button>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -444,6 +464,15 @@ export default function PaymentsPage() {
                     )}
                 </div>
             </div>
+            
+            {/* Invoice View Modal */}
+            {selectedInvoice && (
+                <InvoiceView
+                    transactionId={selectedInvoice.transactionId}
+                    paymentData={selectedInvoice.paymentData}
+                    onClose={() => setSelectedInvoice(null)}
+                />
+            )}
         </div>
     );
 }
