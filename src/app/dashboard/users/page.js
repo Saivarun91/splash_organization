@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Users, Search, FolderKanban, Image as ImageIcon, User, Shield, Crown, Loader2, UserPlus, X, Mail } from "lucide-react";
+import { Users, Search, FolderKanban, Image as ImageIcon, User, Shield, Crown, Loader2, UserPlus, X, Mail, Trash2 } from "lucide-react";
 import { organizationAPI } from "@/lib/api";
 
 const getRoleIcon = (role) => {
@@ -60,6 +60,7 @@ export default function UsersPage() {
     const [addingUser, setAddingUser] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [deletingUserId, setDeletingUserId] = useState(null);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -106,6 +107,39 @@ export default function UsersPage() {
         router.push(`/dashboard/users/${userId}`);
     };
 
+    const handleDeleteUser = async (userId, userEmail, e) => {
+        e.stopPropagation(); // Prevent triggering the card click
+        
+        if (!window.confirm(`Are you sure you want to remove ${userEmail} from this organization?`)) {
+            return;
+        }
+
+        setDeletingUserId(userId);
+        setError("");
+        setSuccess("");
+
+        try {
+            const response = await organizationAPI.removeUser(organizationId, userId);
+            
+            if (response.success) {
+                setSuccess(`User ${userEmail} removed successfully!`);
+                
+                // Refresh users list
+                const data = await organizationAPI.getOrganizationMembers(organizationId);
+                if (data.members) {
+                    setUsers(data.members);
+                }
+                
+                // Clear success message after 5 seconds
+                setTimeout(() => setSuccess(""), 5000);
+            }
+        } catch (err) {
+            setError(err.message || "Failed to remove user. Please try again.");
+        } finally {
+            setDeletingUserId(null);
+        }
+    };
+
     const handleAddUser = async (e) => {
         e.preventDefault();
         setError("");
@@ -146,58 +180,85 @@ export default function UsersPage() {
                 setTimeout(() => setSuccess(""), 5000);
             }
         } catch (err) {
-            setError(err.message || "Failed to add user. Please try again.");
+            // The error message from apiRequest already contains the error from the backend
+            // Check if it mentions existing organization
+            let errorMessage = err.message || "Failed to add user. Please try again.";
+            
+            // The backend returns error in format: "This email is already in {org_name}"
+            // or in the error field of the JSON response
+            setError(errorMessage);
         } finally {
             setAddingUser(false);
         }
     };
 
-    const UserCard = ({ user }) => (
-        <div
-            onClick={() => handleUserClick(user.id)}
-            className="bg-card text-card-foreground border border-border rounded-xl p-6 hover:shadow-md transition-all cursor-pointer"
-        >
-            <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-2xl mb-4">
-                    {(user.full_name || user.email || "U").charAt(0).toUpperCase()}
-                </div>
-                <h3 className="font-semibold text-foreground text-lg mb-1">
-                    {user.full_name || user.email || "Unknown User"}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-3">{user.email}</p>
-                <div className="flex items-center gap-2 mb-4">
-                    <span
-                        className={`px-3 py-1 rounded text-sm font-medium border flex items-center gap-1 ${getRoleColor(
-                            user.organization_role
-                        )}`}
+    const UserCard = ({ user }) => {
+        const isOwner = user.organization_role === "owner";
+        const isDeleting = deletingUserId === user.id;
+        
+        return (
+            <div
+                onClick={() => handleUserClick(user.id)}
+                className="bg-card text-card-foreground border border-border rounded-xl p-6 hover:shadow-md transition-all cursor-pointer relative"
+            >
+                {/* Delete button - only show if not owner */}
+                {!isOwner && (
+                    <button
+                        onClick={(e) => handleDeleteUser(user.id, user.email, e)}
+                        disabled={isDeleting}
+                        className="absolute top-4 right-4 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Remove user from organization"
                     >
-                        {getRoleIcon(user.organization_role)}
-                        {getRoleDisplayName(user.organization_role)}
-                    </span>
-                </div>
-                <div className="w-full grid grid-cols-2 gap-4 pt-4 border-t border-border">
-                    <div className="text-center">
-                        <div className="flex items-center justify-center gap-2 mb-1">
-                            <FolderKanban className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-sm text-muted-foreground">Projects</span>
-                        </div>
-                        <div className="text-xl font-bold text-foreground">
-                            {user.projects_count || 0}
-                        </div>
+                        {isDeleting ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <Trash2 className="w-4 h-4" />
+                        )}
+                    </button>
+                )}
+                
+                <div className="flex flex-col items-center text-center">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-2xl mb-4">
+                        {(user.full_name || user.email || "U").charAt(0).toUpperCase()}
                     </div>
-                    <div className="text-center">
-                        <div className="flex items-center justify-center gap-2 mb-1">
-                            <ImageIcon className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-sm text-muted-foreground">Images</span>
+                    <h3 className="font-semibold text-foreground text-lg mb-1">
+                        {user.full_name || user.email || "Unknown User"}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-3">{user.email}</p>
+                    <div className="flex items-center gap-2 mb-4">
+                        <span
+                            className={`px-3 py-1 rounded text-sm font-medium border flex items-center gap-1 ${getRoleColor(
+                                user.organization_role
+                            )}`}
+                        >
+                            {getRoleIcon(user.organization_role)}
+                            {getRoleDisplayName(user.organization_role)}
+                        </span>
+                    </div>
+                    <div className="w-full grid grid-cols-2 gap-4 pt-4 border-t border-border">
+                        <div className="text-center">
+                            <div className="flex items-center justify-center gap-2 mb-1">
+                                <FolderKanban className="w-4 h-4 text-muted-foreground" />
+                                <span className="text-sm text-muted-foreground">Projects</span>
+                            </div>
+                            <div className="text-xl font-bold text-foreground">
+                                {user.projects_count || 0}
+                            </div>
                         </div>
-                        <div className="text-xl font-bold text-foreground">
-                            {user.images_generated || 0}
+                        <div className="text-center">
+                            <div className="flex items-center justify-center gap-2 mb-1">
+                                <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                                <span className="text-sm text-muted-foreground">Images</span>
+                            </div>
+                            <div className="text-xl font-bold text-foreground">
+                                {user.images_generated || 0}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     if (loading) {
         return (

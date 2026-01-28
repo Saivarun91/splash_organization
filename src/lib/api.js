@@ -86,6 +86,10 @@ export const organizationAPI = {
       method: "POST",
       body: JSON.stringify({ email, role }),
     }),
+  removeUser: (organizationId, userId) =>
+    apiRequest(`/api/organizations/${organizationId}/users/${userId}/remove/`, {
+      method: "DELETE",
+    }),
 };
 
 /**

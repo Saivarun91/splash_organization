@@ -17,6 +17,7 @@ export default function PaymentsPage() {
     const [razorpayLoaded, setRazorpayLoaded] = useState(false);
     const [processingPayment, setProcessingPayment] = useState(false);
     const [selectedInvoice, setSelectedInvoice] = useState(null);
+    const [selectedCredits, setSelectedCredits] = useState({}); // Track selected credits for each Pro plan
 
     useEffect(() => {
         const orgId = localStorage.getItem("org_organization_id");
