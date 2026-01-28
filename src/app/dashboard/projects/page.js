@@ -4,22 +4,23 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FolderKanban, Search, Clock, Users, Eye, Loader2 } from "lucide-react";
 import { organizationAPI } from "@/lib/api";
+import { useLanguage } from "@/context/LanguageContext";
 
-const getTimeAgo = (dateString) => {
-    if (!dateString) return "Unknown";
+const getTimeAgo = (dateString, t) => {
+    if (!dateString) return t("orgPortal.unknown");
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
     const diffInDays = Math.floor(diffInHours / 24);
 
     if (diffInHours < 1) {
-        return "Just now";
+        return t("orgPortal.justNow");
     } else if (diffInHours < 24) {
-        return `${diffInHours} ${diffInHours === 1 ? "hour" : "hours"} ago`;
+        return `${diffInHours} ${diffInHours === 1 ? t("orgPortal.hour") : t("orgPortal.hours")} ${t("orgPortal.ago")}`;
     } else if (diffInDays === 1) {
-        return "1 day ago";
+        return `1 ${t("orgPortal.day")} ${t("orgPortal.ago")}`;
     } else {
-        return `${diffInDays} days ago`;
+        return `${diffInDays} ${t("orgPortal.days")} ${t("orgPortal.ago")}`;
     }
 };
 
@@ -37,22 +38,23 @@ const getStatusBadge = (status) => {
     }
 };
 
-const getStatusText = (status) => {
+const getStatusText = (status, t) => {
     switch (status?.toLowerCase()) {
         case "active":
         case "progress":
-            return "In Progress";
+            return t("orgPortal.inProgress");
         case "completed":
-            return "Completed";
+            return t("orgPortal.completed");
         case "draft":
-            return "Draft";
+            return t("orgPortal.draft");
         default:
-            return status || "Unknown";
+            return status || t("orgPortal.unknown");
     }
 };
 
 export default function ProjectsPage() {
     const router = useRouter();
+    const { t } = useLanguage();
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [projects, setProjects] = useState([]);
@@ -104,7 +106,7 @@ export default function ProjectsPage() {
             <div className="p-8 flex items-center justify-center min-h-screen">
                 <div className="text-center">
                     <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-                    <p className="text-gray-600">Loading projects...</p>
+                    <p className="text-gray-600">{t("orgPortal.loadingProjects")}</p>
                 </div>
             </div>
         );
@@ -113,8 +115,8 @@ export default function ProjectsPage() {
     return (
         <div className="p-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Projects</h1>
-                <p className="text-gray-600">Manage and monitor all organization projects</p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("orgPortal.projects")}</h1>
+                <p className="text-gray-600">{t("orgPortal.manageAndMonitorProjects")}</p>
             </div>
 
             {/* Search and Filters */}
@@ -123,7 +125,7 @@ export default function ProjectsPage() {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
                         type="text"
-                        placeholder="Search projects..."
+                        placeholder={t("orgPortal.searchProjects")}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -132,7 +134,7 @@ export default function ProjectsPage() {
 
                 {/* Status Filters */}
                 <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-medium text-gray-700">Filter by Status:</span>
+                    <span className="text-sm font-medium text-gray-700">{t("orgPortal.filterByStatus")}</span>
                     {["all", "progress", "completed"].map((status) => (
                         <button
                             key={status}
@@ -144,10 +146,10 @@ export default function ProjectsPage() {
                             }`}
                         >
                             {status === "all"
-                                ? "All"
+                                ? t("orgPortal.all")
                                 : status === "progress"
-                                ? "In Progress"
-                                : "Completed"}
+                                ? t("orgPortal.inProgress")
+                                : t("orgPortal.completed")}
                         </button>
                     ))}
                 </div>
@@ -177,7 +179,7 @@ export default function ProjectsPage() {
                                             project.status
                                         )}`}
                                     >
-                                        {getStatusText(project.status)}
+                                        {getStatusText(project.status, t)}
                                     </span>
                                 </div>
 
@@ -195,7 +197,7 @@ export default function ProjectsPage() {
                                 <div className="grid grid-cols-2 gap-4 mb-5 pb-5 border-b border-gray-100">
                                     <div>
                                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                                            Images
+                                            {t("orgPortal.images")}
                                         </p>
                                         <p className="text-lg font-bold text-gray-900">
                                             {imageCount.toLocaleString()}
@@ -203,10 +205,10 @@ export default function ProjectsPage() {
                                     </div>
                                     <div>
                                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                                            Updated
+                                            {t("orgPortal.updated")}
                                         </p>
                                         <p className="text-sm font-semibold text-gray-700">
-                                            {getTimeAgo(updatedAt)}
+                                            {getTimeAgo(updatedAt, t)}
                                         </p>
                                     </div>
                                 </div>
@@ -236,12 +238,12 @@ export default function ProjectsPage() {
                                                 )}
                                             </>
                                         ) : (
-                                            <span className="text-xs text-gray-500">No collaborators</span>
+                                            <span className="text-xs text-gray-500">{t("orgPortal.noCollaborators")}</span>
                                         )}
                                     </div>
                                     <span className="text-sm font-semibold text-blue-600 group-hover:text-blue-700 transition-colors flex items-center gap-1.5">
                                         <Eye size={16} />
-                                        View Details
+                                        {t("orgPortal.viewDetails")}
                                     </span>
                                 </div>
                             </div>
@@ -251,11 +253,11 @@ export default function ProjectsPage() {
             ) : (
                 <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
                     <FolderKanban className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 text-lg font-medium">No projects found</p>
+                    <p className="text-gray-600 text-lg font-medium">{t("orgPortal.noProjectsFound")}</p>
                     <p className="text-gray-500 text-sm mt-2">
                         {searchQuery || statusFilter !== "all"
-                            ? "Try adjusting your search or filters"
-                            : "This organization has no projects yet."}
+                            ? t("orgPortal.tryAdjustingSearchOrFilters")
+                            : t("orgPortal.noProjectsYet")}
                     </p>
                 </div>
             )}

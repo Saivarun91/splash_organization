@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import { CreditCard, Check, X, Calendar, DollarSign, Loader2, AlertCircle } from "lucide-react";
 import { paymentAPI, plansAPI, organizationAPI } from "@/lib/api";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function PaymentsPage() {
+    const { t } = useLanguage();
     const [activeTab, setActiveTab] = useState("plans");
     const [loading, setLoading] = useState(false);
     const [plans, setPlans] = useState([]);
@@ -90,7 +92,7 @@ export default function PaymentsPage() {
 
     const handlePurchasePlan = async (plan) => {
         if (!organizationId || !razorpayLoaded) {
-            alert("Please wait for payment gateway to load");
+            alert(t("orgPortal.pleaseWaitPaymentGateway"));
             return;
         }
 
@@ -126,7 +128,7 @@ export default function PaymentsPage() {
 
                         if (verifyData.success) {
                             const creditsAdded = plan.credits_per_month || 0;
-                            alert(`Payment successful! ${plan.name} plan activated. ${creditsAdded} credits added to your account.`);
+                            alert(`${t("orgPortal.paymentSuccess")} ${plan.name} ${t("orgPortal.planActivated")}. ${creditsAdded} ${t("orgPortal.creditsAddedToAccount")}.`);
                             // Refresh payment history and organization data
                             fetchPaymentHistory(organizationId);
                             fetchOrganizationPlan(organizationId);
@@ -137,11 +139,11 @@ export default function PaymentsPage() {
                                 window.location.reload();
                             }, 1000);
                         } else {
-                            alert("Payment verification failed: " + (verifyData.error || "Unknown error"));
+                            alert(t("orgPortal.paymentVerificationFailed") + ": " + (verifyData.error || t("orgPortal.unknownError")));
                         }
                     } catch (error) {
                         console.error("Payment verification error:", error);
-                        alert("Payment verification failed. Please contact support.");
+                        alert(t("orgPortal.paymentVerificationFailedContactSupport"));
                     } finally {
                         setProcessingPayment(false);
                     }
@@ -165,7 +167,7 @@ export default function PaymentsPage() {
             razorpay.open();
         } catch (error) {
             console.error("Payment error:", error);
-            alert("Failed to initiate payment: " + (error.message || "Unknown error"));
+            alert(t("orgPortal.failedToInitiatePayment") + ": " + (error.message || t("orgPortal.unknownError")));
             setProcessingPayment(false);
         }
     };
@@ -173,8 +175,8 @@ export default function PaymentsPage() {
     return (
         <div className="p-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Payments and Subscriptions</h1>
-                <p className="text-gray-600">Manage your payments and purchase credits</p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("orgPortal.paymentsAndSubscriptions")}</h1>
+                <p className="text-gray-600">{t("orgPortal.managePaymentsAndPurchaseCredits")}</p>
             </div>
 
             <div className="bg-white rounded-lg shadow-md border border-gray-200 mb-6">
@@ -187,7 +189,7 @@ export default function PaymentsPage() {
                                 : "text-gray-600 hover:text-gray-900"
                         }`}
                     >
-                        Purchase Credits
+                        {t("orgPortal.purchaseCredits")}
                     </button>
                     <button
                         onClick={() => setActiveTab("history")}
@@ -197,37 +199,37 @@ export default function PaymentsPage() {
                                 : "text-gray-600 hover:text-gray-900"
                         }`}
                     >
-                        Payment History
+                        {t("orgPortal.paymentHistory")}
                     </button>
                 </div>
 
                 <div className="p-6">
                     {activeTab === "history" ? (
                         <div>
-                            <h2 className="text-xl font-semibold text-gray-900 mb-6">Payment History</h2>
+                            <h2 className="text-xl font-semibold text-gray-900 mb-6">{t("orgPortal.paymentHistory")}</h2>
                             {paymentHistory.length === 0 ? (
                                 <div className="text-center py-12">
                                     <CreditCard className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-600">No payment history found</p>
+                                    <p className="text-gray-600">{t("orgPortal.noPaymentHistoryFound")}</p>
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
                                     <table className="w-full">
                                         <thead>
                                             <tr className="border-b border-gray-200">
-                                                <th className="text-left py-3 px-4 font-semibold text-gray-900">Date</th>
+                                                <th className="text-left py-3 px-4 font-semibold text-gray-900">{t("orgPortal.date")}</th>
                                                 <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                                                    Plan/Type
+                                                    {t("orgPortal.planType")}
                                                 </th>
                                                 <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                                                    Credits
+                                                    {t("orgPortal.credits")}
                                                 </th>
                                                 <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                                                    Amount
+                                                    {t("orgPortal.amount")}
                                                 </th>
-                                                <th className="text-left py-3 px-4 font-semibold text-gray-900">Status</th>
+                                                <th className="text-left py-3 px-4 font-semibold text-gray-900">{t("orgPortal.status")}</th>
                                                 <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                                                    Transaction ID
+                                                    {t("orgPortal.transactionId")}
                                                 </th>
                                             </tr>
                                         </thead>
@@ -249,7 +251,7 @@ export default function PaymentsPage() {
                                                     </td>
                                                     <td className="py-4 px-4">
                                                         <span className="text-gray-900 font-medium">
-                                                            {payment.plan_name || 'Credit Purchase'}
+                                                            {payment.plan_name || t("orgPortal.creditPurchase")}
                                                         </span>
                                                     </td>
                                                     <td className="py-4 px-4">
@@ -298,21 +300,21 @@ export default function PaymentsPage() {
                         </div>
                     ) : (
                         <div>
-                            <h2 className="text-xl font-semibold text-gray-900 mb-6">Plans & Subscriptions</h2>
+                            <h2 className="text-xl font-semibold text-gray-900 mb-6">{t("orgPortal.plansAndSubscriptions")}</h2>
                             
                             {currentPlan && (
                                 <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="text-sm text-blue-700 font-medium">Current Plan</p>
+                                            <p className="text-sm text-blue-700 font-medium">{t("orgPortal.currentPlan")}</p>
                                             <p className="text-lg font-bold text-blue-900">{currentPlan.name}</p>
                                             <p className="text-sm text-blue-600">
-                                                {currentPlan.credits_per_month?.toLocaleString() || 0} credits/month • 
-                                                {(currentPlan.currency === 'INR' ? '₹' : '$')}{currentPlan.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/{currentPlan.billing_cycle === 'yearly' ? 'year' : 'month'}
+                                                {currentPlan.credits_per_month?.toLocaleString() || 0} {t("orgPortal.creditsPerMonth")} • 
+                                                {(currentPlan.currency === 'INR' ? '₹' : '$')}{currentPlan.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/{currentPlan.billing_cycle === 'yearly' ? t("orgPortal.year") : t("orgPortal.month")}
                                             </p>
                                         </div>  
                                         <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-medium">
-                                            Active
+                                            {t("orgPortal.active")}
                                         </span>
                                     </div>
                                 </div>
@@ -321,19 +323,19 @@ export default function PaymentsPage() {
                             {!razorpayLoaded && (
                                 <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
                                     <AlertCircle className="w-5 h-5 text-yellow-600" />
-                                    <p className="text-yellow-700 text-sm">Loading payment gateway...</p>
+                                    <p className="text-yellow-700 text-sm">{t("orgPortal.loadingPaymentGateway")}</p>
                                 </div>
                             )}
 
                             {plansLoading ? (
                                 <div className="flex items-center justify-center py-12">
                                     <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-                                    <span className="ml-3 text-gray-600">Loading plans...</span>
+                                    <span className="ml-3 text-gray-600">{t("orgPortal.loadingPlans")}</span>
                                 </div>
                             ) : plans.length === 0 ? (
                                 <div className="text-center py-12">
                                     <CreditCard className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-600">No plans available at the moment</p>
+                                    <p className="text-gray-600">{t("orgPortal.noPlansAvailable")}</p>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -356,14 +358,14 @@ export default function PaymentsPage() {
                                                 {plan.is_popular && (
                                                     <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                                                         <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
-                                                            Most Popular
+                                                            {t("orgPortal.mostPopular")}
                                                         </span>
                                                     </div>
                                                 )}
                                                 {isCurrentPlan && (
                                                     <div className="absolute top-4 right-4">
                                                         <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                                                            Current
+                                                            {t("orgPortal.current")}
                                                         </span>
                                                     </div>
                                                 )}
@@ -386,7 +388,7 @@ export default function PaymentsPage() {
                                                         <p className="text-gray-600 mt-2 text-sm">{plan.description}</p>
                                                     )}
                                                     <p className="text-gray-700 mt-2 font-semibold">
-                                                        {plan.credits_per_month?.toLocaleString() || 0} Credits/month
+                                                        {plan.credits_per_month?.toLocaleString() || 0} {t("orgPortal.creditsPerMonth")}
                                                     </p>
                                                 </div>
                                                 {plan.features && plan.features.length > 0 && (
@@ -427,12 +429,12 @@ export default function PaymentsPage() {
                                                     {processingPayment ? (
                                                         <>
                                                             <Loader2 className="w-5 h-5 animate-spin" />
-                                                            Processing...
+                                                            {t("orgPortal.processing")}
                                                         </>
                                                     ) : isCurrentPlan ? (
-                                                        "Current Plan"
+                                                        t("orgPortal.currentPlan")
                                                     ) : (
-                                                        `Subscribe to ${plan.name}`
+                                                        `${t("orgPortal.subscribeTo")} ${plan.name}`
                                                     )}
                                                 </button>
                                             </div>

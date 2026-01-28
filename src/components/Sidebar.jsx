@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { useLanguage } from "@/context/LanguageContext";
+import { switchToFrontendPortal } from "@/lib/portalSwitch";
 import {
     LayoutDashboard,
     Users,
@@ -18,57 +20,60 @@ import {
     ChevronRight,
     Menu,
     X,
+    User,
+    LogOut,
 } from "lucide-react";
 
 export function Sidebar({ collapsed, setCollapsed, hovered, setHovered }) {
+    const { t } = useLanguage();
     const [expandedItems, setExpandedItems] = useState([]);
     const pathname = usePathname();
     const router = useRouter();
 
     const navItems = [
         {
-            label: "Dashboard",
+            label: t("dashboard.dashboard"),
             icon: LayoutDashboard,
             path: "/dashboard",
         },
         {
-            label: "Users",
+            label: t("dashboard.users"),
             icon: Users,
             path: "/dashboard/users",
         },
         {
-            label: "Projects",
+            label: t("dashboard.projects"),
             icon: FolderKanban,
             path: "/dashboard/projects",
         },
         {
-            label: "Billings and Plans",
+            label: t("dashboard.billingsAndPlans"),
             icon: CreditCard,
             path: "/dashboard/payments",
         },
         {
-            label: "Credits Usage History",
+            label: t("dashboard.creditsUsageHistory"),
             icon: History,
             path: "/dashboard/credits-history",
         },
         {
-            label: "Gallery",
+            label: t("dashboard.gallery"),
             icon: Image,
             path: "/dashboard/gallery",
         },
         {
-            label: "Settings",
+            label: t("dashboard.settings"),
             icon: Settings,
             path: "/dashboard/settings",
         },
         {
-            label: "Help and Learning",
+            label: t("dashboard.helpAndLearning"),
             icon: HelpCircle,
             path: "/dashboard/help",
             children: [
-                { label: "Feedback", icon: MessageSquare, path: "/dashboard/help/feedback" },
-                { label: "Tutorials", icon: BookOpen, path: "/dashboard/help/tutorials" },
-                { label: "Help Center", icon: FileQuestion, path: "/dashboard/help/help-center" },
+                { label: t("dashboard.feedback"), icon: MessageSquare, path: "/dashboard/help/feedback" },
+                { label: t("dashboard.tutorials"), icon: BookOpen, path: "/dashboard/help/tutorials" },
+                { label: t("dashboard.helpCenter"), icon: FileQuestion, path: "/dashboard/help/help-center" },
             ],
         },
     ];
@@ -193,11 +198,27 @@ export function Sidebar({ collapsed, setCollapsed, hovered, setHovered }) {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+            <nav className="flex-1 overflow-y-auto p-4 space-y-2 pb-24">
                 {navItems.map((item) => (
                     <NavItem key={item.path} item={item} />
                 ))}
             </nav>
+
+            {/* Footer - Switch User */}
+            <div className="absolute bottom-0 left-0 w-full border-t border-gray-800 bg-gray-900/80 backdrop-blur-md">
+                <div className="flex flex-col gap-2 py-3 px-4">
+                    {/* Switch User Button */}
+                    <button
+                        onClick={switchToFrontendPortal}
+                        className={`flex items-center ${isExpanded ? "gap-3 w-full text-left" : "justify-center"} 
+                            text-gray-300 hover:text-white px-3 py-2 rounded-md hover:bg-white/10 transition`}
+                        title={t("dashboard.switchToUserPortal")}
+                    >
+                        <User className="w-5 h-5" />
+                        {isExpanded && <span>{t("dashboard.switchToUserPortal")}</span>}
+                    </button>
+                </div>
+            </div>
         </aside>
     );
 }

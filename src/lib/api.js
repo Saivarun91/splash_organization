@@ -62,6 +62,11 @@ export const authAPI = {
       body: JSON.stringify({ email, password }),
     }),
   getProfile: () => apiRequest("/api/profile/"),
+  updateUserProfile: (data) =>
+    apiRequest("/api/profile/update/", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
 };
 
 /**

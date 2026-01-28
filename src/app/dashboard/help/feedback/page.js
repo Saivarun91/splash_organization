@@ -20,7 +20,7 @@ export default function FeedbackPage() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        alert("Thank you for your feedback! We'll review it shortly.");
+        alert(t("orgPortal.thankYouFeedback"));
     };
 
     return (
@@ -28,9 +28,9 @@ export default function FeedbackPage() {
             {/* Header */}
             <div className="text-center">
                 <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                    Feedback & Feature Requests
+                    {t("orgPortal.feedbackFeatureRequests")}
                 </h1>
-                <p className="text-gray-500">Help us improve Splash AI Studio with your suggestions</p>
+                <p className="text-gray-500">{t("orgPortal.helpImprove")}</p>
             </div>
 
             {/* Feedback Type Cards */}
@@ -38,22 +38,22 @@ export default function FeedbackPage() {
                 {[
                     {
                         icon: Lightbulb,
-                        title: "Feature Requests",
-                        description: "Suggest new features",
+                        title: t("orgPortal.featureRequests"),
+                        description: t("orgPortal.suggestNewFeatures"),
                         color: "from-teal-500 to-teal-400",
                         value: "feature-requests",
                     },
                     {
                         icon: Bug,
-                        title: "Bug Reports",
-                        description: "Report issues",
+                        title: t("orgPortal.bugReports"),
+                        description: t("orgPortal.reportIssues"),
                         color: "from-red-500 to-red-400",
                         value: "bug-reports",
                     },
                     {
                         icon: Sparkles,
-                        title: "General Feedback",
-                        description: "Share your thoughts",
+                        title: t("orgPortal.generalFeedback"),
+                        description: t("orgPortal.shareThoughts"),
                         color: "from-pink-500 to-rose-400",
                         value: "general-feedback",
                     },
@@ -84,24 +84,24 @@ export default function FeedbackPage() {
             {/* Feedback Form */}
             <div className="bg-white rounded-xl shadow-lg border border-gray-200">
                 <div className="p-6 border-b">
-                    <h2 className="text-xl font-semibold">Submit Your Feedback</h2>
+                    <h2 className="text-xl font-semibold">{t("orgPortal.submitFeedback")}</h2>
                     <p className="text-sm text-gray-500 mt-1">
-                        We read every submission and use your feedback to improve.
+                        {t("orgPortal.weReadEverySubmission")}
                     </p>
                 </div>
                 <div className="p-6">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Feedback Type */}
                         <div className="space-y-2">
-                            <Label htmlFor="type">Feedback Type</Label>
+                            <Label htmlFor="type">{t("orgPortal.feedbackType")}</Label>
                             <Select value={feedbackType} onValueChange={setFeedbackType}>
                                 <SelectTrigger id="type" className="border-gray-300">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="feature-requests">Feature Request</SelectItem>
-                                    <SelectItem value="bug-reports">Bug Report</SelectItem>
-                                    <SelectItem value="general-feedback">General Feedback</SelectItem>
+                                    <SelectItem value="feature-requests">{t("orgPortal.featureRequests")}</SelectItem>
+                                    <SelectItem value="bug-reports">{t("orgPortal.bugReports")}</SelectItem>
+                                    <SelectItem value="general-feedback">{t("orgPortal.generalFeedback")}</SelectItem>
                                     <SelectItem value="ui-ux">UI/UX Improvement</SelectItem>
                                     <SelectItem value="performance">Performance Issue</SelectItem>
                                 </SelectContent>
@@ -110,10 +110,10 @@ export default function FeedbackPage() {
 
                         {/* Subject */}
                         <div className="space-y-2">
-                            <Label htmlFor="subject">Subject *</Label>
+                            <Label htmlFor="subject">{t("orgPortal.subject")} *</Label>
                             <Input
                                 id="subject"
-                                placeholder="Brief summary of your feedback"
+                                placeholder={t("orgPortal.enterSubject")}
                                 required
                                 className="border-gray-300 focus:ring-teal-500"
                             />
@@ -121,10 +121,10 @@ export default function FeedbackPage() {
 
                         {/* Description */}
                         <div className="space-y-2">
-                            <Label htmlFor="description">Description *</Label>
+                            <Label htmlFor="description">{t("orgPortal.description")} *</Label>
                             <Textarea
                                 id="description"
-                                placeholder="Provide detailed information..."
+                                placeholder={t("orgPortal.enterMessage")}
                                 rows={6}
                                 required
                                 className="border-gray-300 focus:ring-teal-500"
@@ -133,15 +133,15 @@ export default function FeedbackPage() {
 
                         {/* Email */}
                         <div className="space-y-2">
-                            <Label htmlFor="email">Email (Optional)</Label>
+                            <Label htmlFor="email">{t("auth.email")} ({t("common.optional")})</Label>
                             <Input
                                 id="email"
                                 type="email"
-                                placeholder="your@email.com"
+                                placeholder={t("auth.exampleEmail")}
                                 className="border-gray-300 focus:ring-teal-500"
                             />
                             <p className="text-xs text-gray-500">
-                                We'll reach out if we need more information about your feedback.
+                                {t("orgPortal.weReachOut")}
                             </p>
                         </div>
 
@@ -152,7 +152,7 @@ export default function FeedbackPage() {
                             size="lg"
                         >
                             <MessageSquare className="w-4 h-4 mr-2" />
-                            Submit Feedback
+                            {t("orgPortal.submitFeedback")}
                         </Button>
                     </form>
                 </div>

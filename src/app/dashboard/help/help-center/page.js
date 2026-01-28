@@ -4,51 +4,53 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, HelpCircle, Book, Zap, CreditCard, Shield } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function HelpCenterPage() {
+    const { t } = useLanguage();
     const categories = [
         {
             icon: Zap,
-            title: "Getting Started",
-            description: "Learn the basics and set up your account",
+            title: t("orgPortal.gettingStarted"),
+            description: t("orgPortal.learnBasicsAndSetup"),
             articles: 12,
         },
         {
             icon: Book,
-            title: "Image Generation",
-            description: "Master all types of image generation",
+            title: t("orgPortal.imageGeneration"),
+            description: t("orgPortal.masterAllTypes"),
             articles: 18,
         },
         {
             icon: CreditCard,
-            title: "Billing & Credits",
-            description: "Manage your subscription and credits",
+            title: t("orgPortal.billingCredits"),
+            description: t("orgPortal.manageSubscriptionAndCredits"),
             articles: 8,
         },
         {
             icon: Shield,
-            title: "Account & Security",
-            description: "Keep your account safe and secure",
+            title: t("orgPortal.accountSecurity"),
+            description: t("orgPortal.keepAccountSafe"),
             articles: 10,
         },
     ];
 
     const faqs = [
         {
-            question: "How many credits does each generation cost?",
-            answer: "Plain images cost 5 credits, themed images cost 8 credits, model images cost 12 credits, and campaign images cost 15 credits.",
+            question: t("orgPortal.faq1Question"),
+            answer: t("orgPortal.faq1Answer"),
         },
         {
-            question: "Can I use my own model photos?",
-            answer: "Yes! You can upload human model photos with plain backgrounds and front or 3/4 angle poses for best results.",
+            question: t("orgPortal.faq2Question"),
+            answer: t("orgPortal.faq2Answer"),
         },
         {
-            question: "How long does image generation take?",
-            answer: "Generation times vary: plain images take 2-3 seconds, themed images 3-4 seconds, model images 4-5 seconds, and campaign images 5-6 seconds.",
+            question: t("orgPortal.faq3Question"),
+            answer: t("orgPortal.faq3Answer"),
         },
         {
-            question: "Can I collaborate with team members?",
-            answer: "Yes! You can invite collaborators to your projects with different roles: Owner, Editor, or Viewer permissions.",
+            question: t("orgPortal.faq4Question"),
+            answer: t("orgPortal.faq4Answer"),
         },
     ];
 
@@ -71,10 +73,10 @@ export default function HelpCenterPage() {
                         marginBottom: "1rem",
                     }}
                 >
-                    How can we help you?
+                    {t("orgPortal.howCanWeHelp")}
                 </h1>
                 <p style={{ color: "hsl(0, 0%, 40%)", marginBottom: "1.5rem" }}>
-                    Search our knowledge base or browse categories below
+                    {t("orgPortal.searchKnowledgeBase")}
                 </p>
                 <div style={{ position: "relative" }}>
                     <Search
@@ -89,7 +91,7 @@ export default function HelpCenterPage() {
                         }}
                     />
                     <Input
-                        placeholder="Search for articles, guides, or FAQs..."
+                        placeholder={t("orgPortal.searchArticlesGuides")}
                         className="pl-12 h-12 text-base"
                         style={{
                             paddingLeft: "3rem",
@@ -144,7 +146,7 @@ export default function HelpCenterPage() {
                                 {category.description}
                             </p>
                             <p style={{ fontSize: "0.75rem", color: "hsl(180, 45%, 45%)", fontWeight: 500 }}>
-                                {category.articles} articles
+                                {category.articles} {t("orgPortal.articles")}
                             </p>
                         </CardContent>
                     </Card>
@@ -160,9 +162,9 @@ export default function HelpCenterPage() {
                 }}
             >
                 <CardHeader>
-                    <CardTitle style={{ color: "hsl(0, 0%, 15%)" }}>Frequently Asked Questions</CardTitle>
+                    <CardTitle style={{ color: "hsl(0, 0%, 15%)" }}>{t("orgPortal.frequentlyAskedQuestions")}</CardTitle>
                     <CardDescription style={{ color: "hsl(0, 0%, 40%)" }}>
-                        Quick answers to common questions
+                        {t("orgPortal.quickAnswersToCommonQuestions")}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -219,10 +221,10 @@ export default function HelpCenterPage() {
                             marginBottom: "0.5rem",
                         }}
                     >
-                        Still need help?
+                        {t("orgPortal.stillNeedHelp")}
                     </h3>
                     <p style={{ color: "hsl(0, 0%, 40%)", marginBottom: "1rem" }}>
-                        Our support team is here to assist you
+                        {t("orgPortal.supportTeamHere")}
                     </p>
                     <Button
                         style={{
@@ -233,7 +235,7 @@ export default function HelpCenterPage() {
                             fontWeight: 500,
                         }}
                     >
-                        Contact Support
+                        {t("orgPortal.contactSupport")}
                     </Button>
                 </CardContent>
             </Card>

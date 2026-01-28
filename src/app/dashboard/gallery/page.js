@@ -3,29 +3,31 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Grid, Download, RefreshCw, Eye, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { organizationAPI } from "@/lib/api";
+import { useLanguage } from "@/context/LanguageContext";
 
-const getImageCategory = (imageType) => {
-    if (imageType === "white_background") return "Plain";
-    if (imageType === "background_change") return "Themed";
-    if (imageType === "model_with_ornament" || imageType === "real_model_with_ornament") return "Model";
-    if (imageType === "campaign_shot_advanced") return "Campaign";
-    return "Other";
+const getImageCategory = (imageType, t) => {
+    if (imageType === "white_background") return t("orgPortal.plain");
+    if (imageType === "background_change") return t("orgPortal.themed");
+    if (imageType === "model_with_ornament" || imageType === "real_model_with_ornament") return t("orgPortal.model");
+    if (imageType === "campaign_shot_advanced") return t("orgPortal.campaign");
+    return t("orgPortal.other");
 };
 
-const getDaysAgo = (dateString) => {
-    if (!dateString) return "Recently";
+const getDaysAgo = (dateString, t) => {
+    if (!dateString) return t("orgPortal.recently");
     const date = new Date(dateString);
     const now = new Date();
     const diffTime = Math.abs(now - date);
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays === 0) return "Today";
-    if (diffDays === 1) return "1 day ago";
-    return `${diffDays} days ago`;
+    if (diffDays === 0) return t("orgPortal.today");
+    if (diffDays === 1) return `1 ${t("orgPortal.day")} ${t("orgPortal.ago")}`;
+    return `${diffDays} ${t("orgPortal.days")} ${t("orgPortal.ago")}`;
 };
 
 const ITEMS_PER_PAGE = 18;
 
 export default function GalleryPage() {
+    const { t } = useLanguage();
     const [images, setImages] = useState([]);
     const [filter, setFilter] = useState("all");
     const [loading, setLoading] = useState(true);
@@ -148,8 +150,8 @@ export default function GalleryPage() {
         <div className="min-h-screen bg-[#fcfcfc] p-8">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-[#1a1a1a] mb-2">Organization Images</h1>
-                    <p className="text-[#737373] text-lg">All images generated under your organization</p>
+                    <h1 className="text-4xl font-bold text-[#1a1a1a] mb-2">{t("orgPortal.organizationImages")}</h1>
+                    <p className="text-[#737373] text-lg">{t("orgPortal.allImagesGeneratedUnderOrg")}</p>
                 </div>
 
                 <div className="flex items-center gap-3 mb-8">
@@ -163,7 +165,7 @@ export default function GalleryPage() {
                                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             }`}
                         >
-                            {f === "all" ? "All" : f}
+                            {f === "all" ? t("orgPortal.all") : f === "plain" ? t("orgPortal.plain") : f === "themed" ? t("orgPortal.themed") : f === "model" ? t("orgPortal.model") : f === "campaign" ? t("orgPortal.campaign") : f}
                         </button>
                     ))}
                 </div>
@@ -172,7 +174,7 @@ export default function GalleryPage() {
                     <div className="flex items-center justify-center h-64">
                         <div className="text-center">
                             <Loader2 className="w-12 h-12 text-[#884cff] animate-spin mx-auto mb-4" />
-                            <p className="text-[#737373]">Loading images...</p>
+                            <p className="text-[#737373]">{t("orgPortal.loadingImages")}</p>
                         </div>
                     </div>
                 ) : filteredImages.length === 0 ? (
@@ -180,11 +182,11 @@ export default function GalleryPage() {
                         <div className="w-24 h-24 bg-gradient-to-br from-[#884cff]/10 to-[#5a2fcf]/10 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Grid className="w-12 h-12 text-[#884cff]" />
                         </div>
-                        <h3 className="text-2xl font-bold text-[#1a1a1a] mb-3">No Images Yet</h3>
+                        <h3 className="text-2xl font-bold text-[#1a1a1a] mb-3">{t("orgPortal.noImagesYet")}</h3>
                         <p className="text-[#737373] mb-6">
                             {filter === "all"
-                                ? "No images have been generated under this organization yet"
-                                : "No images found for this filter"}
+                                ? t("orgPortal.noImagesGeneratedYet")
+                                : t("orgPortal.noImagesFoundForFilter")}
                         </p>
                     </div>
                 ) : (
@@ -199,7 +201,7 @@ export default function GalleryPage() {
                                     <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-2">
                                         <img
                                             src={image.image_url}
-                                            alt={getImageCategory(image.image_type)}
+                                            alt={getImageCategory(image.image_type, t)}
                                             className="w-full h-full object-cover"
                                             loading="lazy"
                                             onError={(e) => {
@@ -218,7 +220,7 @@ export default function GalleryPage() {
                                                     handleView(image);
                                                 }}
                                                 className="p-2.5 bg-white rounded-full hover:bg-gray-100 transition-all shadow-lg"
-                                                title="View in new tab"
+                                                title={t("orgPortal.viewInNewTab")}
                                             >
                                                 <Eye size={16} className="text-gray-700" />
                                             </button>
@@ -228,7 +230,7 @@ export default function GalleryPage() {
                                                     handleDownload(image);
                                                 }}
                                                 className="p-2.5 bg-white rounded-full hover:bg-gray-100 transition-all shadow-lg"
-                                                title="Download"
+                                                title={t("orgPortal.download")}
                                             >
                                                 <Download size={16} className="text-gray-700" />
                                             </button>
@@ -236,10 +238,10 @@ export default function GalleryPage() {
                                     </div>
                                     <div className="bg-white rounded-lg p-2">
                                         <p className="text-sm font-medium text-gray-700 mb-1">
-                                            {getImageCategory(image.image_type)}
+                                            {getImageCategory(image.image_type, t)}
                                         </p>
                                         <p className="text-xs text-gray-500">
-                                            Generated {getDaysAgo(image.created_at)}
+                                            {t("orgPortal.generated")} {getDaysAgo(image.created_at, t)}
                                         </p>
                                     </div>
                                 </div>
@@ -252,7 +254,7 @@ export default function GalleryPage() {
                         )}
                         {!hasMore && filteredImages.length > 0 && (
                             <div className="text-center py-8 text-gray-500">
-                                <p>All {totalCount} images loaded</p>
+                                <p>{t("orgPortal.allImagesLoaded").replace("{count}", totalCount)}</p>
                             </div>
                         )}
                     </>

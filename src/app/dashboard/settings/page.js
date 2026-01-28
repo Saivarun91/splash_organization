@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { Settings as SettingsIcon, User, Bell, Shield, Globe, Save, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function SettingsPage() {
+    const { t } = useLanguage();
     const [loading, setLoading] = useState(false);
     const [settings, setSettings] = useState({
         organizationName: "My Organization",
@@ -38,8 +40,8 @@ export default function SettingsPage() {
     return (
         <div className="p-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
-                <p className="text-gray-600">Manage your organization settings and preferences</p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("orgPortal.settings")}</h1>
+                <p className="text-gray-600">{t("orgPortal.manageSettings")}</p>
             </div>
 
             <div className="space-y-6 max-w-4xl">
@@ -50,13 +52,13 @@ export default function SettingsPage() {
                             <User className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-semibold text-gray-900">Organization Information</h2>
-                            <p className="text-sm text-gray-600">Update your organization details</p>
+                            <h2 className="text-xl font-semibold text-gray-900">{t("orgPortal.organizationInformation")}</h2>
+                            <p className="text-sm text-gray-600">{t("orgPortal.updateOrganizationDetails")}</p>
                         </div>
                     </div>
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Organization Name</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">{t("orgPortal.organizationName")}</label>
                             <input
                                 type="text"
                                 value={settings.organizationName}
@@ -67,7 +69,7 @@ export default function SettingsPage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">{t("auth.email")}</label>
                             <input
                                 type="email"
                                 value={settings.email}
@@ -85,15 +87,15 @@ export default function SettingsPage() {
                             <Bell className="w-5 h-5 text-green-600" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-semibold text-gray-900">Notifications</h2>
-                            <p className="text-sm text-gray-600">Configure your notification preferences</p>
+                            <h2 className="text-xl font-semibold text-gray-900">{t("orgPortal.notifications")}</h2>
+                            <p className="text-sm text-gray-600">{t("orgPortal.notificationSettings")}</p>
                         </div>
                     </div>
                     <div className="space-y-4">
                         <label className="flex items-center justify-between cursor-pointer">
                             <div>
-                                <span className="text-sm font-medium text-gray-900">Email Notifications</span>
-                                <p className="text-xs text-gray-600">Receive notifications via email</p>
+                                <span className="text-sm font-medium text-gray-900">{t("orgPortal.emailNotifications")}</span>
+                                <p className="text-xs text-gray-600">{t("orgPortal.receiveEmailNotifications")}</p>
                             </div>
                             <input
                                 type="checkbox"
@@ -109,8 +111,8 @@ export default function SettingsPage() {
                         </label>
                         <label className="flex items-center justify-between cursor-pointer">
                             <div>
-                                <span className="text-sm font-medium text-gray-900">Push Notifications</span>
-                                <p className="text-xs text-gray-600">Receive browser push notifications</p>
+                                <span className="text-sm font-medium text-gray-900">{t("orgPortal.pushNotifications")}</span>
+                                <p className="text-xs text-gray-600">{t("orgPortal.receivePushNotifications")}</p>
                             </div>
                             <input
                                 type="checkbox"
@@ -126,8 +128,8 @@ export default function SettingsPage() {
                         </label>
                         <label className="flex items-center justify-between cursor-pointer">
                             <div>
-                                <span className="text-sm font-medium text-gray-900">Project Updates</span>
-                                <p className="text-xs text-gray-600">Get notified about project changes</p>
+                                <span className="text-sm font-medium text-gray-900">{t("orgPortal.projectUpdates")}</span>
+                                <p className="text-xs text-gray-600">{t("orgPortal.getNotifiedProjectChanges")}</p>
                             </div>
                             <input
                                 type="checkbox"
@@ -143,8 +145,8 @@ export default function SettingsPage() {
                         </label>
                         <label className="flex items-center justify-between cursor-pointer">
                             <div>
-                                <span className="text-sm font-medium text-gray-900">Credit Alerts</span>
-                                <p className="text-xs text-gray-600">Get notified when credits are low</p>
+                                <span className="text-sm font-medium text-gray-900">{t("orgPortal.creditAlerts")}</span>
+                                <p className="text-xs text-gray-600">{t("orgPortal.getNotifiedCreditsLow")}</p>
                             </div>
                             <input
                                 type="checkbox"
@@ -168,13 +170,13 @@ export default function SettingsPage() {
                             <Globe className="w-5 h-5 text-purple-600" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-semibold text-gray-900">Preferences</h2>
-                            <p className="text-sm text-gray-600">Customize your experience</p>
+                            <h2 className="text-xl font-semibold text-gray-900">{t("orgPortal.preferences")}</h2>
+                            <p className="text-sm text-gray-600">{t("orgPortal.preferenceSettings")}</p>
                         </div>
                     </div>
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">{t("common.language")}</label>
                             <select
                                 value={settings.preferences.language}
                                 onChange={(e) =>
@@ -185,14 +187,14 @@ export default function SettingsPage() {
                                 }
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                                <option value="en">English</option>
-                                <option value="es">Spanish</option>
+                                <option value="en">{t("common.english")}</option>
+                                <option value="es">{t("common.spanish")}</option>
                                 <option value="fr">French</option>
                                 <option value="de">German</option>
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">{t("orgPortal.timezone")}</label>
                             <select
                                 value={settings.preferences.timezone}
                                 onChange={(e) =>
@@ -220,15 +222,15 @@ export default function SettingsPage() {
                             <Shield className="w-5 h-5 text-red-600" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-semibold text-gray-900">Security</h2>
-                            <p className="text-sm text-gray-600">Manage your security settings</p>
+                            <h2 className="text-xl font-semibold text-gray-900">{t("orgPortal.security")}</h2>
+                            <p className="text-sm text-gray-600">{t("orgPortal.securitySettings")}</p>
                         </div>
                     </div>
                     <div className="space-y-4">
                         <label className="flex items-center justify-between cursor-pointer">
                             <div>
-                                <span className="text-sm font-medium text-gray-900">Two-Factor Authentication</span>
-                                <p className="text-xs text-gray-600">Add an extra layer of security</p>
+                                <span className="text-sm font-medium text-gray-900">{t("orgPortal.twoFactor")}</span>
+                                <p className="text-xs text-gray-600">{t("orgPortal.addExtraSecurity")}</p>
                             </div>
                             <input
                                 type="checkbox"
@@ -244,7 +246,7 @@ export default function SettingsPage() {
                         </label>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Session Timeout (minutes)
+                                {t("orgPortal.sessionTimeout")}
                             </label>
                             <input
                                 type="number"
@@ -273,12 +275,12 @@ export default function SettingsPage() {
                         {loading ? (
                             <>
                                 <Loader2 className="w-5 h-5 animate-spin" />
-                                Saving...
+                                {t("orgPortal.saving")}
                             </>
                         ) : (
                             <>
                                 <Save className="w-5 h-5" />
-                                Save Settings
+                                {t("orgPortal.saveSettings")}
                             </>
                         )}
                     </button>

@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AdminWorkflowTab } from "@/components/organization/AdminWorkflowTab";
 import { AdminCollaboratorsTab } from "@/components/organization/AdminCollaboratorsTab";
 import { ProjectImagesView } from "@/components/organization/ProjectImagesView";
+import { useLanguage } from "@/context/LanguageContext";
 
 // Mock data - replace with actual API calls
 const mockProject = {
@@ -101,6 +102,7 @@ const mockCollectionData = {
 export default function ProjectDetailPage() {
     const params = useParams();
     const router = useRouter();
+    const { t } = useLanguage();
     const [project, setProject] = useState(null);
     const [collectionData, setCollectionData] = useState(null);
     const [activeTab, setActiveTab] = useState("workflow");
@@ -119,7 +121,7 @@ export default function ProjectDetailPage() {
             <div className="flex items-center justify-center h-64">
                 <div className="flex flex-col items-center gap-4">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                    <div className="text-gray-500">Loading project...</div>
+                    <div className="text-gray-500">{t("orgPortal.loadingProject")}</div>
                 </div>
             </div>
         );
@@ -128,7 +130,7 @@ export default function ProjectDetailPage() {
     if (!project) {
         return (
             <div className="text-center py-12">
-                <p className="text-gray-500">Project not found</p>
+                <p className="text-gray-500">{t("orgPortal.projectNotFound")}</p>
             </div>
         );
     }
@@ -141,7 +143,7 @@ export default function ProjectDetailPage() {
                 className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
             >
                 <ArrowLeft className="w-5 h-5" />
-                <span>Back to Projects</span>
+                <span>{t("orgPortal.backToProjects")}</span>
             </button>
 
             {/* Project Detail View */}
@@ -154,7 +156,7 @@ export default function ProjectDetailPage() {
                         </div>
                         <div>
                             <h2 className="text-2xl font-bold text-gray-900">{project.name}</h2>
-                            <p className="text-sm text-gray-600 mt-1">{project.about || "No description"}</p>
+                            <p className="text-sm text-gray-600 mt-1">{project.about || t("orgPortal.noDescription")}</p>
                         </div>
                     </div>
                 </div>
@@ -169,21 +171,21 @@ export default function ProjectDetailPage() {
                                     className="rounded-none border-b-2 border-transparent px-6 py-4 data-[state=active]:border-blue-600 data-[state=active]:bg-blue-50"
                                 >
                                     <Workflow size={18} className="mr-2" />
-                                    Workflow
+                                    {t("orgPortal.workflow")}
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="collaborators"
                                     className="rounded-none border-b-2 border-transparent px-6 py-4 data-[state=active]:border-blue-600 data-[state=active]:bg-blue-50"
                                 >
                                     <Users size={18} className="mr-2" />
-                                    Collaborators
+                                    {t("orgPortal.collaborators")}
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="images"
                                     className="rounded-none border-b-2 border-transparent px-6 py-4 data-[state=active]:border-blue-600 data-[state=active]:bg-blue-50"
                                 >
                                     <ImageIcon size={18} className="mr-2" />
-                                    Image Analysis
+                                    {t("orgPortal.imageAnalysis")}
                                 </TabsTrigger>
                             </TabsList>
                         </div>
