@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CreditCard, Check, X, Calendar, DollarSign, Loader2, AlertCircle } from "lucide-react";
+import { CreditCard, Check, X, Calendar, DollarSign, Loader2, AlertCircle, Eye } from "lucide-react";
 import { paymentAPI, plansAPI, organizationAPI } from "@/lib/api";
 import { useLanguage } from "@/context/LanguageContext";
+import { InvoiceView } from "@/components/InvoiceView";
+import { Button } from "@/components/ui/button";
 
 export default function PaymentsPage() {
     const { t } = useLanguage();
@@ -16,6 +18,8 @@ export default function PaymentsPage() {
     const [currentPlan, setCurrentPlan] = useState(null);
     const [razorpayLoaded, setRazorpayLoaded] = useState(false);
     const [processingPayment, setProcessingPayment] = useState(false);
+    const [selectedInvoice, setSelectedInvoice] = useState(null);
+    const [selectedCredits, setSelectedCredits] = useState({}); // Track selected credits for each Pro plan
 
     useEffect(() => {
         const orgId = localStorage.getItem("org_organization_id");
@@ -179,14 +183,14 @@ export default function PaymentsPage() {
                 <p className="text-gray-600">{t("orgPortal.managePaymentsAndPurchaseCredits")}</p>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md border border-gray-200 mb-6">
-                <div className="flex border-b border-gray-200">
+            <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border mb-6">
+                <div className="flex border-b border-border">
                     <button
                         onClick={() => setActiveTab("plans")}
                         className={`px-6 py-4 font-medium transition-colors ${
                             activeTab === "plans"
-                                ? "text-blue-600 border-b-2 border-blue-600"
-                                : "text-gray-600 hover:text-gray-900"
+                                ? "text-primary border-b-2 border-primary"
+                                : "text-muted-foreground hover:text-foreground"
                         }`}
                     >
                         {t("orgPortal.purchaseCredits")}
@@ -195,8 +199,8 @@ export default function PaymentsPage() {
                         onClick={() => setActiveTab("history")}
                         className={`px-6 py-4 font-medium transition-colors ${
                             activeTab === "history"
-                                ? "text-blue-600 border-b-2 border-blue-600"
-                                : "text-gray-600 hover:text-gray-900"
+                                ? "text-primary border-b-2 border-primary"
+                                : "text-muted-foreground hover:text-foreground"
                         }`}
                     >
                         {t("orgPortal.paymentHistory")}
@@ -231,18 +235,21 @@ export default function PaymentsPage() {
                                                 <th className="text-left py-3 px-4 font-semibold text-gray-900">
                                                     {t("orgPortal.transactionId")}
                                                 </th>
+                                                <th className="text-left py-3 px-4 font-semibold text-foreground">
+                                                    Actions
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {paymentHistory.map((payment) => (
                                                 <tr
                                                     key={payment.id}
-                                                    className="border-b border-gray-100 hover:bg-gray-50"
+                                                    className="border-b border-border hover:bg-accent/50"
                                                 >
                                                     <td className="py-4 px-4">
                                                         <div className="flex items-center gap-2">
-                                                            <Calendar className="w-4 h-4 text-gray-400" />
-                                                            <span className="text-gray-900">
+                                                            <Calendar className="w-4 h-4 text-muted-foreground" />
+                                                            <span className="text-foreground">
                                                                 {payment.created_at
                                                                     ? new Date(payment.created_at).toLocaleDateString()
                                                                     : "N/A"}
@@ -255,14 +262,14 @@ export default function PaymentsPage() {
                                                         </span>
                                                     </td>
                                                     <td className="py-4 px-4">
-                                                        <span className="text-gray-900 font-semibold">
+                                                        <span className="text-foreground font-semibold">
                                                             {payment.credits?.toLocaleString() || 0}
                                                         </span>
                                                     </td>
                                                     <td className="py-4 px-4">
                                                         <div className="flex items-center gap-2">
-                                                            <DollarSign className="w-4 h-4 text-gray-400" />
-                                                            <span className="text-gray-900 font-semibold">
+                                                            <DollarSign className="w-4 h-4 text-muted-foreground" />
+                                                            <span className="text-foreground font-semibold">
                                                                 ₹{payment.amount}
                                                             </span>
                                                         </div>
@@ -287,9 +294,23 @@ export default function PaymentsPage() {
                                                         </span>
                                                     </td>
                                                     <td className="py-4 px-4">
-                                                        <span className="text-gray-600 font-mono text-sm">
+                                                        <span className="text-muted-foreground font-mono text-sm">
                                                             {payment.razorpay_order_id || "N/A"}
                                                         </span>
+                                                    </td>
+                                                    <td className="py-4 px-4">
+                                                        <Button
+                                                            onClick={() => setSelectedInvoice({
+                                                                transactionId: payment.razorpay_order_id || payment.id,
+                                                                paymentData: payment
+                                                            })}
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="flex items-center gap-2"
+                                                        >
+                                                            <Eye className="w-4 h-4" />
+                                                            View Invoice
+                                                        </Button>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -446,6 +467,15 @@ export default function PaymentsPage() {
                     )}
                 </div>
             </div>
+            
+            {/* Invoice View Modal */}
+            {selectedInvoice && (
+                <InvoiceView
+                    transactionId={selectedInvoice.transactionId}
+                    paymentData={selectedInvoice.paymentData}
+                    onClose={() => setSelectedInvoice(null)}
+                />
+            )}
         </div>
     );
 }

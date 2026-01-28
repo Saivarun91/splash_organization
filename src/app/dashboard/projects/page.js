@@ -122,13 +122,13 @@ export default function ProjectsPage() {
             {/* Search and Filters */}
             <div className="mb-6 space-y-4">
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                     <input
                         type="text"
                         placeholder={t("orgPortal.searchProjects")}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-10 pr-4 py-3 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                     />
                 </div>
 
@@ -141,8 +141,8 @@ export default function ProjectsPage() {
                             onClick={() => setStatusFilter(status)}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                                 statusFilter === status
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                                    ? "bg-primary text-primary-foreground"
+                                    : "bg-card text-card-foreground border border-border hover:bg-accent"
                             }`}
                         >
                             {status === "all"
@@ -167,7 +167,7 @@ export default function ProjectsPage() {
                             <div
                                 key={project.id}
                                 onClick={() => handleProjectClick(project.id)}
-                                className="group bg-white border border-gray-200 rounded-xl p-6 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                                className="group bg-card text-card-foreground border border-border rounded-xl p-6 cursor-pointer transition-all duration-300 hover:shadow-md hover:-translate-y-1"
                             >
                                 {/* Header Section */}
                                 <div className="flex items-start justify-between mb-4">
@@ -185,16 +185,16 @@ export default function ProjectsPage() {
 
                                 {/* Project Title and Description */}
                                 <div className="mb-5">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                                    <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
                                         {project.name}
                                     </h3>
                                     {project.about && (
-                                        <p className="text-sm text-gray-600 line-clamp-2">{project.about}</p>
+                                        <p className="text-sm text-muted-foreground line-clamp-2">{project.about}</p>
                                     )}
                                 </div>
 
                                 {/* Stats Section */}
-                                <div className="grid grid-cols-2 gap-4 mb-5 pb-5 border-b border-gray-100">
+                                <div className="grid grid-cols-2 gap-4 mb-5 pb-5 border-b border-border">
                                     <div>
                                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
                                             {t("orgPortal.images")}

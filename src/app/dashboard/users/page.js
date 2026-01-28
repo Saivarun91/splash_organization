@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Users, Search, FolderKanban, Image as ImageIcon, User, Shield, Crown, Loader2, UserPlus, X, Mail } from "lucide-react";
+import { Users, Search, FolderKanban, Image as ImageIcon, User, Shield, Crown, Loader2, UserPlus, X, Mail, Trash2 } from "lucide-react";
 import { organizationAPI } from "@/lib/api";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -62,6 +62,7 @@ export default function UsersPage() {
     const [addingUser, setAddingUser] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [deletingUserId, setDeletingUserId] = useState(null);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -108,6 +109,39 @@ export default function UsersPage() {
         router.push(`/dashboard/users/${userId}`);
     };
 
+    const handleDeleteUser = async (userId, userEmail, e) => {
+        e.stopPropagation(); // Prevent triggering the card click
+        
+        if (!window.confirm(`Are you sure you want to remove ${userEmail} from this organization?`)) {
+            return;
+        }
+
+        setDeletingUserId(userId);
+        setError("");
+        setSuccess("");
+
+        try {
+            const response = await organizationAPI.removeUser(organizationId, userId);
+            
+            if (response.success) {
+                setSuccess(`User ${userEmail} removed successfully!`);
+                
+                // Refresh users list
+                const data = await organizationAPI.getOrganizationMembers(organizationId);
+                if (data.members) {
+                    setUsers(data.members);
+                }
+                
+                // Clear success message after 5 seconds
+                setTimeout(() => setSuccess(""), 5000);
+            }
+        } catch (err) {
+            setError(err.message || "Failed to remove user. Please try again.");
+        } finally {
+            setDeletingUserId(null);
+        }
+    };
+
     const handleAddUser = async (e) => {
         e.preventDefault();
         setError("");
@@ -148,35 +182,39 @@ export default function UsersPage() {
                 setTimeout(() => setSuccess(""), 5000);
             }
         } catch (err) {
-            setError(err.message || "Failed to add user. Please try again.");
+            // The error message from apiRequest already contains the error from the backend
+            // Check if it mentions existing organization
+            let errorMessage = err.message || "Failed to add user. Please try again.";
+            
+            // The backend returns error in format: "This email is already in {org_name}"
+            // or in the error field of the JSON response
+            setError(errorMessage);
         } finally {
             setAddingUser(false);
         }
     };
 
-    const UserCard = ({ user }) => (
-        <div
-            onClick={() => handleUserClick(user.id)}
-            className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all cursor-pointer"
-        >
-            <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-2xl mb-4">
-                    {(user.full_name || user.email || "U").charAt(0).toUpperCase()}
-                </div>
-                <h3 className="font-semibold text-gray-900 text-lg mb-1">
-                    {user.full_name || user.email || "Unknown User"}
-                </h3>
-                <p className="text-sm text-gray-600 mb-3">{user.email}</p>
-                <div className="flex items-center gap-2 mb-4">
-                    <span
-                        className={`px-3 py-1 rounded text-sm font-medium border flex items-center gap-1 ${getRoleColor(
-                            user.organization_role
-                        )}`}
+    const UserCard = ({ user }) => {
+        const isOwner = user.organization_role === "owner";
+        const isDeleting = deletingUserId === user.id;
+        
+        return (
+            <div
+                onClick={() => handleUserClick(user.id)}
+                className="bg-card text-card-foreground border border-border rounded-xl p-6 hover:shadow-md transition-all cursor-pointer relative"
+            >
+                {/* Delete button - only show if not owner */}
+                {!isOwner && (
+                    <button
+                        onClick={(e) => handleDeleteUser(user.id, user.email, e)}
+                        disabled={isDeleting}
+                        className="absolute top-4 right-4 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Remove user from organization"
                     >
                         {getRoleIcon(user.organization_role)}
                         {getRoleDisplayName(user.organization_role, t)}
-                    </span>
-                </div>
+                    </button>
+                )}
                 <div className="w-full grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
                     <div className="text-center">
                         <div className="flex items-center justify-center gap-2 mb-1">
@@ -192,14 +230,20 @@ export default function UsersPage() {
                             <ImageIcon className="w-4 h-4 text-gray-600" />
                             <span className="text-sm text-gray-600">{t("orgPortal.images")}</span>
                         </div>
-                        <div className="text-xl font-bold text-gray-900">
-                            {user.images_generated || 0}
+                        <div className="text-center">
+                            <div className="flex items-center justify-center gap-2 mb-1">
+                                <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                                <span className="text-sm text-muted-foreground">Images</span>
+                            </div>
+                            <div className="text-xl font-bold text-foreground">
+                                {user.images_generated || 0}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     if (loading) {
         return (
@@ -213,7 +257,7 @@ export default function UsersPage() {
     }
 
     return (
-        <div className="p-8">
+        <div className="space-y-6 animate-fadeIn">
             <div className="mb-8 flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("dashboard.users")}</h1>
@@ -221,7 +265,7 @@ export default function UsersPage() {
                 </div>
                 <button
                     onClick={() => setShowAddUserModal(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
                 >
                     <UserPlus className="w-5 h-5" />
                     {t("orgPortal.addUser")}
@@ -243,7 +287,7 @@ export default function UsersPage() {
             {/* Add User Modal */}
             {showAddUserModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                    <div className="bg-card text-card-foreground rounded-xl shadow-sm p-6 w-full max-w-md border border-border">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-2xl font-bold text-gray-900">{t("orgPortal.addUserToOrganization")}</h2>
                             <button
@@ -253,7 +297,7 @@ export default function UsersPage() {
                                     setNewUserRole("member");
                                     setError("");
                                 }}
-                                className="text-gray-400 hover:text-gray-600"
+                                className="text-muted-foreground hover:text-foreground"
                             >
                                 <X className="w-6 h-6" />
                             </button>
@@ -265,14 +309,14 @@ export default function UsersPage() {
                                     {t("auth.email")} <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                                     <input
                                         type="email"
                                         value={newUserEmail}
                                         onChange={(e) => setNewUserEmail(e.target.value)}
                                         placeholder={t("auth.exampleEmail")}
                                         required
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full pl-10 pr-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                                     />
                                 </div>
                             </div>
@@ -284,7 +328,7 @@ export default function UsersPage() {
                                 <select
                                     value={newUserRole}
                                     onChange={(e) => setNewUserRole(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                                 >
                                     <option value="member">{t("orgPortal.member")}</option>
                                     <option value="chief_editor">{t("orgPortal.chiefEditor")}</option>

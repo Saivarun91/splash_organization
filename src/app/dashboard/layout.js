@@ -1,15 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
+import { Topbar } from "@/components/Topbar";
 
 export default function DashboardLayout({ children }) {
-    const [collapsed, setCollapsed] = useState(false);
+    const [collapsed, setCollapsed] = useState(true);
     const [hovered, setHovered] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
-    const router = useRouter();
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     useEffect(() => {
         // Check authentication
@@ -58,20 +65,21 @@ export default function DashboardLayout({ children }) {
             // Check for existing token in localStorage
             const token = localStorage.getItem("org_auth_token");
             if (!token) {
-                router.push("/login");
-                return;
+                setIsAuthenticated(false);
+            } else {
+                setIsAuthenticated(true);
             }
-            setIsAuthenticated(true);
         }
         setLoading(false);
-    }, [router]);
+    }, []);
 
-    const sidebarWidth = collapsed && !hovered ? 80 : 256;
+    // Compute sidebar width dynamically
+    const sidebarWidth = isMobile ? 0 : collapsed && !hovered ? 80 : 256; // px
 
     if (loading) {
         return (
-            <div className="flex min-h-screen items-center justify-center">
-                <p>Loading...</p>
+            <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 via-purple-50/30 to-pink-50/20">
+                <p className="text-foreground">Loading...</p>
             </div>
         );
     }
@@ -81,19 +89,29 @@ export default function DashboardLayout({ children }) {
     }
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
+        <div className="flex h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-pink-50/20">
             <Sidebar
                 collapsed={collapsed}
-                setCollapsed={setCollapsed}
                 hovered={hovered}
                 setHovered={setHovered}
+                setCollapsed={setCollapsed}
+                isMobile={isMobile}
             />
-            <main
-                className="flex-1 transition-all duration-300"
-                style={{ marginLeft: `${sidebarWidth}px` }}
-            >
-                {children}
-            </main>
+
+            <div className="flex-1 flex flex-col">
+                {/* Topbar — reacts to sidebar collapse */}
+                <Topbar collapsed={collapsed && !hovered} />
+
+                {/* Main content below topbar */}
+                <main
+                    className="flex-1 overflow-y-auto p-8 transition-all duration-300 mt-16"
+                    style={{
+                        marginLeft: `${isMobile ? 0 : sidebarWidth}px`,
+                    }}
+                >
+                    {children}
+                </main>
+            </div>
         </div>
     );
 }
