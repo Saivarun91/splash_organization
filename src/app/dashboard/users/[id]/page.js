@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ArrowLeft, FolderKanban, Image as ImageIcon, User, Shield, Crown, Calendar } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, FolderKanban, Image as ImageIcon, User, Shield, Crown } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 
@@ -35,6 +34,7 @@ const getRoleColor = (role) => {
 export default function UserDetailsPage() {
     const router = useRouter();
     const params = useParams();
+    const { t } = useLanguage();
     const userId = params.id;
     const [activeTab, setActiveTab] = useState("projects");
     const [selectedProject, setSelectedProject] = useState(null);
@@ -55,8 +55,8 @@ export default function UserDetailsPage() {
                 onClick={() => router.push("/dashboard/users")}
                 className="flex items-center gap-2 mb-6"
             >
-                <ArrowLeft className="w-5 h-5 text-gray-600 hover:text-gray-900" />
-                <span className="text-gray-600 hover:text-gray-900">{t("orgPortal.backToUsers")}</span>
+                <ArrowLeft className="w-5 h-5" />
+                <span>{t("orgPortal.backToUsers")}</span>
             </button>
 
             <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200 mb-6">
@@ -87,7 +87,7 @@ export default function UserDetailsPage() {
                         </div>
                         <div>
                             <p className="text-sm text-gray-600">{t("orgPortal.projects")}</p>
-                            <p className="text-3xl font-bold text-gray-900">{user.projects_count}</p>
+                            <p className="text-3xl font-bold text-gray-900">{user.projectsCount}</p>
                         </div>
                     </div>
                 </div>
@@ -98,7 +98,7 @@ export default function UserDetailsPage() {
                         </div>
                         <div>
                             <p className="text-sm text-gray-600">{t("orgPortal.imagesGenerated")}</p>
-                            <p className="text-3xl font-bold text-gray-900">{user.images_generated}</p>
+                            <p className="text-3xl font-bold text-gray-900">{user.imagesGenerated}</p>
                         </div>
                     </div>
                 </div>
@@ -118,7 +118,7 @@ export default function UserDetailsPage() {
                                 : "bg-gray-100 text-gray-600 hover:text-gray-900"
                         }`}
                     >
-                        Projects
+                        {t("orgPortal.projects")}
                     </button>
                     <button
                         onClick={() => setActiveTab("images")}
@@ -128,7 +128,7 @@ export default function UserDetailsPage() {
                                 : "bg-gray-100 text-gray-600 hover:text-gray-900"
                         }`}
                     >
-                        Images
+                        {t("orgPortal.images")}
                     </button>
                 </div>
 
@@ -138,7 +138,7 @@ export default function UserDetailsPage() {
                         <div className="flex gap-6">
                             {/* Projects List */}
                             <div className="w-1/3 border-r border-gray-200 pr-6">
-                                <h3 className="font-semibold text-gray-900 mb-4">Projects</h3>
+                                <h3 className="font-semibold text-gray-900 mb-4">{t("orgPortal.projects")}</h3>
                                 <div className="space-y-3">
                                     {user.projects.map((project) => (
                                         <div
@@ -162,7 +162,7 @@ export default function UserDetailsPage() {
                                 {selectedProject ? (
                                     <div>
                                         <h3 className="font-semibold text-gray-900 mb-4">
-                                            {t("orgPortal.teamMembers")} - {selectedProject.title}
+                                            {t("orgPortal.teamMembers")} - {selectedProject.name}
                                         </h3>
                                         <div className="space-y-3">
                                             {selectedProject.users.map((member) => (
@@ -186,7 +186,7 @@ export default function UserDetailsPage() {
                                                             }`}
                                                         >
                                                             {member.role}
-                                                            {member.id === user.id && " (You)"}
+                                                            {member.id === user.id && ` (${t("orgPortal.you")})`}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -195,14 +195,14 @@ export default function UserDetailsPage() {
                                     </div>
                                 ) : (
                                     <div className="flex items-center justify-center h-full text-gray-500">
-                                        <p>Select a project to view team members</p>
+                                        <p>{t("orgPortal.selectProjectToViewTeam")}</p>
                                     </div>
                                 )}
                             </div>
                         </div>
                     ) : (
                         <div>
-                            <h3 className="font-semibold text-gray-900 mb-4">Images Generated</h3>
+                            <h3 className="font-semibold text-gray-900 mb-4">{t("orgPortal.imagesGenerated")}</h3>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                 {userImages.map((image) => (
                                     <div

@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { X, Calendar, Search, Users, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { organizationAPI } from "@/lib/api";
+import { useLanguage } from "@/context/LanguageContext";
 
 const ITEMS_PER_PAGE = 10;
 
 export default function CreditsHistoryPage() {
+    const { t } = useLanguage();
     const [selectedUser, setSelectedUser] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [dateFilter, setDateFilter] = useState({ startDate: "", endDate: "" });
@@ -111,7 +113,7 @@ export default function CreditsHistoryPage() {
                 <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
                     <div className="flex items-center justify-between p-6 border-b border-gray-200">
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900">Credit Usage History</h2>
+                            <h2 className="text-2xl font-bold text-gray-900">{t("orgPortal.creditUsageHistory")}</h2>
                             <p className="text-gray-600 mt-1">
                                 {user?.full_name || user?.email} ({user?.email})
                             </p>
@@ -131,7 +133,7 @@ export default function CreditsHistoryPage() {
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2">
                                 <Calendar className="w-5 h-5 text-gray-400" />
-                                <span className="text-sm font-medium text-gray-700">Filter by Date:</span>
+                                <span className="text-sm font-medium text-gray-700">{t("orgPortal.filterByDate")}:</span>
                             </div>
                             <input
                                 type="date"
@@ -141,7 +143,7 @@ export default function CreditsHistoryPage() {
                                 }
                                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
-                            <span className="text-gray-500">to</span>
+                            <span className="text-gray-500">{t("orgPortal.to")}</span>
                             <input
                                 type="date"
                                 value={dateFilter.endDate}
@@ -155,7 +157,7 @@ export default function CreditsHistoryPage() {
                                     onClick={() => setDateFilter({ startDate: "", endDate: "" })}
                                     className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
                                 >
-                                    Clear Filter
+                                    {t("orgPortal.clearFilter")}
                                 </button>
                             )}
                         </div>
@@ -167,13 +169,13 @@ export default function CreditsHistoryPage() {
                                 <table className="w-full">
                                     <thead>
                                         <tr className="border-b border-gray-200 bg-gray-50">
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">Date</th>
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">Type</th>
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">Amount</th>
+                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">{t("orgPortal.date")}</th>
+                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">{t("orgPortal.type")}</th>
+                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">{t("orgPortal.amount")}</th>
                                             <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                                                Balance After
+                                                {t("orgPortal.balanceAfter")}
                                             </th>
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">Reason</th>
+                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">{t("orgPortal.reason")}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -198,7 +200,7 @@ export default function CreditsHistoryPage() {
                                                                 : "bg-red-100 text-red-800"
                                                         }`}
                                                     >
-                                                        {log.change_type === "credit" ? "Credit" : "Debit"}
+                                                        {log.change_type === "credit" ? t("orgPortal.credit") : t("orgPortal.debit")}
                                                     </span>
                                                 </td>
                                                 <td className="py-4 px-4">
@@ -228,7 +230,7 @@ export default function CreditsHistoryPage() {
                             </div>
                         ) : (
                             <div className="text-center py-12">
-                                <p className="text-gray-600">No credit logs found for the selected date range</p>
+                                <p className="text-gray-600">{t("orgPortal.noCreditLogsFound")}</p>
                             </div>
                         )}
                     </div>
@@ -242,7 +244,7 @@ export default function CreditsHistoryPage() {
             <div className="p-8 flex items-center justify-center min-h-screen">
                 <div className="text-center">
                     <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-                    <p className="text-gray-600">Loading credit history...</p>
+                    <p className="text-gray-600">{t("orgPortal.loadingCreditHistory")}</p>
                 </div>
             </div>
         );
@@ -251,30 +253,30 @@ export default function CreditsHistoryPage() {
     return (
         <div className="p-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Credits Usage History</h1>
-                <p className="text-gray-600">View individual credit usage and consumption logs</p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("orgPortal.creditsUsageHistory")}</h1>
+                <p className="text-gray-600">{t("orgPortal.viewIndividualCreditUsage")}</p>
             </div>
 
             {creditUsage && creditUsage.summary && (
                 <div className="mb-6 bg-white rounded-lg shadow-md p-6 border border-gray-200">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Summary</h2>
+                    <h2 className="text-lg font-semibold text-gray-900 mb-4">{t("orgPortal.summary")}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
-                            <p className="text-sm text-gray-600">Total Debits</p>
+                            <p className="text-sm text-gray-600">{t("orgPortal.totalDebits")}</p>
                             <p className="text-2xl font-bold text-red-600">{creditUsage.summary.total_debits || 0}</p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600">Total Credits</p>
+                            <p className="text-sm text-gray-600">{t("orgPortal.totalCredits")}</p>
                             <p className="text-2xl font-bold text-green-600">
                                 {creditUsage.summary.total_credits || 0}
                             </p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600">Net Usage</p>
+                            <p className="text-sm text-gray-600">{t("orgPortal.netUsage")}</p>
                             <p className="text-2xl font-bold text-gray-900">{creditUsage.summary.net_usage || 0}</p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600">Current Balance</p>
+                            <p className="text-sm text-gray-600">{t("orgPortal.currentBalance")}</p>
                             <p className="text-2xl font-bold text-blue-600">
                                 {creditUsage.organization?.current_balance || 0}
                             </p>
@@ -288,7 +290,7 @@ export default function CreditsHistoryPage() {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
                         type="text"
-                        placeholder="Search users by name or email..."
+                        placeholder={t("orgPortal.searchUsers")}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -301,10 +303,10 @@ export default function CreditsHistoryPage() {
                     <table className="w-full">
                         <thead className="bg-gray-50 border-b border-gray-200">
                             <tr>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">User</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Email</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Role</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Actions</th>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-900">{t("orgPortal.user")}</th>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-900">{t("orgPortal.email")}</th>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-900">{t("orgPortal.role")}</th>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-900">{t("orgPortal.actions")}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -345,7 +347,7 @@ export default function CreditsHistoryPage() {
                                                 }}
                                                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                                             >
-                                                View Credit Logs
+                                                {t("orgPortal.viewCreditLogs")}
                                             </button>
                                         </td>
                                     </tr>
@@ -354,7 +356,7 @@ export default function CreditsHistoryPage() {
                                 <tr>
                                     <td colSpan={4} className="text-center py-12">
                                         <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                                        <p className="text-gray-600">No users found</p>
+                                        <p className="text-gray-600">{t("orgPortal.noUsersFound")}</p>
                                     </td>
                                 </tr>
                             )}
@@ -364,7 +366,7 @@ export default function CreditsHistoryPage() {
                 {filteredMembers.length > ITEMS_PER_PAGE && (
                     <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
                         <div className="text-sm text-gray-600">
-                            Showing {startIndex + 1} to {Math.min(endIndex, filteredMembers.length)} of {filteredMembers.length} users
+                            {t("orgPortal.showingUsers").replace("{start}", startIndex + 1).replace("{end}", Math.min(endIndex, filteredMembers.length)).replace("{total}", filteredMembers.length)}
                         </div>
                         <div className="flex items-center gap-2">
                             <button
@@ -375,7 +377,7 @@ export default function CreditsHistoryPage() {
                                 <ChevronLeft className="w-5 h-5" />
                             </button>
                             <span className="text-sm text-gray-700">
-                                Page {currentPage} of {totalPages}
+                                {t("orgPortal.pageOf").replace("{current}", currentPage).replace("{total}", totalPages)}
                             </span>
                             <button
                                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}

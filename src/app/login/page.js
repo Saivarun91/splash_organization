@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, Mail, Eye, EyeOff, AlertCircle, Building2 } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -47,6 +49,25 @@ export default function LoginPage() {
         localStorage.setItem("org_user", JSON.stringify(data.user));
         localStorage.setItem("org_user_id", data.user.id);
         localStorage.setItem("org_organization_id", data.user.organization?.id || "");
+        
+        // Set preferred language if available
+        if (data.user?.preferred_language) {
+          localStorage.setItem('preferredLanguage', data.user.preferred_language);
+          console.log('[Login] Setting preferred language:', data.user.preferred_language);
+        } else {
+          // Default to 'en' if not set
+          localStorage.setItem('preferredLanguage', 'en');
+          console.log('[Login] No preferred language, defaulting to en');
+        }
+        
+        // Dispatch custom event to notify LanguageContext about user login
+        // Use a small delay to ensure localStorage is set
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('org_user_updated', { 
+            detail: { preferred_language: data.user?.preferred_language || 'en' }
+          }));
+        }, 100);
+        
         router.push("/dashboard");
       } else {
         setError("Invalid login response");
@@ -68,8 +89,8 @@ export default function LoginPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl mb-4">
               <Building2 className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Organization Portal</h1>
-            <p className="text-gray-600">Sign in to manage your organization</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("orgPortal.organizationPortal")}</h1>
+            <p className="text-gray-600">{t("orgPortal.signInToManage")}</p>
           </div>
 
           {/* Error Message */}
@@ -85,7 +106,7 @@ export default function LoginPage() {
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
+                {t("auth.email")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -98,7 +119,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="you@example.com"
+                  placeholder={t("auth.exampleEmail")}
                 />
               </div>
             </div>
@@ -106,7 +127,7 @@ export default function LoginPage() {
             {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
+                {t("auth.password")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -119,7 +140,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="Enter your password"
+                  placeholder={t("auth.atLeast8Chars")}
                 />
                 <button
                   type="button"
@@ -141,14 +162,14 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? t("auth.signingIn") : t("auth.signin")}
             </button>
           </form>
 
           {/* Footer */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Only organization owners can access this portal
+              {t("orgPortal.onlyOwnersCanAccess")}
             </p>
           </div>
         </div>

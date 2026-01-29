@@ -17,8 +17,10 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { organizationAPI } from "@/lib/api";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Dashboard() {
+    const { t } = useLanguage();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
         totalUsers: 0,
@@ -347,19 +349,19 @@ export default function Dashboard() {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
-                    <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-                    <p className="text-muted-foreground">Loading dashboard...</p>
+                    <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+                    <p className="text-gray-600">{t("common.loading")}</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6 animate-fadeIn">
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
-                <p className="text-muted-foreground">
-                    Welcome to {organizationName || "your organization"} dashboard
+        <div className="p-8">
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("dashboard.dashboard")}</h1>
+                <p className="text-gray-600">
+                    Welcome to {organizationName || t("dashboard.user")} {t("dashboard.dashboard").toLowerCase()}
                 </p>
             </div>
 
@@ -367,25 +369,25 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <StatCard
                     icon={Users}
-                    title="Total Users"
+                    title={t("dashboard.totalUsers")}
                     value={stats.totalUsers}
                     color="bg-blue-500"
                 />
                 <StatCard
                     icon={Coins}
-                    title="Total Credits"
+                    title={t("dashboard.totalCredits")}
                     value={stats.totalCredits}
                     color="bg-green-500"
                 />
                 <StatCard
                     icon={FolderKanban}
-                    title="Total Projects"
+                    title={t("dashboard.totalProjects")}
                     value={stats.totalProjects}
                     color="bg-purple-500"
                 />
                 <StatCard
                     icon={ImageIcon}
-                    title="Images Generated"
+                    title={t("dashboard.imagesGenerated")}
                     value={stats.imagesGenerated}
                     color="bg-orange-500"
                 />
@@ -396,8 +398,8 @@ export default function Dashboard() {
                 {/* Credit Consumption Graph */}
                 <div className="bg-card text-card-foreground rounded-xl shadow-sm p-6 border border-border">
                     <div className="mb-6">
-                        <h2 className="text-xl font-bold text-foreground mb-1">Credit Consumption Analytics</h2>
-                        <p className="text-sm text-muted-foreground">Track credit usage trends over time</p>
+                        <h2 className="text-xl font-bold text-gray-900 mb-1">{t("dashboard.creditConsumptionAnalytics")}</h2>
+                        <p className="text-sm text-gray-500">{t("dashboard.trackCreditUsage")}</p>
                     </div>
                     <div className="flex items-center gap-2 mb-6">
                         <button
@@ -408,7 +410,7 @@ export default function Dashboard() {
                                     : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
-                            Custom Dates
+                            {t("dashboard.customDates")}
                         </button>
                         <button
                             onClick={() => setCreditGraphTimeRange("day")}
@@ -418,7 +420,7 @@ export default function Dashboard() {
                                     : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
-                            Daily
+                            {t("dashboard.daily")}
                         </button>
                         <button
                             onClick={() => setCreditGraphTimeRange("week")}
@@ -428,7 +430,7 @@ export default function Dashboard() {
                                     : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
-                            Weekly
+                            {t("dashboard.weekly")}
                         </button>
                         <button
                             onClick={() => setCreditGraphTimeRange("month")}
@@ -438,7 +440,7 @@ export default function Dashboard() {
                                     : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
-                            Monthly
+                            {t("dashboard.monthly")}
                         </button>
                     </div>
                     {creditGraphTimeRange === "custom" && (
@@ -529,8 +531,8 @@ export default function Dashboard() {
                 {/* Images Generated Graph */}
                 <div className="bg-card text-card-foreground rounded-xl shadow-sm p-6 border border-border">
                     <div className="mb-6">
-                        <h2 className="text-xl font-bold text-foreground mb-1">Image Generation Analytics</h2>
-                        <p className="text-sm text-muted-foreground">Track image generation trends over time</p>
+                        <h2 className="text-xl font-bold text-gray-900 mb-1">{t("dashboard.imagesGeneratedAnalytics")}</h2>
+                        <p className="text-sm text-gray-500">{t("dashboard.trackImageGeneration")}</p>
                     </div>
                     <div className="flex items-center gap-2 mb-6">
                         <button
@@ -541,7 +543,7 @@ export default function Dashboard() {
                                     : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
-                            Custom Dates
+                            {t("dashboard.customDates")}
                         </button>
                         <button
                             onClick={() => setImageGraphTimeRange("day")}
@@ -551,7 +553,7 @@ export default function Dashboard() {
                                     : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
-                            Daily
+                            {t("dashboard.daily")}
                         </button>
                         <button
                             onClick={() => setImageGraphTimeRange("week")}
@@ -561,7 +563,7 @@ export default function Dashboard() {
                                     : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
-                            Weekly
+                            {t("dashboard.weekly")}
                         </button>
                         <button
                             onClick={() => setImageGraphTimeRange("month")}
@@ -571,7 +573,7 @@ export default function Dashboard() {
                                     : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                         >
-                            Monthly
+                            {t("dashboard.monthly")}
                         </button>
                     </div>
                     {imageGraphTimeRange === "custom" && (
@@ -635,7 +637,7 @@ export default function Dashboard() {
                                     fillOpacity={1} 
                                     fill="url(#colorImages)" 
                                     strokeWidth={2.5}
-                                    name="Images Generated" 
+                                    name={t("dashboard.imagesGenerated")} 
                                 />
                             </AreaChart>
                         </ResponsiveContainer>

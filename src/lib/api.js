@@ -62,6 +62,11 @@ export const authAPI = {
       body: JSON.stringify({ email, password }),
     }),
   getProfile: () => apiRequest("/api/profile/"),
+  updateUserProfile: (data) =>
+    apiRequest("/api/profile/update/", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
 };
 
 /**
@@ -107,14 +112,21 @@ export const plansAPI = {
  * Payment API functions
  */
 export const paymentAPI = {
-  createRazorpayOrder: (organizationId, amount, credits, planId = null) =>
+  createRazorpayOrder: (
+    organizationId,
+    amount,
+    credits,
+    planId = null,
+    billingDetails = {}
+  ) =>
     apiRequest("/api/payments/razorpay/create-order/", {
       method: "POST",
-      body: JSON.stringify({ 
-        organization_id: organizationId, 
-        amount, 
+      body: JSON.stringify({
+        organization_id: organizationId,
+        amount,
         credits,
-        plan_id: planId 
+        plan_id: planId,
+        ...billingDetails,
       }),
     }),
   verifyPayment: (orderId, paymentId, signature) =>

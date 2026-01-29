@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { switchToFrontendPortal } from "@/lib/portalSwitch";
 import {
@@ -20,61 +20,62 @@ import {
     ChevronLeft,
     ChevronRight,
     Menu,
-    Sparkles,
     X,
     User,
     LogOut,
+    Sparkles,
 } from "lucide-react";
 
-export function Sidebar({ collapsed, setCollapsed, hovered, setHovered, isMobile }) {
+export function Sidebar({ collapsed, setCollapsed, hovered, setHovered }) {
+    const { t } = useLanguage();
     const [expandedItems, setExpandedItems] = useState([]);
     const pathname = usePathname();
     const router = useRouter();
 
     const navItems = [
         {
-            label: "Dashboard",
+            label: t("dashboard.dashboard"),
             icon: LayoutDashboard,
             path: "/dashboard",
         },
         {
-            label: "Users",
+            label: t("dashboard.users"),
             icon: Users,
             path: "/dashboard/users",
         },
         {
-            label: "Projects",
+            label: t("dashboard.projects"),
             icon: FolderKanban,
             path: "/dashboard/projects",
         },
         {
-            label: "Billings and Plans",
+            label: t("dashboard.billingsAndPlans"),
             icon: CreditCard,
             path: "/dashboard/payments",
         },
         {
-            label: "Credits Usage History",
+            label: t("dashboard.creditsUsageHistory"),
             icon: History,
             path: "/dashboard/credits-history",
         },
         {
-            label: "Gallery",
+            label: t("dashboard.gallery"),
             icon: Image,
             path: "/dashboard/gallery",
         },
         {
-            label: "Settings",
+            label: t("dashboard.settings"),
             icon: Settings,
             path: "/dashboard/settings",
         },
         {
-            label: "Help and Learning",
+            label: t("dashboard.helpAndLearning"),
             icon: HelpCircle,
             path: "/dashboard/help",
             children: [
-                { label: "Feedback", icon: MessageSquare, path: "/dashboard/help/feedback" },
-                { label: "Tutorials", icon: BookOpen, path: "/dashboard/help/tutorials" },
-                { label: "Help Center", icon: FileQuestion, path: "/dashboard/help/help-center" },
+                { label: t("dashboard.feedback"), icon: MessageSquare, path: "/dashboard/help/feedback" },
+                { label: t("dashboard.tutorials"), icon: BookOpen, path: "/dashboard/help/tutorials" },
+                { label: t("dashboard.helpCenter"), icon: FileQuestion, path: "/dashboard/help/help-center" },
             ],
         },
     ];
@@ -136,7 +137,7 @@ export function Sidebar({ collapsed, setCollapsed, hovered, setHovered, isMobile
             </div>
 
             {/* Navigation */}
-            <nav className="p-3 space-y-2 overflow-y-auto h-[calc(100%-6.5rem)] pb-20">
+            <nav className="flex-1 overflow-y-auto p-4 space-y-2 pb-24">
                 {navItems.map((item) => (
                     <div key={item.label}>
                         {item.children ? (
@@ -201,17 +202,18 @@ export function Sidebar({ collapsed, setCollapsed, hovered, setHovered, isMobile
                 ))}
             </nav>
 
-            {/* Footer (always visible) */}
-            <div className="absolute bottom-0 left-0 w-full border-t border-sidebar-border bg-sidebar/80 backdrop-blur-md">
-                <div className="flex flex-col items-center justify-center gap-2 py-3 px-4">
-                    {/* Logout button - visible both in collapsed and expanded */}
+            {/* Footer - Switch User */}
+            <div className="absolute bottom-0 left-0 w-full border-t border-gray-800 bg-gray-900/80 backdrop-blur-md">
+                <div className="flex flex-col gap-2 py-3 px-4">
+                    {/* Switch User Button */}
                     <button
-                        onClick={handleLogout}
+                        onClick={switchToFrontendPortal}
                         className={`flex items-center ${isExpanded ? "gap-3 w-full text-left" : "justify-center"} 
-                            text-sidebar-foreground/70 hover:text-sidebar-accent-foreground px-3 py-2 rounded-md hover:bg-sidebar-accent/40 transition`}
+                            text-gray-300 hover:text-white px-3 py-2 rounded-md hover:bg-white/10 transition`}
+                        title={t("dashboard.switchToUserPortal")}
                     >
-                        <LogOut className="w-5 h-5" />
-                        {isExpanded && <span>Logout</span>}
+                        <User className="w-5 h-5" />
+                        {isExpanded && <span>{t("dashboard.switchToUserPortal")}</span>}
                     </button>
                 </div>
             </div>

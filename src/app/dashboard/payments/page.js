@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { CreditCard, Check, X, Calendar, DollarSign, Loader2, AlertCircle, Eye } from "lucide-react";
-import { paymentAPI, plansAPI, organizationAPI } from "@/lib/api";
+import { paymentAPI, plansAPI, organizationAPI, invoiceAPI } from "@/lib/api";
+import { useLanguage } from "@/context/LanguageContext";
 import { InvoiceView } from "@/components/InvoiceView";
 import { Button } from "@/components/ui/button";
 
 export default function PaymentsPage() {
+    const { t } = useLanguage();
     const [activeTab, setActiveTab] = useState("plans");
     const [loading, setLoading] = useState(false);
     const [plans, setPlans] = useState([]);
@@ -18,6 +20,16 @@ export default function PaymentsPage() {
     const [processingPayment, setProcessingPayment] = useState(false);
     const [selectedInvoice, setSelectedInvoice] = useState(null);
     const [selectedCredits, setSelectedCredits] = useState({}); // Track selected credits for each Pro plan
+    const [invoiceConfig, setInvoiceConfig] = useState({ tax_rate: 18 });
+    const [showBillingModal, setShowBillingModal] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState(null);
+    const [billingDetails, setBillingDetails] = useState({
+        billing_name: "",
+        billing_address: "",
+        billing_phone: "",
+        billing_gst_number: "",
+        billing_type: "individual",
+    });
 
     useEffect(() => {
         const orgId = localStorage.getItem("org_organization_id");
@@ -29,6 +41,8 @@ export default function PaymentsPage() {
 
         // Fetch plans from API
         fetchPlans();
+        // Fetch invoice / GST configuration
+        fetchInvoiceConfig();
 
         // Load Razorpay script
         const script = document.createElement("script");
@@ -43,6 +57,17 @@ export default function PaymentsPage() {
             }
         };
     }, []);
+
+    const fetchInvoiceConfig = async () => {
+        try {
+            const config = await invoiceAPI.getConfig();
+            if (config && typeof config.tax_rate !== "undefined") {
+                setInvoiceConfig(config);
+            }
+        } catch (error) {
+            console.warn("Failed to fetch invoice config, using default GST:", error);
+        }
+    };
 
     const fetchPlans = async () => {
         setPlansLoading(true);
@@ -94,18 +119,43 @@ export default function PaymentsPage() {
 
     const handlePurchasePlan = async (plan) => {
         if (!organizationId || !razorpayLoaded) {
-            alert("Please wait for payment gateway to load");
+            alert(t("orgPortal.pleaseWaitPaymentGateway"));
             return;
         }
 
+        // Open billing details modal first
+        setSelectedPlan(plan);
+        setShowBillingModal(true);
+    };
+
+    const startPaymentWithBilling = async () => {
+        if (!organizationId || !razorpayLoaded || !selectedPlan) {
+            return;
+        }
+
+        const plan = selectedPlan;
+
         setProcessingPayment(true);
         try {
-            // Create Razorpay order with plan information
+            // Base amount (before GST)
+            const baseAmount = plan.price;
+            const taxRate = invoiceConfig?.tax_rate || 18;
+            const taxAmount = (baseAmount * taxRate) / 100;
+            const totalAmount = baseAmount + taxAmount;
+
+            // Create Razorpay order with plan + billing information
             const orderData = await paymentAPI.createRazorpayOrder(
                 organizationId,
-                plan.price,
+                baseAmount,
                 plan.credits_per_month || 0,
-                plan.id
+                plan.id,
+                {
+                    billing_name: billingDetails.billing_name,
+                    billing_address: billingDetails.billing_address,
+                    billing_phone: billingDetails.billing_phone,
+                    billing_gst_number: billingDetails.billing_gst_number,
+                    billing_type: billingDetails.billing_type,
+                }
             );
 
             if (!orderData.success) {
@@ -114,7 +164,9 @@ export default function PaymentsPage() {
 
             const options = {
                 key: orderData.key_id,
-                amount: orderData.amount * 100, // Convert to paise
+                // Backend already includes GST in Razorpay order amount,
+                // so use total_amount (if provided) for user display.
+                amount: (orderData.total_amount || totalAmount) * 100,
                 currency: "INR",
                 name: "Splash AI Studio",
                 description: `Subscribe to ${plan.name} plan`,
@@ -130,7 +182,7 @@ export default function PaymentsPage() {
 
                         if (verifyData.success) {
                             const creditsAdded = plan.credits_per_month || 0;
-                            alert(`Payment successful! ${plan.name} plan activated. ${creditsAdded} credits added to your account.`);
+                            alert(`${t("orgPortal.paymentSuccess")} ${plan.name} ${t("orgPortal.planActivated")}. ${creditsAdded} ${t("orgPortal.creditsAddedToAccount")}.`);
                             // Refresh payment history and organization data
                             fetchPaymentHistory(organizationId);
                             fetchOrganizationPlan(organizationId);
@@ -141,11 +193,11 @@ export default function PaymentsPage() {
                                 window.location.reload();
                             }, 1000);
                         } else {
-                            alert("Payment verification failed: " + (verifyData.error || "Unknown error"));
+                            alert(t("orgPortal.paymentVerificationFailed") + ": " + (verifyData.error || t("orgPortal.unknownError")));
                         }
                     } catch (error) {
                         console.error("Payment verification error:", error);
-                        alert("Payment verification failed. Please contact support.");
+                        alert(t("orgPortal.paymentVerificationFailedContactSupport"));
                     } finally {
                         setProcessingPayment(false);
                     }
@@ -169,16 +221,16 @@ export default function PaymentsPage() {
             razorpay.open();
         } catch (error) {
             console.error("Payment error:", error);
-            alert("Failed to initiate payment: " + (error.message || "Unknown error"));
+            alert(t("orgPortal.failedToInitiatePayment") + ": " + (error.message || t("orgPortal.unknownError")));
             setProcessingPayment(false);
         }
     };
 
     return (
-        <div className="space-y-6 animate-fadeIn">
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold text-foreground mb-2">Payments and Subscriptions</h1>
-                <p className="text-muted-foreground">Manage your payments and purchase credits</p>
+        <div className="p-8">
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("orgPortal.paymentsAndSubscriptions")}</h1>
+                <p className="text-gray-600">{t("orgPortal.managePaymentsAndPurchaseCredits")}</p>
             </div>
 
             <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border mb-6">
@@ -191,7 +243,7 @@ export default function PaymentsPage() {
                                 : "text-muted-foreground hover:text-foreground"
                         }`}
                     >
-                        Purchase Credits
+                        {t("orgPortal.purchaseCredits")}
                     </button>
                     <button
                         onClick={() => setActiveTab("history")}
@@ -201,18 +253,18 @@ export default function PaymentsPage() {
                                 : "text-muted-foreground hover:text-foreground"
                         }`}
                     >
-                        Payment History
+                        {t("orgPortal.paymentHistory")}
                     </button>
                 </div>
 
                 <div className="p-6">
                     {activeTab === "history" ? (
                         <div>
-                            <h2 className="text-xl font-semibold text-foreground mb-6">Payment History</h2>
+                            <h2 className="text-xl font-semibold text-gray-900 mb-6">{t("orgPortal.paymentHistory")}</h2>
                             {paymentHistory.length === 0 ? (
                                 <div className="text-center py-12">
-                                    <CreditCard className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                                    <p className="text-muted-foreground">No payment history found</p>
+                                    <CreditCard className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                                    <p className="text-gray-600">{t("orgPortal.noPaymentHistoryFound")}</p>
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
@@ -320,21 +372,21 @@ export default function PaymentsPage() {
                         </div>
                     ) : (
                         <div>
-                            <h2 className="text-xl font-semibold text-gray-900 mb-6">Plans & Subscriptions</h2>
+                            <h2 className="text-xl font-semibold text-gray-900 mb-6">{t("orgPortal.plansAndSubscriptions")}</h2>
                             
                             {currentPlan && (
                                 <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="text-sm text-blue-700 font-medium">Current Plan</p>
+                                            <p className="text-sm text-blue-700 font-medium">{t("orgPortal.currentPlan")}</p>
                                             <p className="text-lg font-bold text-blue-900">{currentPlan.name}</p>
                                             <p className="text-sm text-blue-600">
-                                                {currentPlan.credits_per_month?.toLocaleString() || 0} credits/month • 
-                                                {(currentPlan.currency === 'INR' ? '₹' : '$')}{currentPlan.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/{currentPlan.billing_cycle === 'yearly' ? 'year' : 'month'}
+                                                {currentPlan.credits_per_month?.toLocaleString() || 0} {t("orgPortal.creditsPerMonth")} • 
+                                                {(currentPlan.currency === 'INR' ? '₹' : '$')}{currentPlan.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/{currentPlan.billing_cycle === 'yearly' ? t("orgPortal.year") : t("orgPortal.month")}
                                             </p>
                                         </div>  
                                         <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-medium">
-                                            Active
+                                            {t("orgPortal.active")}
                                         </span>
                                     </div>
                                 </div>
@@ -343,19 +395,19 @@ export default function PaymentsPage() {
                             {!razorpayLoaded && (
                                 <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
                                     <AlertCircle className="w-5 h-5 text-yellow-600" />
-                                    <p className="text-yellow-700 text-sm">Loading payment gateway...</p>
+                                    <p className="text-yellow-700 text-sm">{t("orgPortal.loadingPaymentGateway")}</p>
                                 </div>
                             )}
 
                             {plansLoading ? (
                                 <div className="flex items-center justify-center py-12">
                                     <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-                                    <span className="ml-3 text-gray-600">Loading plans...</span>
+                                    <span className="ml-3 text-gray-600">{t("orgPortal.loadingPlans")}</span>
                                 </div>
                             ) : plans.length === 0 ? (
                                 <div className="text-center py-12">
                                     <CreditCard className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-600">No plans available at the moment</p>
+                                    <p className="text-gray-600">{t("orgPortal.noPlansAvailable")}</p>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -378,14 +430,14 @@ export default function PaymentsPage() {
                                                 {plan.is_popular && (
                                                     <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                                                         <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
-                                                            Most Popular
+                                                            {t("orgPortal.mostPopular")}
                                                         </span>
                                                     </div>
                                                 )}
                                                 {isCurrentPlan && (
                                                     <div className="absolute top-4 right-4">
                                                         <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                                                            Current
+                                                            {t("orgPortal.current")}
                                                         </span>
                                                     </div>
                                                 )}
@@ -408,7 +460,7 @@ export default function PaymentsPage() {
                                                         <p className="text-gray-600 mt-2 text-sm">{plan.description}</p>
                                                     )}
                                                     <p className="text-gray-700 mt-2 font-semibold">
-                                                        {plan.credits_per_month?.toLocaleString() || 0} Credits/month
+                                                        {plan.credits_per_month?.toLocaleString() || 0} {t("orgPortal.creditsPerMonth")}
                                                     </p>
                                                 </div>
                                                 {plan.features && plan.features.length > 0 && (
@@ -449,12 +501,12 @@ export default function PaymentsPage() {
                                                     {processingPayment ? (
                                                         <>
                                                             <Loader2 className="w-5 h-5 animate-spin" />
-                                                            Processing...
+                                                            {t("orgPortal.processing")}
                                                         </>
                                                     ) : isCurrentPlan ? (
-                                                        "Current Plan"
+                                                        t("orgPortal.currentPlan")
                                                     ) : (
-                                                        `Subscribe to ${plan.name}`
+                                                        `${t("orgPortal.subscribeTo")} ${plan.name}`
                                                     )}
                                                 </button>
                                             </div>
@@ -467,6 +519,189 @@ export default function PaymentsPage() {
                 </div>
             </div>
             
+            {/* Billing Details Modal */}
+            {showBillingModal && selectedPlan && (
+                <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50">
+                    <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 space-y-4">
+                        <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                {t("orgPortal.billingDetails") || "Billing Details"}
+                            </h3>
+                            <button
+                                onClick={() => {
+                                    setShowBillingModal(false);
+                                    setProcessingPayment(false);
+                                }}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <p className="text-sm text-gray-600">
+                            {t("orgPortal.enterBillingDetails") || "Please enter billing details required for GST invoice."}
+                        </p>
+
+                        <div className="space-y-3">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    {t("orgPortal.billingName") || "Billing Name"}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={billingDetails.billing_name}
+                                    onChange={(e) =>
+                                        setBillingDetails((prev) => ({ ...prev, billing_name: e.target.value }))
+                                    }
+                                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    {t("orgPortal.billingAddress") || "Billing Address"}
+                                </label>
+                                <textarea
+                                    rows={2}
+                                    value={billingDetails.billing_address}
+                                    onChange={(e) =>
+                                        setBillingDetails((prev) => ({ ...prev, billing_address: e.target.value }))
+                                    }
+                                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        {t("orgPortal.phoneNumber") || "Phone Number"}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={billingDetails.billing_phone}
+                                        onChange={(e) =>
+                                            setBillingDetails((prev) => ({ ...prev, billing_phone: e.target.value }))
+                                        }
+                                        className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        {t("orgPortal.gstNumber") || "GST Number (optional)"}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={billingDetails.billing_gst_number}
+                                        onChange={(e) =>
+                                            setBillingDetails((prev) => ({
+                                                ...prev,
+                                                billing_gst_number: e.target.value,
+                                            }))
+                                        }
+                                        className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <span className="block text-sm font-medium text-gray-700 mb-1">
+                                    {t("orgPortal.billingType") || "Billing Type"}
+                                </span>
+                                <div className="flex gap-4 text-sm">
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="billing_type"
+                                            value="individual"
+                                            checked={billingDetails.billing_type === "individual"}
+                                            onChange={(e) =>
+                                                setBillingDetails((prev) => ({
+                                                    ...prev,
+                                                    billing_type: e.target.value,
+                                                }))
+                                            }
+                                        />
+                                        <span>{t("orgPortal.individual") || "Individual"}</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="billing_type"
+                                            value="business"
+                                            checked={billingDetails.billing_type === "business"}
+                                            onChange={(e) =>
+                                                setBillingDetails((prev) => ({
+                                                    ...prev,
+                                                    billing_type: e.target.value,
+                                                }))
+                                            }
+                                        />
+                                        <span>{t("orgPortal.business") || "Business"}</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            {/* GST Summary */}
+                            <div className="mt-2 rounded-md bg-gray-50 border border-gray-200 p-3 text-sm">
+                                <p className="font-semibold text-gray-800 mb-1">
+                                    {t("orgPortal.orderSummary") || "Order Summary"}
+                                </p>
+                                <div className="flex justify-between text-gray-700">
+                                    <span>{t("orgPortal.planAmount") || "Plan amount"}</span>
+                                    <span>
+                                        ₹{selectedPlan.price.toFixed(2)}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between text-gray-700 mt-1">
+                                    <span>
+                                        {t("orgPortal.gst") || "GST"} ({invoiceConfig?.tax_rate ?? 18}%)
+                                    </span>
+                                    <span>
+                                        ₹{(selectedPlan.price * (invoiceConfig?.tax_rate ?? 18) / 100).toFixed(2)}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between text-gray-900 font-semibold mt-2 border-t border-gray-200 pt-2">
+                                    <span>{t("orgPortal.totalPayable") || "Total payable"}</span>
+                                    <span>
+                                        ₹
+                                        {(
+                                            selectedPlan.price +
+                                            selectedPlan.price * (invoiceConfig?.tax_rate ?? 18) / 100
+                                        ).toFixed(2)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-4 flex justify-end gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setShowBillingModal(false);
+                                    setProcessingPayment(false);
+                                }}
+                            >
+                                {t("common.cancel") || "Cancel"}
+                            </Button>
+                            <Button
+                                onClick={startPaymentWithBilling}
+                                disabled={processingPayment}
+                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                                {processingPayment ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        {t("orgPortal.processing") || "Processing..."}
+                                    </>
+                                ) : (
+                                    t("orgPortal.proceedToPay") || "Proceed to pay"
+                                )}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Invoice View Modal */}
             {selectedInvoice && (
                 <InvoiceView
