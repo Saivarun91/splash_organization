@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { CreditCard, Check, X, Calendar, DollarSign, Loader2, AlertCircle, Eye } from "lucide-react";
-import { paymentAPI, plansAPI, organizationAPI } from "@/lib/api";
+import { paymentAPI, plansAPI, organizationAPI, invoiceAPI } from "@/lib/api";
 import { useLanguage } from "@/context/LanguageContext";
 import { InvoiceView } from "@/components/InvoiceView";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,16 @@ export default function PaymentsPage() {
     const [processingPayment, setProcessingPayment] = useState(false);
     const [selectedInvoice, setSelectedInvoice] = useState(null);
     const [selectedCredits, setSelectedCredits] = useState({}); // Track selected credits for each Pro plan
+    const [invoiceConfig, setInvoiceConfig] = useState({ tax_rate: 18 });
+    const [showBillingModal, setShowBillingModal] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState(null);
+    const [billingDetails, setBillingDetails] = useState({
+        billing_name: "",
+        billing_address: "",
+        billing_phone: "",
+        billing_gst_number: "",
+        billing_type: "individual",
+    });
 
     useEffect(() => {
         const orgId = localStorage.getItem("org_organization_id");
@@ -31,6 +41,8 @@ export default function PaymentsPage() {
 
         // Fetch plans from API
         fetchPlans();
+        // Fetch invoice / GST configuration
+        fetchInvoiceConfig();
 
         // Load Razorpay script
         const script = document.createElement("script");
@@ -45,6 +57,17 @@ export default function PaymentsPage() {
             }
         };
     }, []);
+
+    const fetchInvoiceConfig = async () => {
+        try {
+            const config = await invoiceAPI.getConfig();
+            if (config && typeof config.tax_rate !== "undefined") {
+                setInvoiceConfig(config);
+            }
+        } catch (error) {
+            console.warn("Failed to fetch invoice config, using default GST:", error);
+        }
+    };
 
     const fetchPlans = async () => {
         setPlansLoading(true);
@@ -100,14 +123,39 @@ export default function PaymentsPage() {
             return;
         }
 
+        // Open billing details modal first
+        setSelectedPlan(plan);
+        setShowBillingModal(true);
+    };
+
+    const startPaymentWithBilling = async () => {
+        if (!organizationId || !razorpayLoaded || !selectedPlan) {
+            return;
+        }
+
+        const plan = selectedPlan;
+
         setProcessingPayment(true);
         try {
-            // Create Razorpay order with plan information
+            // Base amount (before GST)
+            const baseAmount = plan.price;
+            const taxRate = invoiceConfig?.tax_rate || 18;
+            const taxAmount = (baseAmount * taxRate) / 100;
+            const totalAmount = baseAmount + taxAmount;
+
+            // Create Razorpay order with plan + billing information
             const orderData = await paymentAPI.createRazorpayOrder(
                 organizationId,
-                plan.price,
+                baseAmount,
                 plan.credits_per_month || 0,
-                plan.id
+                plan.id,
+                {
+                    billing_name: billingDetails.billing_name,
+                    billing_address: billingDetails.billing_address,
+                    billing_phone: billingDetails.billing_phone,
+                    billing_gst_number: billingDetails.billing_gst_number,
+                    billing_type: billingDetails.billing_type,
+                }
             );
 
             if (!orderData.success) {
@@ -116,7 +164,9 @@ export default function PaymentsPage() {
 
             const options = {
                 key: orderData.key_id,
-                amount: orderData.amount * 100, // Convert to paise
+                // Backend already includes GST in Razorpay order amount,
+                // so use total_amount (if provided) for user display.
+                amount: (orderData.total_amount || totalAmount) * 100,
                 currency: "INR",
                 name: "Splash AI Studio",
                 description: `Subscribe to ${plan.name} plan`,
@@ -468,6 +518,189 @@ export default function PaymentsPage() {
                 </div>
             </div>
             
+            {/* Billing Details Modal */}
+            {showBillingModal && selectedPlan && (
+                <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50">
+                    <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 space-y-4">
+                        <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                {t("orgPortal.billingDetails") || "Billing Details"}
+                            </h3>
+                            <button
+                                onClick={() => {
+                                    setShowBillingModal(false);
+                                    setProcessingPayment(false);
+                                }}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <p className="text-sm text-gray-600">
+                            {t("orgPortal.enterBillingDetails") || "Please enter billing details required for GST invoice."}
+                        </p>
+
+                        <div className="space-y-3">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    {t("orgPortal.billingName") || "Billing Name"}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={billingDetails.billing_name}
+                                    onChange={(e) =>
+                                        setBillingDetails((prev) => ({ ...prev, billing_name: e.target.value }))
+                                    }
+                                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    {t("orgPortal.billingAddress") || "Billing Address"}
+                                </label>
+                                <textarea
+                                    rows={2}
+                                    value={billingDetails.billing_address}
+                                    onChange={(e) =>
+                                        setBillingDetails((prev) => ({ ...prev, billing_address: e.target.value }))
+                                    }
+                                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        {t("orgPortal.phoneNumber") || "Phone Number"}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={billingDetails.billing_phone}
+                                        onChange={(e) =>
+                                            setBillingDetails((prev) => ({ ...prev, billing_phone: e.target.value }))
+                                        }
+                                        className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        {t("orgPortal.gstNumber") || "GST Number (optional)"}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={billingDetails.billing_gst_number}
+                                        onChange={(e) =>
+                                            setBillingDetails((prev) => ({
+                                                ...prev,
+                                                billing_gst_number: e.target.value,
+                                            }))
+                                        }
+                                        className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <span className="block text-sm font-medium text-gray-700 mb-1">
+                                    {t("orgPortal.billingType") || "Billing Type"}
+                                </span>
+                                <div className="flex gap-4 text-sm">
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="billing_type"
+                                            value="individual"
+                                            checked={billingDetails.billing_type === "individual"}
+                                            onChange={(e) =>
+                                                setBillingDetails((prev) => ({
+                                                    ...prev,
+                                                    billing_type: e.target.value,
+                                                }))
+                                            }
+                                        />
+                                        <span>{t("orgPortal.individual") || "Individual"}</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="billing_type"
+                                            value="business"
+                                            checked={billingDetails.billing_type === "business"}
+                                            onChange={(e) =>
+                                                setBillingDetails((prev) => ({
+                                                    ...prev,
+                                                    billing_type: e.target.value,
+                                                }))
+                                            }
+                                        />
+                                        <span>{t("orgPortal.business") || "Business"}</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            {/* GST Summary */}
+                            <div className="mt-2 rounded-md bg-gray-50 border border-gray-200 p-3 text-sm">
+                                <p className="font-semibold text-gray-800 mb-1">
+                                    {t("orgPortal.orderSummary") || "Order Summary"}
+                                </p>
+                                <div className="flex justify-between text-gray-700">
+                                    <span>{t("orgPortal.planAmount") || "Plan amount"}</span>
+                                    <span>
+                                        ₹{selectedPlan.price.toFixed(2)}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between text-gray-700 mt-1">
+                                    <span>
+                                        {t("orgPortal.gst") || "GST"} ({invoiceConfig?.tax_rate ?? 18}%)
+                                    </span>
+                                    <span>
+                                        ₹{(selectedPlan.price * (invoiceConfig?.tax_rate ?? 18) / 100).toFixed(2)}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between text-gray-900 font-semibold mt-2 border-t border-gray-200 pt-2">
+                                    <span>{t("orgPortal.totalPayable") || "Total payable"}</span>
+                                    <span>
+                                        ₹
+                                        {(
+                                            selectedPlan.price +
+                                            selectedPlan.price * (invoiceConfig?.tax_rate ?? 18) / 100
+                                        ).toFixed(2)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-4 flex justify-end gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setShowBillingModal(false);
+                                    setProcessingPayment(false);
+                                }}
+                            >
+                                {t("common.cancel") || "Cancel"}
+                            </Button>
+                            <Button
+                                onClick={startPaymentWithBilling}
+                                disabled={processingPayment}
+                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                                {processingPayment ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        {t("orgPortal.processing") || "Processing..."}
+                                    </>
+                                ) : (
+                                    t("orgPortal.proceedToPay") || "Proceed to pay"
+                                )}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Invoice View Modal */}
             {selectedInvoice && (
                 <InvoiceView

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { switchToFrontendPortal } from "@/lib/portalSwitch";
@@ -22,6 +23,7 @@ import {
     X,
     User,
     LogOut,
+    Sparkles,
 } from "lucide-react";
 
 export function Sidebar({ collapsed, setCollapsed, hovered, setHovered }) {
