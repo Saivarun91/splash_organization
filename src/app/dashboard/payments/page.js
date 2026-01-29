@@ -20,6 +20,7 @@ export default function PaymentsPage() {
     const [processingPayment, setProcessingPayment] = useState(false);
     const [selectedInvoice, setSelectedInvoice] = useState(null);
     const [selectedCredits, setSelectedCredits] = useState({}); // Track selected credits for each Pro plan
+    const [selectedCreditOption, setSelectedCreditOption] = useState(0); // Selected credit option index for Pro plan
     const [invoiceConfig, setInvoiceConfig] = useState({ tax_rate: 18 });
     const [showBillingModal, setShowBillingModal] = useState(false);
     const [selectedPlan, setSelectedPlan] = useState(null);
@@ -73,12 +74,19 @@ export default function PaymentsPage() {
         setPlansLoading(true);
         try {
             const response = await plansAPI.getAll(true); // Fetch only active plans
+            let allPlans = [];
             if (response.success && response.plans) {
-                setPlans(response.plans);
+                allPlans = response.plans;
             } else if (response.plans) {
-                // Handle case where response might not have success field
-                setPlans(Array.isArray(response.plans) ? response.plans : []);
+                allPlans = Array.isArray(response.plans) ? response.plans : [];
             }
+            // Filter to only Pro and Enterprise plans, Pro first
+            const proPlan = allPlans.find((p) => (p.name || "").toLowerCase() === "pro");
+            const enterprisePlan = allPlans.find((p) => (p.name || "").toLowerCase() === "enterprise");
+            const filteredPlans = [];
+            if (proPlan) filteredPlans.push(proPlan);
+            if (enterprisePlan) filteredPlans.push(enterprisePlan);
+            setPlans(filteredPlans);
         } catch (error) {
             console.error("Error fetching plans:", error);
             setPlans([]);
@@ -137,8 +145,20 @@ export default function PaymentsPage() {
 
         setProcessingPayment(true);
         try {
-            // Base amount (before GST)
-            const baseAmount = plan.price;
+            // For Pro plan, use selected credit option; for Enterprise, use plan price (0 or custom)
+            let baseAmount = plan.price;
+            let creditsToAdd = plan.credits_per_month || 0;
+            
+            // If Pro plan, get amount and credits from selected credit option
+            if ((plan.name || "").toLowerCase() === "pro") {
+                const creditOptions = plan.credit_options || plan.custom_settings?.credit_options || [];
+                const selectedOption = creditOptions[selectedCreditOption] || creditOptions[0];
+                if (selectedOption) {
+                    baseAmount = selectedOption.amount || plan.price;
+                    creditsToAdd = selectedOption.credits || 0;
+                }
+            }
+
             const taxRate = invoiceConfig?.tax_rate || 18;
             const taxAmount = (baseAmount * taxRate) / 100;
             const totalAmount = baseAmount + taxAmount;
@@ -147,7 +167,7 @@ export default function PaymentsPage() {
             const orderData = await paymentAPI.createRazorpayOrder(
                 organizationId,
                 baseAmount,
-                plan.credits_per_month || 0,
+                creditsToAdd,
                 plan.id,
                 {
                     billing_name: billingDetails.billing_name,
@@ -181,7 +201,13 @@ export default function PaymentsPage() {
                         );
 
                         if (verifyData.success) {
-                            const creditsAdded = plan.credits_per_month || 0;
+                            // For Pro plan, use credits from selected option
+                            let creditsAdded = plan.credits_per_month || 0;
+                            if ((plan.name || "").toLowerCase() === "pro") {
+                                const creditOptions = plan.credit_options || plan.custom_settings?.credit_options || [];
+                                const selectedOption = creditOptions[selectedCreditOption] || creditOptions[0];
+                                creditsAdded = selectedOption?.credits || creditsAdded;
+                            }
                             alert(`${t("orgPortal.paymentSuccess")} ${plan.name} ${t("orgPortal.planActivated")}. ${creditsAdded} ${t("orgPortal.creditsAddedToAccount")}.`);
                             // Refresh payment history and organization data
                             fetchPaymentHistory(organizationId);
@@ -410,108 +436,144 @@ export default function PaymentsPage() {
                                     <p className="text-gray-600">{t("orgPortal.noPlansAvailable")}</p>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    {plans.map((plan) => {
-                                        const isCurrentPlan = currentPlan && currentPlan.id === plan.id;
-                                        const originalPrice = plan.original_price || plan.price;
-                                        const hasDiscount = originalPrice > plan.price;
-                                        
-                                        return (
-                                            <div
-                                                key={plan.id}
-                                                className={`border rounded-lg p-6 relative ${
-                                                    plan.is_popular
-                                                        ? "border-blue-500 shadow-lg scale-105"
-                                                        : isCurrentPlan
-                                                        ? "border-green-500 shadow-md"
-                                                        : "border-gray-200 hover:shadow-md"
-                                                }`}
-                                            >
-                                                {plan.is_popular && (
-                                                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                                                        <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
-                                                            {t("orgPortal.mostPopular")}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                {isCurrentPlan && (
-                                                    <div className="absolute top-4 right-4">
-                                                        <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                                                            {t("orgPortal.current")}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                <div className="text-center mb-6">
-                                                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                                                    <div className="flex items-baseline justify-center gap-2">
-                                                        {hasDiscount && (
-                                                            <span className="text-lg text-gray-500 line-through">
-                                                                {(plan.currency === 'INR' ? '₹' : '$')}{originalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                            </span>
-                                                        )}
-                                                        <span className="text-4xl font-bold text-gray-900">
-                                                            {(plan.currency === 'INR' ? '₹' : '$')}{plan.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                        </span>
-                                                        <span className="text-gray-600">
-                                                            /{plan.billing_cycle === 'yearly' ? 'year' : 'month'}
-                                                        </span>
-                                                    </div>
-                                                    {plan.description && (
-                                                        <p className="text-gray-600 mt-2 text-sm">{plan.description}</p>
-                                                    )}
-                                                    <p className="text-gray-700 mt-2 font-semibold">
-                                                        {plan.credits_per_month?.toLocaleString() || 0} {t("orgPortal.creditsPerMonth")}
-                                                    </p>
-                                                </div>
-                                                {plan.features && plan.features.length > 0 && (
-                                                    <ul className="space-y-3 mb-6">
-                                                        {plan.features.map((feature, index) => (
-                                                            <li key={index} className="flex items-start gap-2">
-                                                                <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                                                                <span className="text-gray-700">{feature}</span>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                )}
-                                                {/* <div className="space-y-2 mb-6">
-                                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                        <Check className="w-4 h-4 text-green-500" />
-                                                        <span>Up to {plan.max_projects || 'Unlimited'} projects</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                        <Check className="w-4 h-4 text-green-500" />
-                                                        <span>AI features {plan.ai_features_enabled ? 'enabled' : 'disabled'}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                        <Check className="w-4 h-4 text-green-500" />
-                                                        <span>Secure payment via Razorpay</span>
-                                                    </div>
-                                                </div> */}
-                                                <button
-                                                    onClick={() => handlePurchasePlan(plan)}
-                                                    disabled={processingPayment || !razorpayLoaded || isCurrentPlan}
-                                                    className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
-                                                        isCurrentPlan
-                                                            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                                                            : plan.is_popular
-                                                            ? "bg-blue-600 text-white hover:bg-blue-700"
-                                                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                                                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                <div className="flex justify-center">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl">
+                                        {plans.map((plan) => {
+                                            const isCurrentPlan = currentPlan && currentPlan.id === plan.id;
+                                            const isPro = (plan.name || "").toLowerCase() === "pro";
+                                            const isEnterprise = (plan.name || "").toLowerCase() === "enterprise";
+                                            
+                                            // Get credit options for Pro plan
+                                            const creditOptions = isPro 
+                                                ? (plan.credit_options || plan.custom_settings?.credit_options || [])
+                                                : [];
+                                            const selectedOption = creditOptions[selectedCreditOption] || creditOptions[0];
+                                            
+                                            // Amount display: Pro uses selected option, Enterprise uses custom display
+                                            let displayAmount = plan.price;
+                                            let amountLabel = "";
+                                            if (isPro && selectedOption) {
+                                                displayAmount = selectedOption.amount || plan.price;
+                                                amountLabel = "one-time";
+                                            } else if (isEnterprise) {
+                                                const amountDisplay = plan.custom_settings?.amount_display || plan.amount_display || "As you go";
+                                                displayAmount = null; // Will show text instead
+                                                amountLabel = amountDisplay;
+                                            } else {
+                                                amountLabel = `/${plan.billing_cycle === 'yearly' ? 'year' : 'month'}`;
+                                            }
+                                            
+                                            const ctaText = plan.custom_settings?.cta_text || plan.cta_text || (isPro ? "Pay" : "Contact Sales");
+                                            
+                                            return (
+                                                <div
+                                                    key={plan.id}
+                                                    className={`border-2 rounded-xl p-6 relative ${
+                                                        isPro
+                                                            ? "border-purple-200 bg-gradient-to-b from-purple-50 to-white shadow-lg"
+                                                            : isEnterprise
+                                                            ? "border-gray-200 bg-white shadow-lg"
+                                                            : isCurrentPlan
+                                                            ? "border-green-500 shadow-md"
+                                                            : "border-gray-200 hover:shadow-md"
+                                                    }`}
                                                 >
-                                                    {processingPayment ? (
-                                                        <>
-                                                            <Loader2 className="w-5 h-5 animate-spin" />
-                                                            {t("orgPortal.processing")}
-                                                        </>
-                                                    ) : isCurrentPlan ? (
-                                                        t("orgPortal.currentPlan")
-                                                    ) : (
-                                                        `${t("orgPortal.subscribeTo")} ${plan.name}`
+                                                    {isCurrentPlan && (
+                                                        <div className="absolute top-4 right-4">
+                                                            <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                                                                {t("orgPortal.current")}
+                                                            </span>
+                                                        </div>
                                                     )}
-                                                </button>
-                                            </div>
-                                        );
-                                    })}
+                                                    <div className="text-center mb-6">
+                                                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                                                        {plan.description && (
+                                                            <p className="text-gray-600 mt-1 text-sm">{plan.description}</p>
+                                                        )}
+                                                        <div className="mt-4">
+                                                            {displayAmount !== null ? (
+                                                                <div className="flex items-baseline justify-center gap-2">
+                                                                    <span className="text-4xl font-bold text-gray-900">
+                                                                        {(plan.currency === 'INR' ? '₹' : '$')}{displayAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                                    </span>
+                                                                    {amountLabel && (
+                                                                        <span className="text-gray-600">{amountLabel}</span>
+                                                                    )}
+                                                                </div>
+                                                            ) : (
+                                                                <span className="text-3xl font-bold text-gray-900">{amountLabel}</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    {/* Credit options dropdown for Pro plan */}
+                                                    {isPro && creditOptions.length > 0 && (
+                                                        <div className="mb-4">
+                                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                Choose credits
+                                                            </label>
+                                                            <select
+                                                                value={selectedCreditOption}
+                                                                onChange={(e) => setSelectedCreditOption(Number(e.target.value))}
+                                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                            >
+                                                                {creditOptions.map((opt, index) => (
+                                                                    <option key={index} value={index}>
+                                                                        ${opt.amount} – {opt.credits} credits
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                    )}
+                                                    
+                                                    {plan.features && plan.features.length > 0 && (
+                                                        <ul className="space-y-3 mb-6">
+                                                            {plan.features.map((feature, index) => (
+                                                                <li key={index} className="flex items-start gap-2">
+                                                                    <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                                                                    <span className="text-gray-700">{feature}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    )}
+                                                    
+                                                    {isEnterprise ? (
+                                                        <a
+                                                            href="mailto:sales@example.com"
+                                                            className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 border-2 border-gray-300 text-gray-900 hover:bg-gray-50 ${
+                                                                isCurrentPlan ? "opacity-50 cursor-not-allowed" : ""
+                                                            }`}
+                                                        >
+                                                            {ctaText}
+                                                        </a>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => handlePurchasePlan(plan)}
+                                                            disabled={processingPayment || !razorpayLoaded || isCurrentPlan}
+                                                            className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
+                                                                isCurrentPlan
+                                                                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                                                                    : isPro
+                                                                    ? "bg-purple-600 text-white hover:bg-purple-700"
+                                                                    : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                                                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                                        >
+                                                            {processingPayment ? (
+                                                                <>
+                                                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                                                    {t("orgPortal.processing")}
+                                                                </>
+                                                            ) : isCurrentPlan ? (
+                                                                t("orgPortal.currentPlan")
+                                                            ) : (
+                                                                ctaText
+                                                            )}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -649,7 +711,15 @@ export default function PaymentsPage() {
                                 <div className="flex justify-between text-gray-700">
                                     <span>{t("orgPortal.planAmount") || "Plan amount"}</span>
                                     <span>
-                                        ₹{selectedPlan.price.toFixed(2)}
+                                        ₹{(() => {
+                                            // For Pro plan, use selected credit option amount
+                                            if ((selectedPlan.name || "").toLowerCase() === "pro") {
+                                                const creditOptions = selectedPlan.credit_options || selectedPlan.custom_settings?.credit_options || [];
+                                                const selectedOption = creditOptions[selectedCreditOption] || creditOptions[0];
+                                                return (selectedOption?.amount || selectedPlan.price).toFixed(2);
+                                            }
+                                            return selectedPlan.price.toFixed(2);
+                                        })()}
                                     </span>
                                 </div>
                                 <div className="flex justify-between text-gray-700 mt-1">
@@ -657,17 +727,31 @@ export default function PaymentsPage() {
                                         {t("orgPortal.gst") || "GST"} ({invoiceConfig?.tax_rate ?? 18}%)
                                     </span>
                                     <span>
-                                        ₹{(selectedPlan.price * (invoiceConfig?.tax_rate ?? 18) / 100).toFixed(2)}
+                                        ₹{(() => {
+                                            let baseAmount = selectedPlan.price;
+                                            if ((selectedPlan.name || "").toLowerCase() === "pro") {
+                                                const creditOptions = selectedPlan.credit_options || selectedPlan.custom_settings?.credit_options || [];
+                                                const selectedOption = creditOptions[selectedCreditOption] || creditOptions[0];
+                                                baseAmount = selectedOption?.amount || selectedPlan.price;
+                                            }
+                                            return (baseAmount * (invoiceConfig?.tax_rate ?? 18) / 100).toFixed(2);
+                                        })()}
                                     </span>
                                 </div>
                                 <div className="flex justify-between text-gray-900 font-semibold mt-2 border-t border-gray-200 pt-2">
                                     <span>{t("orgPortal.totalPayable") || "Total payable"}</span>
                                     <span>
                                         ₹
-                                        {(
-                                            selectedPlan.price +
-                                            selectedPlan.price * (invoiceConfig?.tax_rate ?? 18) / 100
-                                        ).toFixed(2)}
+                                        {(() => {
+                                            let baseAmount = selectedPlan.price;
+                                            if ((selectedPlan.name || "").toLowerCase() === "pro") {
+                                                const creditOptions = selectedPlan.credit_options || selectedPlan.custom_settings?.credit_options || [];
+                                                const selectedOption = creditOptions[selectedCreditOption] || creditOptions[0];
+                                                baseAmount = selectedOption?.amount || selectedPlan.price;
+                                            }
+                                            const taxAmount = baseAmount * (invoiceConfig?.tax_rate ?? 18) / 100;
+                                            return (baseAmount + taxAmount).toFixed(2);
+                                        })()}
                                     </span>
                                 </div>
                             </div>
