@@ -218,22 +218,22 @@ export default function PaymentsPage() {
                                 <div className="overflow-x-auto">
                                     <table className="w-full">
                                         <thead>
-                                            <tr className="border-b border-border">
-                                                <th className="text-left py-3 px-4 font-semibold text-foreground">Date</th>
-                                                <th className="text-left py-3 px-4 font-semibold text-foreground">
-                                                    Plan/Type
+                                            <tr className="border-b border-gray-200">
+                                                <th className="text-center py-3 px-4 font-semibold text-gray-900">{t("orgPortal.date")}</th>
+                                                <th className="text-center py-3 px-4 font-semibold text-gray-900">
+                                                    {t("orgPortal.planType")}
                                                 </th>
-                                                <th className="text-left py-3 px-4 font-semibold text-foreground">
-                                                    Credits
+                                                <th className="text-center py-3 px-4 font-semibold text-gray-900">
+                                                    {t("orgPortal.credits")}
                                                 </th>
-                                                <th className="text-left py-3 px-4 font-semibold text-foreground">
-                                                    Amount
+                                                <th className="text-center py-3 px-4 font-semibold text-gray-900">
+                                                    {t("orgPortal.amount")}
                                                 </th>
-                                                <th className="text-left py-3 px-4 font-semibold text-foreground">Status</th>
-                                                <th className="text-left py-3 px-4 font-semibold text-foreground">
-                                                    Transaction ID
+                                                <th className="text-left  py-3 px-10 font-semibold text-gray-900">{t("orgPortal.status")}</th>
+                                                <th className="text-center py-3 px-4 font-semibold text-gray-900">
+                                                    {t("orgPortal.transactionId")}
                                                 </th>
-                                                <th className="text-left py-3 px-4 font-semibold text-foreground">
+                                                <th className="text-center py-3 px-4 font-semibold text-foreground">
                                                     Actions
                                                 </th>
                                             </tr>
@@ -244,7 +244,7 @@ export default function PaymentsPage() {
                                                     key={payment.id}
                                                     className="border-b border-border hover:bg-accent/50"
                                                 >
-                                                    <td className="py-4 px-4">
+                                                    <td className="py-4 px-4 text-center">
                                                         <div className="flex items-center gap-2">
                                                             <Calendar className="w-4 h-4 text-muted-foreground" />
                                                             <span className="text-foreground">
@@ -254,30 +254,30 @@ export default function PaymentsPage() {
                                                             </span>
                                                         </div>
                                                     </td>
-                                                    <td className="py-4 px-4">
-                                                        <span className="text-foreground font-medium">
-                                                            {payment.plan_name || 'Credit Purchase'}
+                                                    <td className="py-4 px-4 text-center">
+                                                        <span className="text-gray-900 font-medium">
+                                                            {payment.plan_name || t("orgPortal.creditPurchase")}
                                                         </span>
                                                     </td>
-                                                    <td className="py-4 px-4">
+                                                    <td className="py-4 px-4 text-center">
                                                         <span className="text-foreground font-semibold">
                                                             {payment.credits?.toLocaleString() || 0}
                                                         </span>
                                                     </td>
-                                                    <td className="py-4 px-4">
+                                                    <td className="py-4 px-4 text-center">
                                                         <div className="flex items-center gap-2">
                                                             <DollarSign className="w-4 h-4 text-muted-foreground" />
                                                             <span className="text-foreground font-semibold">
-                                                                ₹{payment.amount}
+                                                                {payment.amount}
                                                             </span>
                                                         </div>
                                                     </td>
-                                                    <td className="py-4 px-4">
+                                                    <td className="py-4 px-4 text-center">
                                                         <span
-                                                            className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 w-fit ${
+                                                            className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 w-fit text-center ${
                                                                 payment.status === "completed"
                                                                     ? "bg-green-100 text-green-800"
-                                                                    : payment.status === "pending"
+                                                                    : payment.status === "pending" 
                                                                     ? "bg-yellow-100 text-yellow-800"
                                                                     : "bg-red-100 text-red-800"
                                                             }`}
@@ -291,20 +291,21 @@ export default function PaymentsPage() {
                                                                 payment.status.slice(1)}
                                                         </span>
                                                     </td>
-                                                    <td className="py-4 px-4">
+                                                    <td className="py-4 px-4 text-center">
                                                         <span className="text-muted-foreground font-mono text-sm">
-                                                            {payment.razorpay_order_id || "N/A"}
+                                                            {payment.status !== "completed" ? "-" : payment.razorpay_order_id || "N/A"}
                                                         </span>
                                                     </td>
-                                                    <td className="py-4 px-4">
+                                                    <td className="py-4 px-4 text-center">
                                                         <Button
                                                             onClick={() => setSelectedInvoice({
                                                                 transactionId: payment.razorpay_order_id || payment.id,
                                                                 paymentData: payment
-                                                            })}
+                                                            }) }
                                                             variant="outline"
                                                             size="sm"
-                                                            className="flex items-center gap-2"
+                                                            className="flex items-center gap-2"  
+                                                            disabled={payment.status !== "completed"}
                                                         >
                                                             <Eye className="w-4 h-4" />
                                                             View Invoice

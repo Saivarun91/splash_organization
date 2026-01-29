@@ -2,83 +2,33 @@
 
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ArrowLeft, FolderKanban, Image as ImageIcon, User, Shield, Crown } from "lucide-react";
+import { ArrowLeft, FolderKanban, Image as ImageIcon, User, Shield, Crown, Calendar } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/context/LanguageContext";
 
-// Mock data - replace with actual API calls
-const mockUserProjects = [
-    {
-        id: 1,
-        name: "Summer Collection 2024",
-        role: "Project Manager",
-        teamMembers: [
-            { id: 1, name: "John Doe", role: "Project Manager", email: "john.doe@example.com" },
-            { id: 2, name: "Jane Smith", role: "Designer", email: "jane.smith@example.com" },
-            { id: 3, name: "Mike Johnson", role: "Editor", email: "mike.johnson@example.com" },
-        ],
-    },
-    {
-        id: 2,
-        name: "Jewelry Catalog",
-        role: "Designer",
-        teamMembers: [
-            { id: 1, name: "John Doe", role: "Project Manager", email: "john.doe@example.com" },
-            { id: 3, name: "Mike Johnson", role: "Designer", email: "mike.johnson@example.com" },
-            { id: 4, name: "Sarah Williams", role: "Editor", email: "sarah.williams@example.com" },
-        ],
-    },
-    {
-        id: 3,
-        name: "Product Showcase",
-        role: "Editor",
-        teamMembers: [
-            { id: 1, name: "John Doe", role: "Project Manager", email: "john.doe@example.com" },
-            { id: 2, name: "Jane Smith", role: "Designer", email: "jane.smith@example.com" },
-            { id: 5, name: "David Brown", role: "Editor", email: "david.brown@example.com" },
-        ],
-    },
-];
 
-const mockUserImages = [
-    { id: 1, url: "/api/placeholder/300/300", name: "Image 1", createdAt: "2024-01-15" },
-    { id: 2, url: "/api/placeholder/300/300", name: "Image 2", createdAt: "2024-01-14" },
-    { id: 3, url: "/api/placeholder/300/300", name: "Image 3", createdAt: "2024-01-13" },
-    { id: 4, url: "/api/placeholder/300/300", name: "Image 4", createdAt: "2024-01-12" },
-    { id: 5, url: "/api/placeholder/300/300", name: "Image 5", createdAt: "2024-01-11" },
-    { id: 6, url: "/api/placeholder/300/300", name: "Image 6", createdAt: "2024-01-10" },
-];
-
-const mockUser = {
-    id: 1,
-    name: "John Doe",
-    email: "john.doe@example.com",
-    role: "Admin",
-    projectsCount: 12,
-    imagesGenerated: 245,
-};
-
+// Mock data - replace with actual API call
 const getRoleIcon = (role) => {
     switch (role) {
-        case "Admin":
+        case "owner":
             return <Crown className="w-4 h-4" />;
-        case "Manager":
+        case "chief_editor":
             return <Shield className="w-4 h-4" />;
+        case "creative_head":
+            return <CreativeHead className="w-4 h-4" />;
         default:
             return <User className="w-4 h-4" />;
     }
-};
+}; 
 
 const getRoleColor = (role) => {
     switch (role) {
-        case "Admin":
+        case "owner":
             return "bg-purple-100 text-purple-800 border-purple-200";
-        case "Manager":
+        case "chief_editor":
             return "bg-blue-100 text-blue-800 border-blue-200";
-        case "Designer":
+        case "creative_head":
             return "bg-green-100 text-green-800 border-green-200";
-        case "Editor":
-            return "bg-orange-100 text-orange-800 border-orange-200";
-        default:
-            return "bg-gray-100 text-gray-800 border-gray-200";
     }
 };
 
@@ -102,30 +52,27 @@ export default function UserDetailsPage() {
         <div className="p-8">
             {/* Header */}
             <button
-                onClick={() => router.back()}
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+                onClick={() => router.push("/dashboard/users")}
+                className="flex items-center gap-2 mb-6"
             >
-                <ArrowLeft className="w-5 h-5" />
-                <span>Back to Users</span>
+                <ArrowLeft className="w-5 h-5 text-gray-600 hover:text-gray-900" />
+                <span className="text-gray-600 hover:text-gray-900">{t("orgPortal.backToUsers")}</span>
             </button>
 
             <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200 mb-6">
                 <div className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-2xl">
-                        {user.name.charAt(0)}
+                        {user.full_name.charAt(0)}
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">{user.name}</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">{user.full_name}</h1>
                         <p className="text-gray-600">{user.email}</p>
                         <div className="flex items-center gap-2 mt-2">
-                            <span
-                                className={`px-3 py-1 rounded text-sm font-medium border flex items-center gap-1 ${getRoleColor(
-                                    user.role
-                                )}`}
+                            <Badge
+                                className={getRoleColor(user.organization_role)}
                             >
-                                {getRoleIcon(user.role)}
-                                {user.role}
-                            </span>
+                                {getRoleDisplayName(user.organization_role, t)}
+                            </Badge>
                         </div>
                     </div>
                 </div>
@@ -139,8 +86,8 @@ export default function UserDetailsPage() {
                             <FolderKanban className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600">Projects</p>
-                            <p className="text-3xl font-bold text-gray-900">{user.projectsCount}</p>
+                            <p className="text-sm text-gray-600">{t("orgPortal.projects")}</p>
+                            <p className="text-3xl font-bold text-gray-900">{user.projects_count}</p>
                         </div>
                     </div>
                 </div>
@@ -150,8 +97,8 @@ export default function UserDetailsPage() {
                             <ImageIcon className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600">Images Generated</p>
-                            <p className="text-3xl font-bold text-gray-900">{user.imagesGenerated}</p>
+                            <p className="text-sm text-gray-600">{t("orgPortal.imagesGenerated")}</p>
+                            <p className="text-3xl font-bold text-gray-900">{user.images_generated}</p>
                         </div>
                     </div>
                 </div>
@@ -165,20 +112,20 @@ export default function UserDetailsPage() {
                             setActiveTab("projects");
                             setSelectedProject(null);
                         }}
-                        className={`px-6 py-4 font-medium transition-colors ${
+                        className={`px-6 py-4 font-medium transition-colors rounded-t-lg ${
                             activeTab === "projects"
-                                ? "text-blue-600 border-b-2 border-blue-600"
-                                : "text-gray-600 hover:text-gray-900"
+                                ? "bg-blue-500 text-white border-b-2 border-blue-600"
+                                : "bg-gray-100 text-gray-600 hover:text-gray-900"
                         }`}
                     >
                         Projects
                     </button>
                     <button
                         onClick={() => setActiveTab("images")}
-                        className={`px-6 py-4 font-medium transition-colors ${
+                        className={`px-6 py-4 font-medium transition-colors rounded-t-lg ${
                             activeTab === "images"
-                                ? "text-blue-600 border-b-2 border-blue-600"
-                                : "text-gray-600 hover:text-gray-900"
+                                ? "bg-blue-500 text-white border-b-2 border-blue-600"
+                                : "bg-gray-100 text-gray-600 hover:text-gray-900"
                         }`}
                     >
                         Images
@@ -193,7 +140,7 @@ export default function UserDetailsPage() {
                             <div className="w-1/3 border-r border-gray-200 pr-6">
                                 <h3 className="font-semibold text-gray-900 mb-4">Projects</h3>
                                 <div className="space-y-3">
-                                    {userProjects.map((project) => (
+                                    {user.projects.map((project) => (
                                         <div
                                             key={project.id}
                                             onClick={() => handleProjectClick(project)}
@@ -204,7 +151,7 @@ export default function UserDetailsPage() {
                                             }`}
                                         >
                                             <h4 className="font-semibold text-gray-900 mb-1">{project.name}</h4>
-                                            <p className="text-sm text-gray-600">Role: {project.role}</p>
+                                            <p className="text-sm text-gray-600">{t("orgPortal.role")}: {project.organization_role}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -215,19 +162,19 @@ export default function UserDetailsPage() {
                                 {selectedProject ? (
                                     <div>
                                         <h3 className="font-semibold text-gray-900 mb-4">
-                                            Team Members - {selectedProject.name}
+                                            {t("orgPortal.teamMembers")} - {selectedProject.title}
                                         </h3>
                                         <div className="space-y-3">
-                                            {selectedProject.teamMembers.map((member) => (
+                                            {selectedProject.users.map((member) => (
                                                 <div
-                                                    key={member.id}
+                                                    key={user.id}
                                                     className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg"
                                                 >
                                                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
-                                                        {member.name.charAt(0)}
+                                                        {member.full_name.charAt(0)}
                                                     </div>
                                                     <div className="flex-1">
-                                                        <h4 className="font-medium text-gray-900">{member.name}</h4>
+                                                        <h4 className="font-medium text-gray-900">{member.full_name}</h4>
                                                         <p className="text-sm text-gray-600">{member.email}</p>
                                                     </div>
                                                     <div>
@@ -267,7 +214,7 @@ export default function UserDetailsPage() {
                                         </div>
                                         <div className="p-3">
                                             <p className="text-sm font-medium text-gray-900">{image.name}</p>
-                                            <p className="text-xs text-gray-600">{image.createdAt}</p>
+                                            <p className="text-xs text-gray-600">{image.date_created}</p>
                                         </div>
                                     </div>
                                 ))}

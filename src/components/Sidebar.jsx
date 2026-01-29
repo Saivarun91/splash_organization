@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useLanguage } from "@/context/LanguageContext";
+import { switchToFrontendPortal } from "@/lib/portalSwitch";
 import {
     LayoutDashboard,
     Users,
@@ -17,7 +19,10 @@ import {
     FileQuestion,
     ChevronLeft,
     ChevronRight,
+    Menu,
     Sparkles,
+    X,
+    User,
     LogOut,
 } from "lucide-react";
 

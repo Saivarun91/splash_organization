@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Users, Search, FolderKanban, Image as ImageIcon, User, Shield, Crown, Loader2, UserPlus, X, Mail, Trash2 } from "lucide-react";
 import { organizationAPI } from "@/lib/api";
+import { useLanguage } from "@/context/LanguageContext";
+import { Badge } from "@/components/ui/badge";
 
 const getRoleIcon = (role) => {
     switch (role?.toLowerCase()) {
@@ -62,7 +64,7 @@ export default function UsersPage() {
     const [success, setSuccess] = useState("");
     const [deletingUserId, setDeletingUserId] = useState(null);
 
-    useEffect(() => {
+    useEffect(() => { 
         const fetchUsers = async () => {
             try {
                 const orgId = localStorage.getItem("org_organization_id");
@@ -74,6 +76,7 @@ export default function UsersPage() {
                 setOrganizationId(orgId);
                 const data = await organizationAPI.getOrganizationMembers(orgId);
                 if (data.members) {
+                    console.log("data.members", data.members);
                     setUsers(data.members);
                 }
             } catch (error) {
@@ -82,7 +85,7 @@ export default function UsersPage() {
                 setLoading(false);
             }
         };
-
+        
         fetchUsers();
     }, []);
 
@@ -195,17 +198,26 @@ export default function UsersPage() {
     const UserCard = ({ user }) => {
         const isOwner = user.organization_role === "owner";
         const isDeleting = deletingUserId === user.id;
-        
+
+        const handleKeyDown = (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { handleUserClick(user.id); }
+        };
         return (
             <div
                 onClick={() => handleUserClick(user.id)}
+                onKeyDown={handleKeyDown}
+                title={user.full_name} 
+                aria-label={user.full_name} 
+                role="button" 
+                tabIndex={0} 
+                style={{ cursor: 'pointer' }} 
                 className="bg-card text-card-foreground border border-border rounded-xl p-6 hover:shadow-md transition-all cursor-pointer relative"
             >
                 {/* Delete button - only show if not owner */}
                 {!isOwner && (
                     <button
                         onClick={(e) => handleDeleteUser(user.id, user.email, e)}
-                        disabled={isDeleting}
+                        disabled={isDeleting} 
                         className="absolute top-4 right-4 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Remove user from organization"
                     >
