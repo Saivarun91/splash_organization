@@ -4,21 +4,17 @@ import { useState, useEffect } from "react";
 import { CreditCard, Check, X, Calendar, DollarSign, Loader2, AlertCircle, Eye } from "lucide-react";
 import { paymentAPI, plansAPI, organizationAPI, invoiceAPI } from "@/lib/api";
 import { useLanguage } from "@/context/LanguageContext";
-import { InvoiceView } from "@/components/InvoiceView";
 import { Button } from "@/components/ui/button";
 
 export default function PaymentsPage() {
     const { t } = useLanguage();
-    const [activeTab, setActiveTab] = useState("plans");
     const [loading, setLoading] = useState(false);
     const [plans, setPlans] = useState([]);
     const [plansLoading, setPlansLoading] = useState(true);
-    const [paymentHistory, setPaymentHistory] = useState([]);
     const [organizationId, setOrganizationId] = useState(null);
     const [currentPlan, setCurrentPlan] = useState(null);
     const [razorpayLoaded, setRazorpayLoaded] = useState(false);
     const [processingPayment, setProcessingPayment] = useState(false);
-    const [selectedInvoice, setSelectedInvoice] = useState(null);
     const [selectedCredits, setSelectedCredits] = useState({}); // Track selected credits for each Pro plan
     const [selectedCreditOption, setSelectedCreditOption] = useState(0); // Selected credit option index for Pro plan
     const [invoiceConfig, setInvoiceConfig] = useState({ tax_rate: 18 });
@@ -36,7 +32,6 @@ export default function PaymentsPage() {
         const orgId = localStorage.getItem("org_organization_id");
         if (orgId) {
             setOrganizationId(orgId);
-            fetchPaymentHistory(orgId);
             fetchOrganizationPlan(orgId);
         }
 
@@ -114,16 +109,6 @@ export default function PaymentsPage() {
         }
     };
 
-    const fetchPaymentHistory = async (orgId) => {
-        try {
-            const data = await paymentAPI.getPaymentHistory(orgId);
-            if (data.transactions) {
-                setPaymentHistory(data.transactions);
-            }
-        } catch (error) {
-            console.error("Error fetching payment history:", error);
-        }
-    };
 
     const handlePurchasePlan = async (plan) => {
         if (!organizationId || !razorpayLoaded) {
@@ -255,150 +240,14 @@ export default function PaymentsPage() {
     return (
         <div className="p-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("orgPortal.paymentsAndSubscriptions")}</h1>
-                <p className="text-gray-600">{t("orgPortal.managePaymentsAndPurchaseCredits")}</p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("orgPortal.paymentsAndSubscriptions") || "Subscription & Billing"}</h1>
+                <p className="text-gray-600">{t("orgPortal.managePaymentsAndPurchaseCredits") || "Purchase credits and manage your subscription"}</p>
             </div>
 
             <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border mb-6">
-                <div className="flex border-b border-border">
-                    <button
-                        onClick={() => setActiveTab("plans")}
-                        className={`px-6 py-4 font-medium transition-colors ${
-                            activeTab === "plans"
-                                ? "text-primary border-b-2 border-primary"
-                                : "text-muted-foreground hover:text-foreground"
-                        }`}
-                    >
-                        {t("orgPortal.purchaseCredits")}
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("history")}
-                        className={`px-6 py-4 font-medium transition-colors ${
-                            activeTab === "history"
-                                ? "text-primary border-b-2 border-primary"
-                                : "text-muted-foreground hover:text-foreground"
-                        }`}
-                    >
-                        {t("orgPortal.paymentHistory")}
-                    </button>
-                </div>
-
                 <div className="p-6">
-                    {activeTab === "history" ? (
-                        <div>
-                            <h2 className="text-xl font-semibold text-gray-900 mb-6">{t("orgPortal.paymentHistory")}</h2>
-                            {paymentHistory.length === 0 ? (
-                                <div className="text-center py-12">
-                                    <CreditCard className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-600">{t("orgPortal.noPaymentHistoryFound")}</p>
-                                </div>
-                            ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full">
-                                        <thead>
-                                            <tr className="border-b border-gray-200">
-                                                <th className="text-center py-3 px-4 font-semibold text-gray-900">{t("orgPortal.date")}</th>
-                                                <th className="text-center py-3 px-4 font-semibold text-gray-900">
-                                                    {t("orgPortal.planType")}
-                                                </th>
-                                                <th className="text-center py-3 px-4 font-semibold text-gray-900">
-                                                    {t("orgPortal.credits")}
-                                                </th>
-                                                <th className="text-center py-3 px-4 font-semibold text-gray-900">
-                                                    {t("orgPortal.amount")}
-                                                </th>
-                                                <th className="text-left  py-3 px-10 font-semibold text-gray-900">{t("orgPortal.status")}</th>
-                                                <th className="text-center py-3 px-4 font-semibold text-gray-900">
-                                                    {t("orgPortal.transactionId")}
-                                                </th>
-                                                <th className="text-center py-3 px-4 font-semibold text-foreground">
-                                                    Actions
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {paymentHistory.map((payment) => (
-                                                <tr
-                                                    key={payment.id}
-                                                    className="border-b border-border hover:bg-accent/50"
-                                                >
-                                                    <td className="py-4 px-4 text-center">
-                                                        <div className="flex items-center gap-2">
-                                                            <Calendar className="w-4 h-4 text-muted-foreground" />
-                                                            <span className="text-foreground">
-                                                                {payment.created_at
-                                                                    ? new Date(payment.created_at).toLocaleDateString()
-                                                                    : "N/A"}
-                                                            </span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="py-4 px-4 text-center">
-                                                        <span className="text-gray-900 font-medium">
-                                                            {payment.plan_name || t("orgPortal.creditPurchase")}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-4 px-4 text-center">
-                                                        <span className="text-foreground font-semibold">
-                                                            {payment.credits?.toLocaleString() || 0}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-4 px-4 text-center">
-                                                        <div className="flex items-center gap-2">
-                                                            <DollarSign className="w-4 h-4 text-muted-foreground" />
-                                                            <span className="text-foreground font-semibold">
-                                                                {payment.amount}
-                                                            </span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="py-4 px-4 text-center">
-                                                        <span
-                                                            className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 w-fit text-center ${
-                                                                payment.status === "completed"
-                                                                    ? "bg-green-100 text-green-800"
-                                                                    : payment.status === "pending" 
-                                                                    ? "bg-yellow-100 text-yellow-800"
-                                                                    : "bg-red-100 text-red-800"
-                                                            }`}
-                                                        >
-                                                            {payment.status === "completed" ? (
-                                                                <Check className="w-4 h-4" />
-                                                            ) : (
-                                                                <X className="w-4 h-4" />
-                                                            )}
-                                                            {payment.status.charAt(0).toUpperCase() +
-                                                                payment.status.slice(1)}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-4 px-4 text-center">
-                                                        <span className="text-muted-foreground font-mono text-sm">
-                                                            {payment.status !== "completed" ? "-" : payment.razorpay_order_id || "N/A"}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-4 px-4 text-center">
-                                                        <Button
-                                                            onClick={() => setSelectedInvoice({
-                                                                transactionId: payment.razorpay_order_id || payment.id,
-                                                                paymentData: payment
-                                                            }) }
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="flex items-center gap-2"  
-                                                            disabled={payment.status !== "completed"}
-                                                        >
-                                                            <Eye className="w-4 h-4" />
-                                                            View Invoice
-                                                        </Button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <div>
-                            <h2 className="text-xl font-semibold text-gray-900 mb-6">{t("orgPortal.plansAndSubscriptions")}</h2>
+                    <div>
+                            <h2 className="text-xl font-semibold text-gray-900 mb-6">{t("orgPortal.paymentsAndSubscriptions")}</h2>
                             
                             {currentPlan && (
                                 <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -437,7 +286,7 @@ export default function PaymentsPage() {
                                 </div>
                             ) : (
                                 <div className="flex justify-center">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl">
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto w-full">
                                         {plans.map((plan) => {
                                             const isCurrentPlan = currentPlan && currentPlan.id === plan.id;
                                             const isPro = (plan.name || "").toLowerCase() === "pro";
@@ -577,7 +426,6 @@ export default function PaymentsPage() {
                                 </div>
                             )}
                         </div>
-                    )}
                 </div>
             </div>
             
@@ -786,14 +634,6 @@ export default function PaymentsPage() {
                 </div>
             )}
 
-            {/* Invoice View Modal */}
-            {selectedInvoice && (
-                <InvoiceView
-                    transactionId={selectedInvoice.transactionId}
-                    paymentData={selectedInvoice.paymentData}
-                    onClose={() => setSelectedInvoice(null)}
-                />
-            )}
         </div>
     );
 }

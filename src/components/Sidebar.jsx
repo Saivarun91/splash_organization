@@ -24,6 +24,7 @@ import {
     User,
     LogOut,
     Sparkles,
+    Zap,
 } from "lucide-react";
 
 export function Sidebar({ collapsed, setCollapsed, hovered, setHovered }) {
@@ -49,14 +50,14 @@ export function Sidebar({ collapsed, setCollapsed, hovered, setHovered }) {
             path: "/dashboard/projects",
         },
         {
-            label: t("dashboard.billingsAndPlans"),
+            label: t("dashboard.payments") || "Payments",
             icon: CreditCard,
             path: "/dashboard/payments",
-        },
-        {
-            label: t("dashboard.creditsUsageHistory"),
-            icon: History,
-            path: "/dashboard/credits-history",
+            children: [
+                { label: t("dashboard.subscription") || "Subscription", icon: CreditCard, path: "/dashboard/payments" },
+                { label: t("dashboard.paymentHistory") || "Payment History", icon: History, path: "/dashboard/payments/history" },
+                { label: t("dashboard.creditsLogs") || "Credits Usage", icon: Zap, path: "/dashboard/payments/credits" },
+            ],
         },
         {
             label: t("dashboard.gallery"),
