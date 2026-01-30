@@ -136,6 +136,11 @@ export const paymentAPI = {
     }),
   getPaymentHistory: (organizationId) =>
     apiRequest(`/api/payments/history/?organization_id=${organizationId}`),
+  submitContactSales: (data) =>
+    apiRequest("/api/payments/contact-sales/", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
 };
 
 /**

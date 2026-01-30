@@ -5,6 +5,7 @@ import { CreditCard, Check, X, Calendar, DollarSign, Loader2, AlertCircle, Eye }
 import { paymentAPI, plansAPI, organizationAPI, invoiceAPI } from "@/lib/api";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
+import { ContactSalesModal } from "@/components/ContactSalesModal";
 
 export default function PaymentsPage() {
     const { t } = useLanguage();
@@ -19,6 +20,7 @@ export default function PaymentsPage() {
     const [selectedCreditOption, setSelectedCreditOption] = useState(0); // Selected credit option index for Pro plan
     const [invoiceConfig, setInvoiceConfig] = useState({ tax_rate: 18 });
     const [showBillingModal, setShowBillingModal] = useState(false);
+    const [showContactSalesModal, setShowContactSalesModal] = useState(false);
     const [selectedPlan, setSelectedPlan] = useState(null);
     const [billingDetails, setBillingDetails] = useState({
         billing_name: "",
@@ -387,14 +389,16 @@ export default function PaymentsPage() {
                                                     )}
                                                     
                                                     {isEnterprise ? (
-                                                        <a
-                                                            href="mailto:sales@example.com"
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setShowContactSalesModal(true)}
+                                                            disabled={isCurrentPlan}
                                                             className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 border-2 border-gray-300 text-gray-900 hover:bg-gray-50 ${
                                                                 isCurrentPlan ? "opacity-50 cursor-not-allowed" : ""
                                                             }`}
                                                         >
                                                             {ctaText}
-                                                        </a>
+                                                        </button>
                                                     ) : (
                                                         <button
                                                             onClick={() => handlePurchasePlan(plan)}
@@ -634,6 +638,7 @@ export default function PaymentsPage() {
                 </div>
             )}
 
+            <ContactSalesModal open={showContactSalesModal} onOpenChange={setShowContactSalesModal} />
         </div>
     );
 }
