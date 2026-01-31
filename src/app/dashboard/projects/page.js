@@ -97,8 +97,10 @@ export default function ProjectsPage() {
         return matchesSearch && matchesStatus;
     });
 
-    const handleProjectClick = (projectId) => {
-        router.push(`/dashboard/projects/${projectId}`);
+    const handleProjectClick = (project) => {
+        // Use slug if available, otherwise fallback to ID
+        const projectIdentifier = project.slug || project.id;
+        router.push(`/dashboard/projects/${projectIdentifier}`);
     };
 
     if (loading) {
@@ -166,7 +168,7 @@ export default function ProjectsPage() {
                         return (
                             <div
                                 key={project.id}
-                                onClick={() => handleProjectClick(project.id)}
+                                onClick={() => handleProjectClick(project)}
                                 className="group bg-card text-card-foreground border border-border rounded-xl p-6 cursor-pointer transition-all duration-300 hover:shadow-md hover:-translate-y-1"
                             >
                                 {/* Header Section */}
