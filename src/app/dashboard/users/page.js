@@ -76,6 +76,7 @@ export default function UsersPage() {
 
                 setOrganizationId(orgId);
                 const data = await organizationAPI.getOrganizationMembers(orgId);
+                console.log("data", data);
                 if (data.members) {
                     console.log("data.members", data.members);
                     setUsers(data.members);
@@ -107,8 +108,8 @@ export default function UsersPage() {
         );
     };
 
-    const handleUserClick = (userId) => {
-        router.push(`/dashboard/users/${userId}`);
+    const handleUserClick = (user) => {
+        router.push(`/dashboard/users/${user.slug && user.slug !== "" ? user.slug : user.id}`);
     };
 
     const handleDeleteUser = async (userId, userEmail, e) => {
@@ -201,11 +202,11 @@ export default function UsersPage() {
         const isDeleting = deletingUserId === user.id;
 
         const handleKeyDown = (e) => {
-            if (e.key === 'Enter' || e.key === ' ') { handleUserClick(user.id); }
+            if (e.key === 'Enter' || e.key === ' ') { handleUserClick(user); }
         };
         return (
             <div
-                onClick={() => handleUserClick(user.id)}
+                onClick={() => handleUserClick(user)}
                 onKeyDown={handleKeyDown}
                 title={user.full_name} 
                 aria-label={user.full_name} 
@@ -241,14 +242,8 @@ export default function UsersPage() {
                             <ImageIcon className="w-4 h-4 text-gray-600" />
                             <span className="text-sm text-gray-600">{t("orgPortal.images")}</span>
                         </div>
-                        <div className="text-center">
-                            <div className="flex items-center justify-center gap-2 mb-1">
-                                <ImageIcon className="w-4 h-4 text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground">Images</span>
-                            </div>
-                            <div className="text-xl font-bold text-foreground">
-                                {user.images_generated || 0}
-                            </div>
+                        <div className="text-xl font-bold text-gray-900">
+                            {user.images_generated || 0}
                         </div>
                     </div>
                 </div>
