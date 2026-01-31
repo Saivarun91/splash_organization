@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Organization Portal - Splash AI Studio",
   description: "Organization management portal for Splash AI Studio",
+  icons: {
+    icon: "/images/logo-splash.png",
+  },
 };
 
 export default function RootLayout({ children }) {

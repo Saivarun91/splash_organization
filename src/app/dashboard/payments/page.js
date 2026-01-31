@@ -459,7 +459,7 @@ export default function PaymentsPage() {
                         <div className="space-y-3">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
-                                    {t("orgPortal.billingName") || "Billing Name"}
+                                    {t("orgPortal.billingName") || "Billing Name *"}
                                 </label>
                                 <input
                                     type="text"
@@ -473,7 +473,7 @@ export default function PaymentsPage() {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
-                                    {t("orgPortal.billingAddress") || "Billing Address"}
+                                    {t("orgPortal.billingAddress") || "Billing Address *"}
                                 </label>
                                 <textarea
                                     rows={2}
@@ -488,11 +488,11 @@ export default function PaymentsPage() {
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">
-                                        {t("orgPortal.phoneNumber") || "Phone Number"}
+                                        {t("orgPortal.phoneNumber") || "Phone Number *"}
                                     </label>
                                     <input
                                         type="text"
-                                        value={billingDetails.billing_phone}
+                                        value={billingDetails.billing_phone || ""}
                                         onChange={(e) =>
                                             setBillingDetails((prev) => ({ ...prev, billing_phone: e.target.value }))
                                         }
@@ -505,7 +505,7 @@ export default function PaymentsPage() {
                                     </label>
                                     <input
                                         type="text"
-                                        value={billingDetails.billing_gst_number}
+                                        value={billingDetails.billing_gst_number || ""}
                                         onChange={(e) =>
                                             setBillingDetails((prev) => ({
                                                 ...prev,
@@ -527,7 +527,7 @@ export default function PaymentsPage() {
                                             type="radio"
                                             name="billing_type"
                                             value="individual"
-                                            checked={billingDetails.billing_type === "individual"}
+                                            checked={billingDetails.billing_type === "individual" || ""}
                                             onChange={(e) =>
                                                 setBillingDetails((prev) => ({
                                                     ...prev,
@@ -542,7 +542,7 @@ export default function PaymentsPage() {
                                             type="radio"
                                             name="billing_type"
                                             value="business"
-                                            checked={billingDetails.billing_type === "business"}
+                                            checked={billingDetails.billing_type === "business" || ""}
                                             onChange={(e) =>
                                                 setBillingDetails((prev) => ({
                                                     ...prev,
