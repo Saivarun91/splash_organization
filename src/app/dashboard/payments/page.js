@@ -240,13 +240,16 @@ export default function PaymentsPage() {
     };
 
     return (
-        <div className="p-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("orgPortal.paymentsAndSubscriptions") || "Subscription & Billing"}</h1>
-                <p className="text-gray-600">{t("orgPortal.managePaymentsAndPurchaseCredits") || "Purchase credits and manage your subscription"}</p>
+        <div className="space-y-6">
+            <div className="relative p-4 rounded-xl bg-white dark:bg-card shadow-md border border-gray-200 dark:border-border overflow-hidden">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-tr from-indigo-500 to-purple-500 opacity-10 rounded-full blur-3xl" />
+                <div className="relative z-10">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-foreground mb-1">{t("orgPortal.paymentsAndSubscriptions") || "Subscription & Billing"}</h1>
+                    <p className="text-sm text-gray-600 dark:text-muted-foreground">{t("orgPortal.managePaymentsAndPurchaseCredits") || "Purchase credits and manage your subscription"}</p>
+                </div>
             </div>
 
-            <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border mb-6">
+            <div className="p-6 bg-white dark:bg-card rounded-xl shadow-sm border border-gray-200 dark:border-border mb-6">
                 <div className="p-6">
                     <div>
                             <h2 className="text-xl font-semibold text-gray-900 mb-6">{t("orgPortal.paymentsAndSubscriptions")}</h2>

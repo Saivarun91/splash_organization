@@ -104,7 +104,7 @@ export default function DashboardLayout({ children }) {
 
                 {/* Main content below topbar */}
                 <main
-                    className="flex-1 overflow-y-auto p-8 transition-all duration-300 mt-16"
+                    className="flex-1 overflow-y-auto p-6 md:p-8 transition-all duration-300 mt-16 font-sans text-base"
                     style={{
                         marginLeft: `${isMobile ? 0 : sidebarWidth}px`,
                     }}

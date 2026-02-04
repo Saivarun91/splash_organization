@@ -115,10 +115,13 @@ export default function ProjectsPage() {
     }
 
     return (
-        <div className="p-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("orgPortal.projects")}</h1>
-                <p className="text-gray-600">{t("orgPortal.manageAndMonitorProjects")}</p>
+        <div className="space-y-6">
+            <div className="relative p-4 rounded-xl bg-white dark:bg-card shadow-md border border-gray-200 dark:border-border overflow-hidden">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-tr from-indigo-500 to-purple-500 opacity-10 rounded-full blur-3xl" />
+                <div className="relative z-10">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-foreground mb-1">{t("orgPortal.projects")}</h1>
+                    <p className="text-sm text-gray-600 dark:text-muted-foreground">{t("orgPortal.manageAndMonitorProjects")}</p>
+                </div>
             </div>
 
             {/* Search and Filters */}

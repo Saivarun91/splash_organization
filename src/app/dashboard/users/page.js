@@ -213,7 +213,7 @@ export default function UsersPage() {
                 role="button" 
                 tabIndex={0} 
                 style={{ cursor: 'pointer' }} 
-                className="bg-card text-card-foreground border border-border rounded-xl p-6 hover:shadow-md transition-all cursor-pointer relative"
+                className="bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-all cursor-pointer relative"
             >
                 {/* Delete button - only show if not owner */}
                 {!isOwner && (
@@ -264,18 +264,21 @@ export default function UsersPage() {
 
     return (
         <div className="space-y-6 animate-fadeIn">
-            <div className="mb-8 flex justify-between items-center">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("dashboard.users")}</h1>
-                    <p className="text-gray-600">{t("orgPortal.manageUsers")}</p>
+            <div className="relative p-4 rounded-xl bg-white dark:bg-card shadow-md border border-gray-200 dark:border-border overflow-hidden">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-tr from-indigo-500 to-purple-500 opacity-10 rounded-full blur-3xl" />
+                <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-foreground mb-1">{t("dashboard.users")}</h1>
+                        <p className="text-sm text-gray-600 dark:text-muted-foreground">{t("orgPortal.manageUsers")}</p>
+                    </div>
+                    <button
+                        onClick={() => setShowAddUserModal(true)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-sm"
+                    >
+                        <UserPlus className="w-5 h-5" />
+                        {t("orgPortal.addUser")}
+                    </button>
                 </div>
-                <button
-                    onClick={() => setShowAddUserModal(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                >
-                    <UserPlus className="w-5 h-5" />
-                    {t("orgPortal.addUser")}
-                </button>
             </div>
 
             {/* Success/Error Messages */}
@@ -293,9 +296,9 @@ export default function UsersPage() {
             {/* Add User Modal */}
             {showAddUserModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-card text-card-foreground rounded-xl shadow-sm p-6 w-full max-w-md border border-border">
+                    <div className="bg-white dark:bg-card rounded-xl shadow-sm p-6 w-full max-w-md border border-gray-200 dark:border-border">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl font-bold text-gray-900">{t("orgPortal.addUserToOrganization")}</h2>
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-foreground">{t("orgPortal.addUserToOrganization")}</h2>
                             <button
                                 onClick={() => {
                                     setShowAddUserModal(false);

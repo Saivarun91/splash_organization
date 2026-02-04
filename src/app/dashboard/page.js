@@ -162,17 +162,14 @@ export default function Dashboard() {
 
     /* ---------------- STAT CARD (UNCHANGED) ---------------- */
     const StatCard = ({ icon: Icon, title, value, color }) => (
-        <div className="bg-card text-card-foreground rounded-xl shadow-sm p-6 border border-border hover:shadow-md transition-all duration-300">
-            <div className="flex items-center justify-between">
-                <div>
-                    <p className="text-muted-foreground text-sm font-medium mb-1">{title}</p>
-                    <p className="text-3xl font-bold text-foreground">
-                        {value.toLocaleString()}
-                    </p>
-                </div>
-                <div className={`p-3 rounded-xl ${color}`}>
-                    <Icon className="w-6 h-6 text-white" />
-                </div>
+        <div className="p-4 bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl shadow-sm hover:shadow-lg transition-all duration-300">
+            <div className="flex justify-between items-center pb-2">
+                <span className="text-sm font-medium text-gray-500 dark:text-muted-foreground">{title}</span>
+                <Icon className="w-6 h-6 text-gray-700 dark:text-foreground" />
+            </div>
+            <div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-foreground">{value.toLocaleString()}</div>
+                <p className="text-xs text-gray-500 dark:text-muted-foreground mt-1">{title}</p>
             </div>
         </div>
     );
@@ -186,26 +183,27 @@ export default function Dashboard() {
         );
     }
 
-    /* ---------------- RENDER (UNCHANGED UI) ---------------- */
+    /* ---------------- RENDER (UI aligned with frontend) ---------------- */
     return (
-        <div className="p-8">
+        <div className="space-y-6">
 
-            {/* HEADER */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                    {t("dashboard.dashboard")}
-                </h1>
-                <p className="text-gray-600">
-                    Welcome to {organizationName || t("dashboard.user")} {t("dashboard.dashboard").toLowerCase()}
-                </p>
+            {/* Welcome / Header – same as frontend */}
+            <div className="relative p-4 rounded-xl bg-white shadow-md border border-gray-200 dark:bg-card dark:border-border overflow-hidden">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-tr from-indigo-500 to-purple-500 opacity-10 rounded-full blur-3xl" />
+                <div className="relative z-10">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-foreground">{t("dashboard.dashboard")}</h1>
+                    <p className="text-sm text-gray-600 dark:text-muted-foreground mt-1">
+                        Welcome to {organizationName || t("dashboard.user")} {t("dashboard.dashboard").toLowerCase()}
+                    </p>
+                </div>
             </div>
 
-            {/* STATS */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <StatCard icon={Users} title={t("dashboard.totalUsers")} value={stats.totalUsers} color="bg-blue-500" />
-                <StatCard icon={Coins} title={t("dashboard.totalCredits")} value={stats.totalCredits} color="bg-green-500" />
-                <StatCard icon={FolderKanban} title={t("dashboard.totalProjects")} value={stats.totalProjects} color="bg-purple-500" />
-                <StatCard icon={ImageIcon} title={t("dashboard.imagesGenerated")} value={stats.imagesGenerated} color="bg-orange-500" />
+            {/* STATS – same card style as frontend */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+                <StatCard title={t("dashboard.totalUsers")} value={stats.totalUsers} icon={ Users } color="bg-blue-500" />
+                <StatCard title={t("dashboard.totalCredits")} value={stats.totalCredits} icon={ Coins } color="bg-green-500" />
+                <StatCard title={t("dashboard.totalProjects")} value={stats.totalProjects} icon={ FolderKanban } color="bg-purple-500" />
+                <StatCard title={t("dashboard.imagesGenerated")} value={stats.imagesGenerated} icon={ ImageIcon } color="bg-orange-500" />
             </div>
 
             {/* GRAPHS (ONLY LOADER ADDED) */}
@@ -213,10 +211,10 @@ export default function Dashboard() {
                 {/* CREDIT GRAPH */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 {/* Credit Consumption Graph */}
-                <div className="bg-card text-card-foreground rounded-xl shadow-sm p-6 border border-border">
+                <div className="p-6 bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl shadow-sm">
                     <div className="mb-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-1">{t("dashboard.creditConsumptionAnalytics")}</h2>
-                        <p className="text-sm text-gray-500">{t("dashboard.trackCreditUsage")}</p>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-foreground mb-1">{t("dashboard.creditConsumptionAnalytics")}</h2>
+                        <p className="text-sm text-gray-500 dark:text-muted-foreground">{t("dashboard.trackCreditUsage")}</p>
                     </div>
                     <div className="flex items-center gap-2 mb-6">
                         <button
@@ -352,10 +350,10 @@ export default function Dashboard() {
                 </div>
 
                 {/* Images Generated Graph */}
-                <div className="bg-card text-card-foreground rounded-xl shadow-sm p-6 border border-border">
+                <div className="p-6 bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl shadow-sm">
                     <div className="mb-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-1">{t("dashboard.imagesGeneratedAnalytics")}</h2>
-                        <p className="text-sm text-gray-500">{t("dashboard.trackImageGeneration")}</p>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-foreground mb-1">{t("dashboard.imagesGeneratedAnalytics")}</h2>
+                        <p className="text-sm text-gray-500 dark:text-muted-foreground">{t("dashboard.trackImageGeneration")}</p>
                     </div>
                     <div className="flex items-center gap-2 mb-6">
                         <button

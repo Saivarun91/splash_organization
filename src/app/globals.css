@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -120,7 +121,32 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans text-base antialiased;
+  }
+
+  /* Match frontend typography: same font sizes and weights across all pages */
+  h1 {
+    @apply text-3xl font-bold tracking-tight text-foreground;
+  }
+
+  h2 {
+    @apply text-xl font-bold text-foreground;
+  }
+
+  h3 {
+    @apply text-lg font-semibold text-foreground;
+  }
+
+  p {
+    @apply text-base text-foreground;
+  }
+
+  .text-muted {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .card-base {
+    @apply bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl shadow-sm;
   }
 }
 

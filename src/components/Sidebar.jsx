@@ -105,7 +105,7 @@ export function Sidebar({ collapsed, setCollapsed, hovered, setHovered }) {
 
     return (
         <aside
-            className={`fixed left-0 top-0 z-40 h-screen border-r border-gray-700 backdrop-blur-md bg-gray-900 text-white transition-all duration-300 
+            className={`fixed left-0 top-0 z-40 h-screen border-r border-gray-700 backdrop-blur-md bg-gray-900 text-white transition-all duration-300 font-sans text-base
                 ${isExpanded ? "w-64" : "w-20"}
             `}
             onMouseEnter={() => setHovered && setHovered(true)}

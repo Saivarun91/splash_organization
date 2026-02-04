@@ -38,22 +38,25 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="p-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("orgPortal.settings")}</h1>
-                <p className="text-gray-600">{t("orgPortal.manageSettings")}</p>
+        <div className="space-y-6">
+            <div className="relative p-4 rounded-xl bg-white dark:bg-card shadow-md border border-gray-200 dark:border-border overflow-hidden">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-tr from-indigo-500 to-purple-500 opacity-10 rounded-full blur-3xl" />
+                <div className="relative z-10">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-foreground mb-1">{t("orgPortal.settings")}</h1>
+                    <p className="text-sm text-gray-600 dark:text-muted-foreground">{t("orgPortal.manageSettings")}</p>
+                </div>
             </div>
 
             <div className="space-y-6 max-w-4xl">
                 {/* Organization Settings */}
-                <Card className="p-6">
+                <Card className="p-6 bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <User className="w-5 h-5 text-blue-600" />
+                        <div className="w-10 h-10 bg-indigo-100 dark:bg-sidebar-accent/40 rounded-xl flex items-center justify-center">
+                            <User className="w-5 h-5 text-indigo-600 dark:text-sidebar-primary" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-semibold text-gray-900">{t("orgPortal.organizationInformation")}</h2>
-                            <p className="text-sm text-gray-600">{t("orgPortal.updateOrganizationDetails")}</p>
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-foreground">{t("orgPortal.organizationInformation")}</h2>
+                            <p className="text-sm text-gray-600 dark:text-muted-foreground">{t("orgPortal.updateOrganizationDetails")}</p>
                         </div>
                     </div>
                     <div className="space-y-4">

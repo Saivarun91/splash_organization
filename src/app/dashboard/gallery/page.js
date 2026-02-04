@@ -147,49 +147,51 @@ export default function GalleryPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#fcfcfc] p-8">
-            <div className="max-w-7xl mx-auto">
-                <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-[#1a1a1a] mb-2">{t("orgPortal.organizationImages")}</h1>
-                    <p className="text-[#737373] text-lg">{t("orgPortal.allImagesGeneratedUnderOrg")}</p>
+        <div className="space-y-6">
+            <div className="relative p-4 rounded-xl bg-white dark:bg-card shadow-md border border-gray-200 dark:border-border overflow-hidden">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-tr from-indigo-500 to-purple-500 opacity-10 rounded-full blur-3xl" />
+                <div className="relative z-10">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-foreground mb-1">{t("orgPortal.organizationImages")}</h1>
+                    <p className="text-sm text-gray-600 dark:text-muted-foreground">{t("orgPortal.allImagesGeneratedUnderOrg")}</p>
                 </div>
+            </div>
 
-                <div className="flex items-center gap-3 mb-8">
-                    {["all", "plain", "themed", "model", "campaign"].map((f) => (
-                        <button
-                            key={f}
-                            onClick={() => setFilter(f)}
-                            className={`px-6 py-2 rounded-lg font-medium transition-all capitalize ${
-                                filter === f
-                                    ? "bg-[#884cff] text-white"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                            }`}
-                        >
-                            {f === "all" ? t("orgPortal.all") : f === "plain" ? t("orgPortal.plain") : f === "themed" ? t("orgPortal.themed") : f === "model" ? t("orgPortal.model") : f === "campaign" ? t("orgPortal.campaign") : f}
-                        </button>
-                    ))}
+            <div className="flex flex-wrap items-center gap-3">
+                {["all", "plain", "themed", "model", "campaign"].map((f) => (
+                    <button
+                        key={f}
+                        onClick={() => setFilter(f)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
+                            filter === f
+                                ? "bg-indigo-600 text-white shadow-md"
+                                : "bg-gray-100 dark:bg-sidebar-accent/40 text-gray-700 dark:text-foreground hover:bg-gray-200 dark:hover:bg-sidebar-accent/60"
+                        }`}
+                    >
+                        {f === "all" ? t("orgPortal.all") : f === "plain" ? t("orgPortal.plain") : f === "themed" ? t("orgPortal.themed") : f === "model" ? t("orgPortal.model") : f === "campaign" ? t("orgPortal.campaign") : f}
+                    </button>
+                ))}
+            </div>
+
+            {loading ? (
+                <div className="flex items-center justify-center h-64">
+                    <div className="text-center">
+                        <Loader2 className="w-12 h-12 text-indigo-600 dark:text-sidebar-primary animate-spin mx-auto mb-4" />
+                        <p className="text-sm text-gray-500 dark:text-muted-foreground">{t("orgPortal.loadingImages")}</p>
+                    </div>
                 </div>
-
-                {loading ? (
-                    <div className="flex items-center justify-center h-64">
-                        <div className="text-center">
-                            <Loader2 className="w-12 h-12 text-[#884cff] animate-spin mx-auto mb-4" />
-                            <p className="text-[#737373]">{t("orgPortal.loadingImages")}</p>
-                        </div>
+            ) : filteredImages.length === 0 ? (
+                <div className="p-8 md:p-16 bg-white dark:bg-card rounded-xl shadow-sm border border-gray-200 dark:border-border text-center">
+                    <div className="w-20 h-20 bg-indigo-50 dark:bg-sidebar-accent/40 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <Grid className="w-10 h-10 text-indigo-600 dark:text-sidebar-primary" />
                     </div>
-                ) : filteredImages.length === 0 ? (
-                    <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-16 shadow-xl border border-white/20 text-center">
-                        <div className="w-24 h-24 bg-gradient-to-br from-[#884cff]/10 to-[#5a2fcf]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Grid className="w-12 h-12 text-[#884cff]" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-[#1a1a1a] mb-3">{t("orgPortal.noImagesYet")}</h3>
-                        <p className="text-[#737373] mb-6">
-                            {filter === "all"
-                                ? t("orgPortal.noImagesGeneratedYet")
-                                : t("orgPortal.noImagesFoundForFilter")}
-                        </p>
-                    </div>
-                ) : (
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-foreground mb-2">{t("orgPortal.noImagesYet")}</h3>
+                    <p className="text-sm text-gray-500 dark:text-muted-foreground">
+                        {filter === "all"
+                            ? t("orgPortal.noImagesGeneratedYet")
+                            : t("orgPortal.noImagesFoundForFilter")}
+                    </p>
+                </div>
+            ) : (
                     <>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                             {filteredImages.map((image, index) => (
@@ -198,7 +200,7 @@ export default function GalleryPage() {
                                     ref={index === filteredImages.length - 1 ? lastImageElementRef : null}
                                     className="group cursor-pointer"
                                 >
-                                    <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-2">
+                                    <div className="relative aspect-square bg-gray-100 dark:bg-sidebar-accent/30 rounded-xl overflow-hidden mb-2 border border-gray-200 dark:border-border">
                                         <img
                                             src={image.image_url}
                                             alt={getImageCategory(image.image_type, t)}
@@ -236,11 +238,11 @@ export default function GalleryPage() {
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="bg-white rounded-lg p-2">
-                                        <p className="text-sm font-medium text-gray-700 mb-1">
+                                    <div className="bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl p-3 shadow-sm">
+                                        <p className="text-sm font-medium text-gray-900 dark:text-foreground mb-1">
                                             {getImageCategory(image.image_type, t)}
                                         </p>
-                                        <p className="text-xs text-gray-500">
+                                        <p className="text-xs text-gray-500 dark:text-muted-foreground">
                                             {t("orgPortal.generated")} {getDaysAgo(image.created_at, t)}
                                         </p>
                                     </div>
@@ -249,17 +251,16 @@ export default function GalleryPage() {
                         </div>
                         {loadingMore && (
                             <div className="flex justify-center items-center py-8">
-                                <Loader2 className="w-8 h-8 text-[#884cff] animate-spin" />
+                                <Loader2 className="w-8 h-8 text-indigo-600 dark:text-sidebar-primary animate-spin" />
                             </div>
                         )}
                         {!hasMore && filteredImages.length > 0 && (
-                            <div className="text-center py-8 text-gray-500">
+                            <div className="text-center py-8 text-sm text-gray-500 dark:text-muted-foreground">
                                 <p>{t("orgPortal.allImagesLoaded").replace("{count}", totalCount)}</p>
                             </div>
                         )}
                     </>
                 )}
-            </div>
         </div>
     );
 }

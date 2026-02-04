@@ -69,10 +69,10 @@ export function Topbar({ collapsed }) {
             .slice(0, 2);
     };
 
-    /* ======================= JSX ======================= */
+    /* ======================= JSX (aligned with frontend) ======================= */
     return (
         <header
-            className={`fixed top-0 right-0 z-30 h-16 flex items-center bg-white border-b border-gray-200 shadow-sm px-6 transition-all duration-300 ${
+            className={`fixed top-0 right-0 z-30 h-16 flex items-center bg-white dark:bg-card border-b border-gray-200 dark:border-border shadow-sm px-6 transition-all duration-300 font-sans text-base ${
                 collapsed ? "left-20" : "left-64"
             }`}
         >
@@ -82,9 +82,9 @@ export function Topbar({ collapsed }) {
                     <input
                         type="text"
                         placeholder="Search..."
-                        className="w-full border-b border-gray-300 text-gray-900 text-sm px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400 bg-transparent"
+                        className="w-full border-b border-gray-300 dark:border-border text-gray-900 dark:text-foreground text-sm px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400 dark:placeholder-muted-foreground bg-transparent"
                     />
-                    <Search className="absolute right-3 top-2.5 w-4 h-4 text-gray-400" />
+                    <Search className="absolute right-3 top-2.5 w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                 </div>
             </div>
 
@@ -102,13 +102,13 @@ export function Topbar({ collapsed }) {
                     </button>
 
                     {showNotifications && (
-                        <div className="absolute right-0 top-12 w-96 bg-white border border-gray-200 rounded-lg shadow-xl z-50">
-                            <div className="p-4 border-b bg-gradient-to-r from-indigo-50 to-purple-50">
-                                <h3 className="font-semibold text-gray-900">
+                        <div className="absolute right-0 top-12 w-96 bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl shadow-xl z-50">
+                            <div className="p-4 border-b border-gray-200 dark:border-border bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30">
+                                <h3 className="text-base font-semibold text-gray-900 dark:text-foreground">
                                     Notifications
                                 </h3>
                             </div>
-                            <div className="p-8 text-center text-gray-500 text-sm">
+                            <div className="p-8 text-center text-sm text-gray-500 dark:text-muted-foreground">
                                 No notifications
                             </div>
                         </div>
@@ -124,40 +124,38 @@ export function Topbar({ collapsed }) {
                         <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-sm font-semibold text-white">
                             {getUserInitials()}
                         </div>
-                        <span className="text-gray-900 text-sm hidden md:inline">
+                        <span className="text-gray-900 dark:text-foreground text-sm font-medium hidden md:inline">
                             {getUserDisplayName()}
                         </span>
-                        <ChevronDown className="w-4 h-4 text-gray-600" />
+                        <ChevronDown className="w-4 h-4 text-gray-600 dark:text-muted-foreground" />
                     </button>
 
                     {showProfileMenu && (
-                        <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
-                            
+                        <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl shadow-lg z-50 overflow-hidden">
                             {/* User Info */}
-                            <div className="px-4 py-3 border-b bg-gray-50">
-                                <p className="text-sm font-semibold text-gray-900">
+                            <div className="px-4 py-3 border-b border-gray-200 dark:border-border bg-gray-50 dark:bg-sidebar-accent/40">
+                                <p className="text-sm font-semibold text-gray-900 dark:text-foreground">
                                     {getUserDisplayName()}
                                 </p>
-                                <p className="text-xs text-gray-500 truncate">
+                                <p className="text-xs text-gray-500 dark:text-muted-foreground truncate">
                                     {user?.email}
                                 </p>
                             </div>
 
                             {/* Profile */}
                             <button
-                                
-                                className="w-full flex items-center gap-3 px-4 py-2 text-sm hover:bg-indigo-50 transition"
+                                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-900 dark:text-foreground hover:bg-indigo-50 dark:hover:bg-sidebar-accent/40 transition"
                             >
-                                <User className="w-4 h-4 text-indigo-600" />
+                                <User className="w-4 h-4 text-indigo-600 dark:text-sidebar-primary" />
                                 Profile
                             </button>
 
                             {/* Switch to User Panel */}
                             <button
-                               onClick={switchToFrontendPortal}
-                                className="w-full flex items-center gap-3 px-4 py-2 text-sm hover:bg-purple-50 transition"
+                                onClick={switchToFrontendPortal}
+                                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-900 dark:text-foreground hover:bg-purple-50 dark:hover:bg-sidebar-accent/40 transition"
                             >
-                                <SquareUser className="w-4 h-4 text-purple-600" />
+                                <SquareUser className="w-4 h-4 text-purple-600 dark:text-sidebar-primary" />
                                 Switch to User Panel
                             </button>
                         </div>
