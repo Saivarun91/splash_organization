@@ -114,13 +114,24 @@ export function Sidebar({ collapsed, setCollapsed, hovered, setHovered }) {
             {/* Header - same as frontend */}
             <div className="flex items-center h-16 px-3 border-b border-gray-800">
                 <Link href="/dashboard" className="flex items-center gap-2 flex-1 group">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center transition-transform duration-200 group-hover:scale-105">
-                        <Sparkles className="w-5 h-5 text-white" />
-                    </div>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-105">
+                            {collapsed && !hovered && (
+                                <img src="/images/favicon.png" alt="Splash AI Studio" className="w-full h-full object-contain"  />
+                            ) }
+                            
+                            {/* <img src="/images/favicon.png" alt="Splash AI Studio" className="w-full h-full object-contain"  /> */}
+                        </div>
                     {isExpanded && (
-                        <span className="text-lg font-semibold tracking-tight ml-2">
-                            Splash AI Studio
-                        </span>
+                        <div className="flex items-center justify-center gap-2 group" >
+                            <Link href="/dashboard" className="flex items-center justify-center gap-2 group" >
+                                <img
+                                    src="/images/sidebar.png"
+                                    alt="Splash AI Studio"
+                                    className="h-32 lg:h-40 w-auto object-contain hover:scale-105 transition-transform duration-300 translate-y-2 mb-px"
+                                />
+                            </Link>
+                           
+                </div>
                     )}
                 </Link>
 
