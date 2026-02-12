@@ -5,6 +5,42 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
+const ORG_LOGIN_PATH = "/login";
+
+/**
+ * On any token/authentication error: clear org auth state and redirect to login.
+ */
+function handleOrgTokenError() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem("org_auth_token");
+  localStorage.removeItem("org_user");
+  localStorage.removeItem("org_user_id");
+  localStorage.removeItem("org_organization_id");
+  window.location.href = ORG_LOGIN_PATH;
+}
+
+function isTokenRelatedError(error) {
+  if (!error?.message) return false;
+  const msg = String(error.message).toLowerCase();
+  return (
+    msg.includes("token") ||
+    msg.includes("401") ||
+    msg.includes("unauthorized") ||
+    msg.includes("authentication") ||
+    msg.includes("expired") ||
+    msg.includes("invalid credentials")
+  );
+}
+
+/** Ensure 401 responses trigger logout and redirect; returns response otherwise. */
+function checkResponseAuth(response) {
+  if (response.status === 401) {
+    handleOrgTokenError();
+    throw new Error("Authentication failed. Please login again.");
+  }
+  return response;
+}
+
 /**
  * Generic API fetch function with authentication
  */
@@ -31,22 +67,24 @@ async function apiRequest(endpoint, options = {}) {
 
     // Handle 401 Unauthorized - token expired or invalid
     if (response.status === 401) {
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("org_auth_token");
-        localStorage.removeItem("org_user");
-        localStorage.removeItem("org_user_id");
-        localStorage.removeItem("org_organization_id");
-        window.location.href = "/login";
-      }
+      handleOrgTokenError();
       throw new Error("Authentication failed. Please login again.");
     }
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || errorData.message || `API Error: ${response.statusText}`);
+      const errMsg = errorData.error || errorData.message || `API Error: ${response.statusText}`;
+      const err = new Error(errMsg);
+      if (isTokenRelatedError(err)) {
+        handleOrgTokenError();
+      }
+      throw err;
     }
     return await response.json();
   } catch (error) {
+    if (isTokenRelatedError(error)) {
+      handleOrgTokenError();
+    }
     console.error("API Request failed:", error);
     throw error;
   }
@@ -166,9 +204,12 @@ export const organizationAPI = {
         headers: {
           Authorization: token ? `Bearer ${token}` : "",
         },
-      }).then(response => response.json());
+      }).then(response => {
+        checkResponseAuth(response);
+        return response.json();
+      });
     }
-    
+
     const requestData = { description };
     if (targetAudience) requestData.target_audience = targetAudience;
     if (campaignSeason) requestData.campaign_season = campaignSeason;
@@ -198,9 +239,12 @@ export const organizationAPI = {
         headers: {
           Authorization: token ? `Bearer ${token}` : "",
         },
-      }).then(response => response.json());
+      }).then(response => {
+        checkResponseAuth(response);
+        return response.json();
+      });
     }
-    
+
     return apiRequest(`/probackendapp/api/projects/${projectId}/collections/${collectionId}/selections/`, {
       method: "POST",
       body: JSON.stringify({ selections }),
@@ -238,7 +282,10 @@ export const organizationAPI = {
       headers: {
         Authorization: token ? `Bearer ${token}` : "",
       },
-    }).then(response => response.json());
+    }).then(response => {
+      checkResponseAuth(response);
+      return response.json();
+    });
   },
   enhanceImage: (imageUrl, collectionId, productImagePath, generatedImagePath) => {
     const url = `${API_BASE_URL}/probackendapp/api/collections/${collectionId}/enhance-image/`;
@@ -255,7 +302,10 @@ export const organizationAPI = {
       headers: {
         Authorization: token ? `Bearer ${token}` : "",
       },
-    }).then(response => response.json());
+    }).then(response => {
+      checkResponseAuth(response);
+      return response.json();
+    });
   },
   generateProductModelImages: (collectionId, imageTypeSelections = null) => {
     const body = imageTypeSelections ? { image_type_selections: imageTypeSelections } : {};
@@ -327,7 +377,10 @@ export const organizationAPI = {
       headers: {
         Authorization: token ? `Bearer ${token}` : "",
       },
-    }).then(response => response.json());
+    }).then(response => {
+      checkResponseAuth(response);
+      return response.json();
+    });
   },
   removeWorkflowImage: (projectId, collectionId, imageId, category, cloudUrl = null) => {
     const token = typeof window !== "undefined" ? localStorage.getItem("org_auth_token") : null;
@@ -409,7 +462,10 @@ export const organizationAPI = {
       headers: {
         Authorization: token ? `Bearer ${token}` : "",
       },
-    }).then(response => response.json());
+    }).then(response => {
+      checkResponseAuth(response);
+      return response.json();
+    });
   },
   removeModel: (collectionId, type, model) => {
     const token = typeof window !== "undefined" ? localStorage.getItem("org_auth_token") : null;
@@ -440,7 +496,10 @@ export const organizationAPI = {
       headers: {
         Authorization: token ? `Bearer ${token}` : "",
       },
-    }).then(response => response.json());
+    }).then(response => {
+      checkResponseAuth(response);
+      return response.json();
+    });
   },
   deleteProductImage: (collectionId, productImageUrl, productImagePath) => {
     const token = typeof window !== "undefined" ? localStorage.getItem("org_auth_token") : null;
@@ -532,6 +591,7 @@ export const invoiceAPI = {
         Authorization: token ? `Bearer ${token}` : "",
       },
     }).then((response) => {
+      checkResponseAuth(response);
       if (!response.ok) throw new Error("Failed to download invoice");
       return response.blob();
     });
