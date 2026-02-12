@@ -150,41 +150,33 @@ export default function UsersPage() {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setAddingUser(true);   // 🔥 ADD THIS
 
-        try {
-            const response = await organizationAPI.addUser(organizationId, newUserEmail.trim(), newUserRole);
-            
-            if (response.success) {
-                setSuccess(response.user_created 
-                    ? `${t("orgPortal.userCreatedSuccess")} ${newUserEmail}.`
-                    : t("orgPortal.userAddedSuccess"));
-                
-                // Reset form
-                setNewUserEmail("");
-                setNewUserRole("member");
-                setShowAddUserModal(false);
-                
-                // Refresh users list
-                const data = await organizationAPI.getOrganizationMembers(organizationId);
-                if (data.members) {
-                    setUsers(data.members);
-                }
-                
-                // Clear success message after 5 seconds
-                setTimeout(() => setSuccess(""), 5000);
-            }
-        } catch (err) {
-            // The error message from apiRequest already contains the error from the backend
-            // Check if it mentions existing organization
-            let errorMessage = err.message || "Failed to add user. Please try again.";
-            
-            // The backend returns error in format: "This email is already in {org_name}"
-            // or in the error field of the JSON response
-            setError(errorMessage);
-        } finally {
-            setAddingUser(false);
+    try {
+        const response = await organizationAPI.addUser(
+            organizationId,
+            newUserEmail.trim(),
+            newUserRole
+        );
+
+        if (response.success) {
+            setSuccess("User added successfully");
+            setNewUserEmail("");
+            setNewUserRole("member");
+            setShowAddUserModal(false);
+
+            const data = await organizationAPI.getOrganizationMembers(organizationId);
+            if (data.members) setUsers(data.members);
+
+            setTimeout(() => setSuccess(""), 5000);
         }
-    };
+    } catch (err) {
+        setError(err.message || "Failed to add user");
+    } finally {
+        setAddingUser(false);
+    }
+};
+
 
   /* ---------- User Card ---------- */
   const UserCard = ({ user }) => {
@@ -353,6 +345,53 @@ export default function UsersPage() {
           </p>
         </div>
       )}
+      {showAddUserModal && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-xl w-full max-w-md">
+      <h2 className="text-lg font-semibold mb-4">Add User</h2>
+
+      <form onSubmit={handleAddUser} className="space-y-4">
+
+  <input
+    type="email"
+    placeholder="Enter user email"
+    value={newUserEmail}
+    onChange={(e) => setNewUserEmail(e.target.value)}
+    required
+    className="w-full border rounded-lg px-3 py-2"
+  />
+
+  <select
+    value={newUserRole}
+    onChange={(e) => setNewUserRole(e.target.value)}
+    className="w-full border rounded-lg px-3 py-2"
+  >
+    <option value="member">Member</option>
+    <option value="chief_editor">Chief Editor</option>
+    <option value="creative_head">Creative Head</option>
+  </select>
+
+  <button
+    type="submit"
+    disabled={addingUser}
+    className="w-full bg-primary text-white py-2 rounded-lg"
+  >
+    {addingUser ? "Adding..." : "Add User"}
+  </button>
+
+</form>
+
+
+      <button
+        onClick={() => setShowAddUserModal(false)}
+        className="mt-3 text-sm text-gray-500"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
