@@ -1,19 +1,22 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, Bell, User, ChevronDown, SquareUser } from "lucide-react";
+import { Search, User, ChevronDown, SquareUser, Coins, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { switchToFrontendPortal } from "@/lib/portalSwitch";
+import { useCredits } from "@/context/CreditsContext";
+import { useLanguage } from "@/context/LanguageContext";
+import toast from "react-hot-toast";
 
 export function Topbar({ collapsed }) {
     const router = useRouter();
     const [user, setUser] = useState(null);
-    const [showNotifications, setShowNotifications] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
-
-    const notificationRef = useRef(null);
     const profileRef = useRef(null);
-
+    const { organizationCredits, userCredits, creditsLoading } = useCredits();
+    const liveCredits = organizationCredits?.balance ?? userCredits?.balance;
+    const { t } = useLanguage();
+    const notify = (message) => toast(message);
     /* -------------------- Load User -------------------- */
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -28,17 +31,9 @@ export function Topbar({ collapsed }) {
         }
     }, []);
 
-    /* -------------------- Outside Click -------------------- */
+    /* -------------------- Outside Click (Profile Menu) -------------------- */
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (
-                notificationRef.current &&
-                !notificationRef.current.contains(event.target) &&
-                !event.target.closest('button[data-notification-button]')
-            ) {
-                setShowNotifications(false);
-            }
-
             if (
                 profileRef.current &&
                 !profileRef.current.contains(event.target)
@@ -46,6 +41,14 @@ export function Topbar({ collapsed }) {
                 setShowProfileMenu(false);
             }
         };
+
+        if (liveCredits && liveCredits < 100) {
+            notify(`You have ${liveCredits} credits left. Please top up your credits.`);
+        } else if (liveCredits && liveCredits >= 100) {
+            notify(`You have ${liveCredits} credits left. You can continue using the platform.`);
+        } else {
+            notify(`You have no credits left. Please top up your credits.`);
+        }
 
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -91,29 +94,21 @@ export function Topbar({ collapsed }) {
             {/* Right Section */}
             <div className="flex items-center gap-4">
 
-                {/* Notifications */}
-                <div className="relative" ref={notificationRef}>
-                    <button
-                        data-notification-button
-                        onClick={() => setShowNotifications(!showNotifications)}
-                        className="relative p-2 rounded-md hover:bg-gray-100 transition-colors"
-                    >
-                        <Bell className="w-5 h-5 text-gray-700" />
-                    </button>
-
-                    {showNotifications && (
-                        <div className="absolute right-0 top-12 w-96 bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl shadow-xl z-50">
-                            <div className="p-4 border-b border-gray-200 dark:border-border bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30">
-                                <h3 className="text-base font-semibold text-gray-900 dark:text-foreground">
-                                    Notifications
-                                </h3>
-                            </div>
-                            <div className="p-8 text-center text-sm text-gray-500 dark:text-muted-foreground">
-                                No notifications
-                            </div>
-                        </div>
-                    )}
-                </div>
+                {/* Live credits */}
+                {liveCredits && (
+                    <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
+                        {creditsLoading ? (
+                            <Loader2 className="w-4 h-4 text-amber-600 animate-spin" />
+                        ) : (
+                            <>
+                                <Coins className="w-4 h-4 text-amber-600" />
+                                <span className="text-sm font-semibold text-amber-800">
+                                    {liveCredits.toLocaleString()} {t("orgPortal.credits")}
+                                </span>
+                            </>
+                        )}
+                    </div>
+                )}
 
                 {/* Profile Dropdown */}
                 <div className="relative" ref={profileRef}>
@@ -147,7 +142,7 @@ export function Topbar({ collapsed }) {
                                 className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-900 dark:text-foreground hover:bg-indigo-50 dark:hover:bg-sidebar-accent/40 transition"
                             >
                                 <User className="w-4 h-4 text-indigo-600 dark:text-sidebar-primary" />
-                                Profile
+                                {t("profile")}
                             </button>
 
                             {/* Switch to User Panel */}

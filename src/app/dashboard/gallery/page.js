@@ -10,6 +10,7 @@ const getImageCategory = (imageType, t) => {
     if (imageType === "background_change") return t("orgPortal.themed");
     if (imageType === "model_with_ornament" || imageType === "real_model_with_ornament") return t("orgPortal.model");
     if (imageType === "campaign_shot_advanced") return t("orgPortal.campaign");
+    if (imageType === "project_image") return t("orgPortal.project");
     return t("orgPortal.other");
 };
 
@@ -75,6 +76,8 @@ export default function GalleryPage() {
                     params.image_type = "background_change";
                 } else if (filter === "campaign") {
                     params.image_type = "campaign_shot_advanced";
+                } else if (filter === "project") {
+                    params.image_type = "project_image";
                 }
                 // Note: "model" filter needs special handling as it includes both model_with_ornament and real_model_with_ornament
                 // We'll filter on the frontend for model type since backend doesn't support OR queries easily
@@ -134,6 +137,7 @@ export default function GalleryPage() {
             if (filter === "plain") return img.image_type === "white_background";
             if (filter === "themed") return img.image_type === "background_change";
             if (filter === "campaign") return img.image_type === "campaign_shot_advanced";
+            if (filter === "project") return img.image_type === "project_image";
             return true;
         });
     }, [images, filter]);
@@ -157,7 +161,7 @@ export default function GalleryPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-                {["all", "plain", "themed", "model", "campaign"].map((f) => (
+                {["all", "plain", "themed", "model", "campaign", "project"].map((f) => (
                     <button
                         key={f}
                         onClick={() => setFilter(f)}
@@ -167,7 +171,7 @@ export default function GalleryPage() {
                                 : "bg-gray-100 dark:bg-sidebar-accent/40 text-gray-700 dark:text-foreground hover:bg-gray-200 dark:hover:bg-sidebar-accent/60"
                         }`}
                     >
-                        {f === "all" ? t("orgPortal.all") : f === "plain" ? t("orgPortal.plain") : f === "themed" ? t("orgPortal.themed") : f === "model" ? t("orgPortal.model") : f === "campaign" ? t("orgPortal.campaign") : f}
+                        {f === "all" ? t("orgPortal.all") : f === "plain" ? t("orgPortal.plain") : f === "themed" ? t("orgPortal.themed") : f === "model" ? t("orgPortal.model") : f === "campaign" ? t("orgPortal.campaign") : f === "project" ? t("orgPortal.project") : f}
                     </button>
                 ))}
             </div>

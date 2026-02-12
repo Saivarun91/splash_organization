@@ -3,6 +3,8 @@ import "./globals.css";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { ImageGenerationProvider } from "@/context/ImageGenerationContext";
+import { CreditsProvider } from "@/context/CreditsContext";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +33,12 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <ImageGenerationProvider>
             <LanguageProvider>
-              {children}
+              <CreditsProvider>
+                <div className="relative">
+                  {children}
+                  <Toaster position="top-right" />
+                </div>
+              </CreditsProvider>
             </LanguageProvider>
           </ImageGenerationProvider>
         </AuthProvider>

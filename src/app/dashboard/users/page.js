@@ -67,6 +67,7 @@ const getRoleDisplayName = (role, t) => {
 export default function UsersPage() {
   const router = useRouter();
   const { t } = useLanguage();
+  const [organizationProjectsCount, setOrganizationProjectsCount] = useState(0);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRoles, setSelectedRoles] = useState([]);
@@ -92,6 +93,7 @@ export default function UsersPage() {
         setOrganizationId(orgId);
         const data = await organizationAPI.getOrganizationMembers(orgId);
         if (data.members) setUsers(data.members);
+        if (data.projects) setOrganizationProjectsCount(data.projects.length);
       } catch (err) {
         console.error(err);
       } finally {
@@ -198,10 +200,10 @@ export default function UsersPage() {
         <div className="flex justify-between items-start gap-3">
           <div className="min-w-0">
             <h3 className="font-semibold truncate">
-              {user.full_name || user.email}
+              {user.full_name || user.user_name || "Name to be added"}
             </h3>
             <p className="text-sm text-muted-foreground truncate">
-              {user.email}
+              {user.email }
             </p>
           </div>
 
@@ -214,7 +216,21 @@ export default function UsersPage() {
             {getRoleIcon(user.organization_role)}
             {getRoleDisplayName(user.organization_role, t)}
           </Badge>
+
+          {!isOwner && (
+          <button
+            onClick={(e) => handleDeleteUser(user.id, user.email, e)}
+            disabled={isDeleting}
+            className="rounded-full bg-red-500 p-2 hover:bg-red-700 text-white"
+          >
+            <Trash2 className="w-4 h-4 text-white" />
+           
+          </button>
+        )}
+
+          
         </div>
+
 
         <div className="mt-5 grid grid-cols-2 gap-4 rounded-lg bg-muted/40 p-3">
           <div className="text-center">
@@ -222,7 +238,7 @@ export default function UsersPage() {
               {t("orgPortal.projects")}
             </p>
             <p className="text-lg font-semibold">
-              {user.projects_count || 0}
+            {organizationProjectsCount || 0}
             </p>
           </div>
           <div className="text-center">
@@ -235,19 +251,7 @@ export default function UsersPage() {
           </div>
         </div>
 
-        {!isOwner && (
-          <button
-            onClick={(e) => handleDeleteUser(user.id, user.email, e)}
-            disabled={isDeleting}
-            className="
-              mt-4 flex items-center gap-2 text-sm text-destructive
-              hover:underline disabled:opacity-50
-            "
-          >
-            <Trash2 className="w-4 h-4" />
-            {t("orgPortal.removeUser")}
-          </button>
-        )}
+
       </div>
     );
   };
@@ -348,29 +352,40 @@ export default function UsersPage() {
       {showAddUserModal && (
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
     <div className="bg-white p-6 rounded-xl w-full max-w-md">
-      <h2 className="text-lg font-semibold mb-4">Add User</h2>
-
+    <button
+        onClick={() => setShowAddUserModal(false)}
+        className="float-right text-sm text-black hover:text-red-700 rounded-full p-2 hover:bg-gray-100"
+      >
+        <X className="w-4 h-4 font-bold text-black hover:text-red-700" />
+      </button>
       <form onSubmit={handleAddUser} className="space-y-4">
-
-  <input
-    type="email"
-    placeholder="Enter user email"
-    value={newUserEmail}
-    onChange={(e) => setNewUserEmail(e.target.value)}
-    required
-    className="w-full border rounded-lg px-3 py-2"
-  />
-
-  <select
-    value={newUserRole}
-    onChange={(e) => setNewUserRole(e.target.value)}
-    className="w-full border rounded-lg px-3 py-2"
-  >
-    <option value="member">Member</option>
-    <option value="chief_editor">Chief Editor</option>
-    <option value="creative_head">Creative Head</option>
-  </select>
-
+      
+      <h2 className="text-lg font-semibold mb-4">Add User</h2>
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium text-gray-700">User Email</label>
+        <input
+          type="email"
+          placeholder="user@example.com"
+          value={newUserEmail}
+          onChange={(e) => setNewUserEmail(e.target.value)}
+          required
+          className="w-full border rounded-lg px-3 py-2"
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium text-gray-700">Role</label>
+        <select
+          value={newUserRole}
+          onChange={(e) => setNewUserRole(e.target.value)}
+          className="w-full border rounded-lg px-3 py-2"
+        >
+          <option value="member">Member</option>
+          <option value="chief_editor">Chief Editor</option>
+          <option value="creative_head">Creative Head</option>
+        </select>
+      </div>
+      </div>
   <button
     type="submit"
     disabled={addingUser}
@@ -380,14 +395,6 @@ export default function UsersPage() {
   </button>
 
 </form>
-
-
-      <button
-        onClick={() => setShowAddUserModal(false)}
-        className="mt-3 text-sm text-gray-500"
-      >
-        Close
-      </button>
     </div>
   </div>
 )}
