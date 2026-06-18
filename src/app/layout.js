@@ -21,6 +21,7 @@ export const metadata = {
   description: "Organization management portal for Splash AI Studio",
   icons: {
     icon: "/images/favicon.png",
+    shortcut: "/favicon.ico",
   },
 };
 

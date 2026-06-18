@@ -109,21 +109,21 @@ export function HierarchicalOrnamentSelect({ selectedType, onTypeChange, classNa
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all flex items-center justify-between hover:border-gray-300"
+                className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-gold-solid/40 focus:border-transparent transition-all flex items-center justify-between hover:border-gold-muted/50"
             >
                 <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <Sparkles className="w-3.5 h-3.5 text-purple-600 flex-shrink-0" />
+                    <Sparkles className="w-3.5 h-3.5 text-gold-solid flex-shrink-0" />
                     {selectedOrnament ? (
                         <span className="truncate text-left">{selectedOrnament.category} - {selectedOrnament.name}</span>
                     ) : (
-                        <span className="text-gray-400">Select type</span>
+                        <span className="text-muted-foreground">Select type</span>
                     )}
                 </div>
-                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ml-2 ${isOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform flex-shrink-0 ml-2 ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isOpen && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
                     {Object.entries(ORNAMENT_CATEGORIES).map(([category, items]) => {
                         const isExpanded = expandedCategories.has(category)
                         return (
@@ -131,23 +131,23 @@ export function HierarchicalOrnamentSelect({ selectedType, onTypeChange, classNa
                                 <button
                                     type="button"
                                     onClick={() => toggleCategory(category)}
-                                    className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50 flex items-center justify-between transition-colors border-b border-gray-100 last:border-b-0"
+                                    className="w-full px-3 py-2 text-sm text-left hover:bg-accent/40 flex items-center justify-between transition-colors border-b border-border last:border-b-0"
                                 >
-                                    <span className="font-semibold text-gray-800">{category}</span>
+                                    <span className="font-semibold text-foreground">{category}</span>
                                     {isExpanded ? (
-                                        <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
+                                        <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
                                     ) : (
-                                        <ChevronRight className="w-3.5 h-3.5 text-gray-500" />
+                                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
                                     )}
                                 </button>
                                 {isExpanded && (
-                                    <div className="bg-gray-50">
+                                    <div className="bg-accent/10">
                                         {items.map((item) => (
                                             <button
                                                 key={item.id}
                                                 type="button"
                                                 onClick={() => handleTypeSelect(item.id)}
-                                                className={`w-full px-6 py-1.5 text-sm text-left hover:bg-purple-50 flex items-center gap-2 transition-colors ${selectedType === item.id ? 'bg-purple-100 text-purple-700 font-medium' : 'text-gray-700'
+                                                className={`w-full px-6 py-1.5 text-sm text-left hover:bg-gold-solid/10 hover:text-gold-solid flex items-center gap-2 transition-colors ${selectedType === item.id ? 'bg-gold-solid/20 text-gold-solid font-semibold border-l-2 border-gold-solid' : 'text-muted-foreground'
                                                     }`}
                                             >
                                                 {item.name}

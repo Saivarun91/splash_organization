@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { organizationAPI } from "@/lib/api";
 
 const CreditsContext = createContext(null);
 
@@ -20,7 +21,7 @@ export function CreditsProvider({ children }) {
         }
         try {
             if (showLoading) setCreditsLoading(true);
-            const userProfile = await apiService.getUserProfile(token);
+            const userProfile = await organizationAPI.getUserProfile(token);
             if (userProfile?.success && userProfile?.user) {
                 const currentUser = userProfile.user;
                 let organizationId = null;
@@ -28,10 +29,10 @@ export function CreditsProvider({ children }) {
                     organizationId =
                         typeof currentUser.organization === "object" && currentUser.organization?.id
                             ? currentUser.organization.id
-                            : String(currentUser.organization);
+                             : String(currentUser.organization);
                 }
                 if (organizationId) {
-                    const orgData = await apiService.getOrganization(organizationId, token);
+                    const orgData = await organizationAPI.getOrganization(organizationId);
                     setOrganizationCredits({
                         balance: orgData?.credit_balance ?? 0,
                         organizationName: orgData?.name || "Organization"

@@ -5,6 +5,14 @@ import { Download, ExternalLink, RefreshCw, X, Sparkles, Image as ImageIcon } fr
 import { Button } from "@/components/ui/button"
 import { organizationAPI } from "@/lib/api"
 import { useAuth } from "@/context/AuthContext"
+import { ModelTierSelector } from "@/components/images/ModelTierSelector"
+import { resolveRegenerationTier } from "@/lib/creditPricing"
+
+function getProjectRegenContext(imageType) {
+    if (imageType === "campaign_image") return "campaign"
+    if (imageType === "model_image") return "model"
+    return "themed"
+}
 
 export function ProductImagesDisplay({
     collectionData,
@@ -20,6 +28,8 @@ export function ProductImagesDisplay({
     const [zoomedImage, setZoomedImage] = useState(null)
     const [useDifferentModel, setUseDifferentModel] = useState(false)
     const [selectedModel, setSelectedModel] = useState(null)
+    const [regenModelTier, setRegenModelTier] = useState("regular")
+    const [regenContext, setRegenContext] = useState("themed")
     const [availableModels, setAvailableModels] = useState({ ai_models: [], real_models: [] })
     const { token } = useAuth()
     
@@ -63,7 +73,8 @@ export function ProductImagesDisplay({
                 generatedImage.local_path,
                 customPrompt,
                 useDifferentModel,
-                selectedModel
+                selectedModel,
+                regenModelTier
             )
 
             if (response.success) {
@@ -86,10 +97,17 @@ export function ProductImagesDisplay({
     }
 
     const openPromptModal = async (product, generatedImage, isRegenerated = false) => {
+        const imageType = generatedImage.type || "model_image"
+        const context = getProjectRegenContext(imageType)
         setShowPromptModal({ product, generatedImage, isRegenerated })
         setCustomPrompt("")
         setUseDifferentModel(false)
         setSelectedModel(null)
+        setRegenContext(context)
+        setRegenModelTier(resolveRegenerationTier({
+            storedTier: generatedImage.model_tier,
+            imageType,
+        }))
         setError(null)
 
         try {
@@ -189,29 +207,29 @@ export function ProductImagesDisplay({
         <div className="mb-12">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    <h3 className="text-2xl font-bold text-foreground mb-2">
                         Generated Product Images
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-muted-foreground">
                         {products.length} product{products.length !== 1 ? 's' : ''} • Preview and manage your AI-generated images
                     </p>
                 </div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-purple-50 rounded-full">
-                    <Sparkles className="w-4 h-4 text-purple-600" />
-                    <span className="text-sm font-medium text-purple-700">AI Generated</span>
+                <div className="flex items-center gap-2 px-4 py-2 bg-gold-solid/10 border border-gold-muted rounded-full">
+                    <Sparkles className="w-4 h-4 text-gold-solid" />
+                    <span className="text-sm font-medium text-gold-solid">AI Generated</span>
                 </div>
             </div>
 
             {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-6">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
-                            <div className="w-5 h-5 bg-red-100 rounded-full flex items-center justify-center">
-                                <X className="w-3 h-3 text-red-600" />
+                            <div className="w-5 h-5 bg-red-500/20 rounded-full flex items-center justify-center">
+                                <X className="w-3 h-3 text-red-400" />
                             </div>
                         </div>
                         <div className="ml-3">
-                            <p className="text-red-700 font-medium">{error}</p>
+                            <p className="text-red-400 font-medium">{error}</p>
                         </div>
                     </div>
                 </div>
@@ -222,19 +240,19 @@ export function ProductImagesDisplay({
                     const hasGeneratedImages = product.generated_images && product.generated_images.length > 0
 
                     return (
-                        <div key={productIndex} className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div key={productIndex} className="bg-card rounded-2xl border border-border p-6 shadow-sm hover:shadow-md transition-shadow">
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
-                                        <span className="text-white font-semibold text-sm">
+                                    <div className="w-10 h-10 bg-gold-gradient rounded-lg flex items-center justify-center text-primary-foreground font-semibold shadow-sm">
+                                        <span>
                                             {productIndex + 1}
                                         </span>
                                     </div>
                                     <div>
-                                        <h4 className="text-lg font-semibold text-gray-900">
+                                        <h4 className="text-lg font-semibold text-foreground">
                                             Product {productIndex + 1}
                                         </h4>
-                                        <p className="text-sm text-gray-500">
+                                        <p className="text-sm text-muted-foreground">
                                             {hasGeneratedImages
                                                 ? `${product.generated_images.length} generated image${product.generated_images.length !== 1 ? 's' : ''}`
                                                 : 'No images generated yet'
@@ -248,7 +266,7 @@ export function ProductImagesDisplay({
                                 <div className="md:col-span-1">
                                     <div className="space-y-3">
                                         <div className="relative group">
-                                            <div className="aspect-square rounded-xl overflow-hidden bg-gray-100 border-2 border-purple-500 shadow-sm">
+                                            <div className="aspect-square rounded-xl overflow-hidden bg-accent/10 border-2 border-gold-solid shadow-sm">
                                                 <img
                                                     src={product.uploaded_image_url}
                                                     alt={`Product ${productIndex + 1}`}
@@ -256,11 +274,11 @@ export function ProductImagesDisplay({
                                                     onClick={() => setZoomedImage(product.uploaded_image_url)}
                                                 />
                                             </div>
-                                            <div className="absolute top-3 left-3 bg-purple-600 text-white text-xs px-2 py-1 rounded-full font-medium">
+                                            <div className="absolute top-3 left-3 bg-gold-solid text-primary-foreground text-xs px-2 py-1 rounded-full font-medium">
                                                 Original
                                             </div>
                                         </div>
-                                        <p className="text-xs text-gray-600 text-center font-medium">
+                                        <p className="text-xs text-muted-foreground text-center font-medium">
                                             Source Image
                                         </p>
                                     </div>
@@ -294,7 +312,7 @@ export function ProductImagesDisplay({
                                                 return (
                                                     <div key={imgIndex} className="group">
                                                         <div className="space-y-3">
-                                                            <div className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                                                            <div className="relative aspect-square rounded-xl overflow-hidden bg-accent/10 border border-border shadow-sm hover:shadow-md hover:border-gold-muted transition-all">
                                                                 <img
                                                                     src={imageToShow.cloud_url}
                                                                     alt={`${imageToShow.type} ${imgIndex + 1}`}
@@ -354,7 +372,7 @@ export function ProductImagesDisplay({
                                                                             <Button
                                                                                 size="sm"
                                                                                 variant="secondary"
-                                                                                className="gap-1 text-xs px-2 py-1 h-auto bg-white/90 backdrop-blur-sm hover:bg-white"
+                                                                                className="gap-1 text-xs px-2 py-1 h-auto bg-white/90 backdrop-blur-sm hover:bg-white text-gray-800"
                                                                                 onClick={() => window.open(imageToShow.cloud_url, "_blank")}
                                                                             >
                                                                                 <ExternalLink className="w-3 h-3" /> View
@@ -362,7 +380,7 @@ export function ProductImagesDisplay({
                                                                             <Button
                                                                                 size="sm"
                                                                                 variant="secondary"
-                                                                                className="gap-1 text-xs px-2 py-1 h-auto bg-white/90 backdrop-blur-sm hover:bg-white"
+                                                                                className="gap-1 text-xs px-2 py-1 h-auto bg-white/90 backdrop-blur-sm hover:bg-white text-gray-800"
                                                                                 onClick={(e) => {
                                                                                     e.stopPropagation();
                                                                                     let versionIndex = null;
@@ -392,7 +410,7 @@ export function ProductImagesDisplay({
                                                                             <div className="flex gap-2 justify-center">
                                                                                 <Button
                                                                                     size="sm"
-                                                                                    className="bg-purple-600 hover:bg-purple-700 text-white gap-1 text-xs px-2 py-1 h-auto"
+                                                                                    className="bg-gold-gradient hover:brightness-110 text-primary-foreground font-semibold border-0 gap-1 text-xs px-2 py-1 h-auto"
                                                                                     onClick={() => handleEnhance(product, imageToShow)}
                                                                                     disabled={isRegenerating}
                                                                                 >
@@ -400,11 +418,11 @@ export function ProductImagesDisplay({
                                                                                 </Button>
                                                                                 <Button
                                                                                     size="sm"
-                                                                                    className="bg-purple-600 hover:bg-purple-700 text-white gap-1 text-xs px-2 py-1 h-auto"
+                                                                                    className="bg-gold-gradient hover:brightness-110 text-primary-foreground font-semibold border-0 gap-1 text-xs px-2 py-1 h-auto"
                                                                                     onClick={() => openPromptModal(product, imageToShow, currentIndex > 0)}
                                                                                     disabled={isRegenerating}
                                                                                 >
-                                                                                    {isRegenerating ? 'Processing...' : 'regenerate'}
+                                                                                    {isRegenerating ? 'Processing...' : 'Regenerate'}
                                                                                 </Button>
                                                                             </div>
                                                                         )}
@@ -413,11 +431,11 @@ export function ProductImagesDisplay({
                                                             </div>
 
                                                             <div className="text-center">
-                                                                <p className={`text-xs font-medium ${currentIndex === 0
-                                                                    ? "text-gray-600"
+                                                                <p className={`text-xs font-semibold ${currentIndex === 0
+                                                                    ? "text-muted-foreground"
                                                                     : versionType === 'enhanced'
-                                                                        ? "text-blue-600"
-                                                                        : "text-green-600"
+                                                                        ? "text-gold-solid"
+                                                                        : "text-emerald-400"
                                                                     }`}>
                                                                     {currentIndex === 0
                                                                         ? img.type?.replace("_", " ") || "Generated"
@@ -427,7 +445,7 @@ export function ProductImagesDisplay({
                                                                     }
                                                                 </p>
                                                                 {currentIndex > 0 && (
-                                                                    <p className={`text-xs ${versionType === 'enhanced' ? 'text-blue-500' : 'text-green-500'}`}>
+                                                                    <p className={`text-xs font-medium ${versionType === 'enhanced' ? 'text-gold-solid' : 'text-emerald-400'}`}>
                                                                         ✓ {versionType === 'enhanced' ? 'Enhanced' : 'Improved'}
                                                                     </p>
                                                                 )}
@@ -439,11 +457,11 @@ export function ProductImagesDisplay({
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="md:col-span-5 flex items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-12 bg-gray-50/50">
+                                    <div className="md:col-span-5 flex items-center justify-center border-2 border-dashed border-border rounded-xl p-12 bg-accent/10">
                                         <div className="text-center">
-                                            <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                                            <p className="text-gray-600 font-medium mb-1">No generated images yet</p>
-                                            <p className="text-sm text-gray-500">
+                                            <ImageIcon className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                                            <p className="text-muted-foreground font-medium mb-1">No generated images yet</p>
+                                            <p className="text-sm text-muted-foreground">
                                                 Generate images to see them appear here
                                             </p>
                                         </div>
@@ -456,7 +474,7 @@ export function ProductImagesDisplay({
             </div>
 
             {zoomedImage && (
-                <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4">
                     <div className="relative max-w-7xl max-h-[90vh]">
                         <img
                             src={zoomedImage}
@@ -474,14 +492,14 @@ export function ProductImagesDisplay({
             )}
 
             {showPromptModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl max-w-4xl w-full p-6 max-h-[90vh] overflow-y-auto">
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                    <div className="bg-card border border-border text-foreground rounded-2xl max-w-4xl w-full p-6 max-h-[90vh] overflow-y-auto shadow-2xl">
                         <div className="flex items-center justify-between mb-6">
                             <div>
-                                <h3 className="text-xl font-bold text-gray-900">
+                                <h3 className="text-xl font-bold text-foreground">
                                     Regenerate Image
                                 </h3>
-                                <p className="text-gray-600 text-sm mt-1">
+                                <p className="text-muted-foreground text-sm mt-1">
                                     Use AI to improve your generated image
                                 </p>
                             </div>
@@ -491,20 +509,20 @@ export function ProductImagesDisplay({
                                     setCustomPrompt("")
                                     setError(null)
                                 }}
-                                className="text-gray-400 hover:text-gray-600 transition-colors"
+                                className="text-muted-foreground hover:text-foreground transition-colors"
                             >
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
 
-                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+                        <div className="bg-gold-solid/10 border border-gold-muted rounded-xl p-4 mb-6">
                             <div className="flex items-start gap-3">
-                                <Sparkles className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                                <Sparkles className="w-5 h-5 text-gold-solid mt-0.5 flex-shrink-0" />
                                 <div>
-                                    <p className="text-blue-800 font-medium text-sm">
+                                    <p className="text-foreground font-semibold text-sm">
                                         How Regeneration works
                                     </p>
-                                    <p className="text-blue-700 text-sm mt-1">
+                                    <p className="text-muted-foreground text-sm mt-1">
                                         The AI will use your original product image, the original style prompt, and your new modifications
                                         to create an improved version. Just describe what you want to change!
                                     </p>
@@ -514,37 +532,37 @@ export function ProductImagesDisplay({
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                             <div className="text-center">
-                                <label className="block text-sm font-semibold text-gray-900 mb-3">
+                                <label className="block text-sm font-semibold text-foreground mb-3">
                                     Original Product
                                 </label>
-                                <div className="border-2 border-purple-500 rounded-xl overflow-hidden shadow-sm">
+                                <div className="border-2 border-gold-solid rounded-xl overflow-hidden shadow-sm">
                                     <img
                                         src={showPromptModal.product.uploaded_image_url}
                                         alt="Original Product"
                                         className="w-full h-48 object-cover"
                                     />
                                 </div>
-                                <p className="text-xs text-gray-600 mt-2 font-medium">
+                                <p className="text-xs text-muted-foreground mt-2 font-medium">
                                     📦 Source Image
                                 </p>
                             </div>
 
                             <div className="flex items-center justify-center">
                                 <div className="text-center">
-                                    <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mb-3 shadow-lg">
-                                        <RefreshCw className="w-8 h-8 text-white" />
+                                    <div className="w-20 h-20 bg-gold-gradient rounded-full flex items-center justify-center mb-3 shadow-lg">
+                                        <RefreshCw className="w-8 h-8 text-primary-foreground" />
                                     </div>
-                                    <p className="text-sm font-semibold text-gray-900">
+                                    <p className="text-sm font-semibold text-foreground">
                                         New Enhanced Version
                                     </p>
-                                    <p className="text-xs text-gray-600 mt-1">
+                                    <p className="text-xs text-muted-foreground mt-1">
                                         Based on your instructions
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                        <div className="mb-6 p-4 bg-accent/10 rounded-xl border border-border">
                             <div className="flex items-center gap-3 mb-3">
                                 <input
                                     type="checkbox"
@@ -554,35 +572,35 @@ export function ProductImagesDisplay({
                                         setUseDifferentModel(e.target.checked)
                                         if (!e.target.checked) setSelectedModel(null)
                                     }}
-                                    className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                                    className="w-4 h-4 text-gold-solid border-border bg-background rounded focus:ring-gold-solid/40"
                                 />
-                                <label htmlFor="useDifferentModel" className="text-sm font-semibold text-gray-900 cursor-pointer">
+                                <label htmlFor="useDifferentModel" className="text-sm font-semibold text-foreground cursor-pointer">
                                     🔄 Try with a different model
                                 </label>
                             </div>
                             {useDifferentModel && (
-                                <p className="text-xs text-orange-600 mb-3 bg-orange-50 p-2 rounded">
+                                <p className="text-xs text-amber-400 mb-3 bg-amber-500/10 border border-amber-500/20 p-2 rounded">
                                     ℹ️ The prompt will be disabled and use the original generated prompt when using a different model
                                 </p>
                             )}
 
                             {useDifferentModel && (
                                 <div className="mt-3 space-y-3">
-                                    <p className="text-xs text-gray-600 mb-2">
+                                    <p className="text-xs text-muted-foreground mb-2">
                                         Select a different model to regenerate this image:
                                     </p>
 
                                     {availableModels.ai_models.length > 0 && (
                                         <div>
-                                            <p className="text-xs font-medium text-gray-700 mb-2">AI Models</p>
+                                            <p className="text-xs font-semibold text-foreground mb-2">AI Models</p>
                                             <div className="grid grid-cols-4 gap-2">
                                                 {availableModels.ai_models.map((model, idx) => (
                                                     <button
                                                         key={idx}
                                                         onClick={() => setSelectedModel({ type: 'ai', ...model })}
                                                         className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${selectedModel?.local === model.local
-                                                            ? 'border-purple-500 ring-2 ring-purple-300'
-                                                            : 'border-gray-200 hover:border-purple-300'
+                                                            ? 'border-gold-solid ring-2 ring-gold-solid/35'
+                                                            : 'border-border hover:border-gold-muted'
                                                             }`}
                                                     >
                                                         <img
@@ -591,8 +609,8 @@ export function ProductImagesDisplay({
                                                             className="w-full h-full object-cover"
                                                         />
                                                         {selectedModel?.local === model.local && (
-                                                            <div className="absolute inset-0 bg-purple-600/20 flex items-center justify-center">
-                                                                <div className="bg-purple-600 text-white rounded-full p-1">
+                                                            <div className="absolute inset-0 bg-gold-solid/20 flex items-center justify-center">
+                                                                <div className="bg-gold-solid text-primary-foreground rounded-full p-1">
                                                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                                                     </svg>
@@ -607,15 +625,15 @@ export function ProductImagesDisplay({
 
                                     {availableModels.real_models.length > 0 && (
                                         <div>
-                                            <p className="text-xs font-medium text-gray-700 mb-2">Real Models</p>
+                                            <p className="text-xs font-semibold text-foreground mb-2">Real Models</p>
                                             <div className="grid grid-cols-4 gap-2">
                                                 {availableModels.real_models.map((model, idx) => (
                                                     <button
                                                         key={idx}
                                                         onClick={() => setSelectedModel({ type: 'real', ...model })}
                                                         className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${selectedModel?.local === model.local
-                                                            ? 'border-green-500 ring-2 ring-green-300'
-                                                            : 'border-gray-200 hover:border-green-300'
+                                                            ? 'border-emerald-500 ring-2 ring-emerald-500/35'
+                                                            : 'border-border hover:border-emerald-500/50'
                                                             }`}
                                                     >
                                                         <img
@@ -624,8 +642,8 @@ export function ProductImagesDisplay({
                                                             className="w-full h-full object-cover"
                                                         />
                                                         {selectedModel?.local === model.local && (
-                                                            <div className="absolute inset-0 bg-green-600/20 flex items-center justify-center">
-                                                                <div className="bg-green-600 text-white rounded-full p-1">
+                                                            <div className="absolute inset-0 bg-emerald-500/20 flex items-center justify-center">
+                                                                <div className="bg-emerald-500 text-white rounded-full p-1">
                                                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                                                     </svg>
@@ -642,7 +660,7 @@ export function ProductImagesDisplay({
                                     )}
 
                                     {!selectedModel && useDifferentModel && (
-                                        <p className="text-xs text-orange-600 mt-2">
+                                        <p className="text-xs text-amber-400 mt-2">
                                             ⚠️ Please select a model to use for regeneration
                                         </p>
                                     )}
@@ -650,18 +668,26 @@ export function ProductImagesDisplay({
                             )}
                         </div>
 
+                        <ModelTierSelector
+                            value={regenModelTier}
+                            onChange={setRegenModelTier}
+                            context={regenContext}
+                            compact
+                            className="mb-6"
+                        />
+
                         <div className="mb-6">
-                            <label className="block text-sm font-semibold text-gray-900 mb-3">
+                            <label className="block text-sm font-semibold text-foreground mb-3">
                                 {useDifferentModel ? '📝 Using Original Prompt' : '✍️ Your Enhancement Instructions *'}
                             </label>
                             <textarea
                                 value={customPrompt}
                                 onChange={(e) => setCustomPrompt(e.target.value)}
                                 disabled={useDifferentModel}
-                                className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent min-h-[120px] resize-none text-gray-900 placeholder-gray-500 ${useDifferentModel ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                                className={`w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-solid/40 focus:border-transparent min-h-[120px] resize-none text-foreground placeholder-muted-foreground ${useDifferentModel ? 'bg-accent/10 cursor-not-allowed opacity-60' : ''}`}
                                 placeholder={useDifferentModel ? "Using original prompt from generated image..." : "Describe what you want to improve... (e.g., Make the background more vibrant, add soft shadows, change the lighting to golden hour, improve contrast...)"}
                             />
-                            <p className="text-xs text-gray-600 mt-2">
+                            <p className="text-xs text-muted-foreground mt-2">
                                 {useDifferentModel
                                     ? '🔒 Prompt is locked when using a different model. The original prompt will be used automatically.'
                                     : '💬 Be specific about what you want to change or improve in the image'
@@ -670,21 +696,21 @@ export function ProductImagesDisplay({
                         </div>
 
                         {error && (
-                            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+                            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-6">
                                 <div className="flex items-center">
                                     <div className="flex-shrink-0">
-                                        <X className="w-5 h-5 text-red-600" />
+                                        <X className="w-5 h-5 text-red-400" />
                                     </div>
                                     <div className="ml-3">
-                                        <p className="text-red-700 text-sm font-medium">{error}</p>
+                                        <p className="text-red-400 text-sm font-medium">{error}</p>
                                     </div>
                                 </div>
                             </div>
                         )}
 
                         {!useDifferentModel && (
-                            <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                                <p className="text-xs font-semibold text-gray-900 mb-3">💡 Quick Enhancement Ideas:</p>
+                            <div className="mb-6 p-4 bg-accent/10 rounded-xl border border-border">
+                                <p className="text-xs font-semibold text-foreground mb-3">💡 Quick Enhancement Ideas:</p>
                                 <div className="flex flex-wrap gap-2">
                                     {[
                                         "Make colors more vibrant and saturated",
@@ -698,7 +724,7 @@ export function ProductImagesDisplay({
                                         <button
                                             key={idx}
                                             onClick={() => setCustomPrompt(example)}
-                                            className="text-xs px-3 py-2 bg-white border border-gray-300 rounded-lg hover:border-purple-500 hover:text-purple-600 transition-colors font-medium"
+                                            className="text-xs px-3 py-2 bg-card border border-border rounded-lg hover:border-gold-solid hover:text-gold-solid text-foreground transition-all font-medium"
                                         >
                                             {example}
                                         </button>
@@ -715,12 +741,12 @@ export function ProductImagesDisplay({
                                     setCustomPrompt("")
                                     setError(null)
                                 }}
-                                className="px-6"
+                                className="px-6 border-border hover:bg-accent text-foreground hover:text-foreground bg-transparent"
                             >
                                 Cancel
                             </Button>
                             <Button
-                                className="bg-purple-600 hover:bg-purple-700 text-white px-6"
+                                className="bg-gold-gradient text-primary-foreground font-semibold hover:brightness-110 px-6 border-0 shadow-md"
                                 onClick={() => handleRegenerate(showPromptModal.product, showPromptModal.generatedImage)}
                                 disabled={
                                     regenerating ||

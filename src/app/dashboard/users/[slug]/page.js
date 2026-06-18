@@ -21,28 +21,28 @@ import Link from "next/link";
 const getRoleColor = (role) => {
     switch (role?.toLowerCase()) {
         case "owner":
-            return "bg-purple-100 text-purple-800 border-purple-200";
+            return "bg-gold-solid/10 text-gold-solid border border-gold-muted";
         case "chief_editor":
         case "creative_head":
-            return "bg-blue-100 text-blue-800 border-blue-200";
+            return "bg-blue-500/10 text-blue-400 border border-blue-500/20";
         case "member":
-            return "bg-green-100 text-green-800 border-green-200";
+            return "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
         default:
-            return "bg-gray-100 text-gray-800 border-gray-200";
+            return "bg-secondary text-muted-foreground border border-border";
     }
 };
 
 const getRoleDisplayName = (role, t) => {
-    if (!role) return t("orgPortal.member");
+    if (!role) return t("orgPortal.member") || "Member";
     switch (role.toLowerCase()) {
         case "owner":
-            return t("orgPortal.owner");
+            return t("orgPortal.owner") || "Owner";
         case "chief_editor":
-            return t("orgPortal.chiefEditor");
+            return t("orgPortal.chiefEditor") || "Chief Editor";
         case "creative_head":
-            return t("orgPortal.creativeHead");
+            return t("orgPortal.creativeHead") || "Creative Head";
         case "member":
-            return t("orgPortal.member");
+            return t("orgPortal.member") || "Member";
         default:
             return role.charAt(0).toUpperCase() + role.slice(1).replace(/_/g, " ");
     }
@@ -221,8 +221,8 @@ export default function UserDetailPage({ params }) {
         return (
             <div className="p-8 flex items-center justify-center min-h-screen">
                 <div className="text-center">
-                    <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-                    <p className="text-gray-600">Loading user data...</p>
+                    <Loader2 className="w-12 h-12 text-gold-solid animate-spin mx-auto mb-4" />
+                    <p className="text-muted-foreground">Loading user data...</p>
                 </div>
             </div>
         );
@@ -230,15 +230,15 @@ export default function UserDetailPage({ params }) {
 
     if (error || !user) {
         return (
-            <div className="p-8 flex items-center justify-center min-h-screen">
+            <div className="p-8 flex items-center justify-center min-h-screen text-foreground">
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                    <h1 className="text-2xl font-bold text-foreground mb-4">
                         {error ? "Error loading user" : "User not found"}
                     </h1>
-                    {error && <p className="text-red-600 mb-4">{error}</p>}
+                    {error && <p className="text-red-400 mb-4">{error}</p>}
                     <Link
                         href="/dashboard/users"
-                        className="text-blue-600 hover:underline flex items-center gap-2 justify-center"
+                        className="text-gold-solid hover:underline flex items-center gap-2 justify-center"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Back to Users
@@ -249,47 +249,50 @@ export default function UserDetailPage({ params }) {
     }
 
     return (
-        <div className="space-y-6 animate-fadeIn">
+        <div className="space-y-6 animate-fadeIn p-8 text-foreground">
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
                 <Link
                     href="/dashboard/users"
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="p-2 hover:bg-accent rounded-lg transition-colors"
                 >
-                    <ArrowLeft className="w-5 h-5 text-gray-600" />
+                    <ArrowLeft className="w-5 h-5 text-foreground" />
                 </Link>
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">{user.full_name || user.email}</h1>
-                    <p className="text-gray-600">User Details</p>
+                    <h1 className="text-3xl font-bold text-foreground">{user.full_name || user.email}</h1>
+                    <p className="text-muted-foreground">User Details</p>
                 </div>
             </div>
 
             {/* User Info Card */}
-            <div className="bg-card text-card-foreground border border-border rounded-xl p-6">
+            <div className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="flex items-center gap-3">
-                        <User className="w-5 h-5 text-gray-500" />
+                        <User className="w-5 h-5 text-muted-foreground" />
                         <div>
-                            <p className="text-sm text-gray-600">Full Name</p>
+                            <p className="text-sm text-muted-foreground">Full Name</p>
                             <p className="font-semibold">{user.full_name || "N/A"}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Mail className="w-5 h-5 text-gray-500" />
+                        <Mail className="w-5 h-5 text-muted-foreground" />
                         <div>
-                            <p className="text-sm text-gray-600">Email</p>
+                            <p className="text-sm text-muted-foreground">Email</p>
                             <p className="font-semibold">{user.email}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Badge className={getRoleColor(user.organization_role)}>
-                            {getRoleDisplayName(user.organization_role, t)}
-                        </Badge>
+                        <div className="flex flex-col">
+                            <span className="text-sm text-muted-foreground mb-1">Organization Role</span>
+                            <span className={`${getRoleColor(user.organization_role)} text-xs px-2.5 py-0.5 rounded-full font-semibold border w-fit`}>
+                                {getRoleDisplayName(user.organization_role, t)}
+                            </span>
+                        </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Calendar className="w-5 h-5 text-gray-500" />
+                        <Calendar className="w-5 h-5 text-muted-foreground" />
                         <div>
-                            <p className="text-sm text-gray-600">Joined</p>
+                            <p className="text-sm text-muted-foreground">Joined</p>
                             <p className="font-semibold">{formatDate(user.created_at)}</p>
                         </div>
                     </div>
@@ -298,68 +301,68 @@ export default function UserDetailPage({ params }) {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-card text-card-foreground border border-border rounded-xl p-6">
+                <div className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-2">
-                        <FolderKanban className="w-5 h-5 text-blue-600" />
-                        <p className="text-sm text-gray-600">Projects</p>
+                        <FolderKanban className="w-5 h-5 text-gold-solid" />
+                        <p className="text-sm text-muted-foreground">Projects</p>
                     </div>
                     <p className="text-3xl font-bold">{projects.length}</p>
                 </div>
-                <div className="bg-card text-card-foreground border border-border rounded-xl p-6">
+                <div className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-2">
-                        <ImageIcon className="w-5 h-5 text-green-600" />
-                        <p className="text-sm text-gray-600">Images Generated</p>
+                        <ImageIcon className="w-5 h-5 text-gold-solid" />
+                        <p className="text-sm text-muted-foreground">Images Generated</p>
                     </div>
                     <p className="text-3xl font-bold">{images.length}</p>
                 </div>
-                <div className="bg-card text-card-foreground border border-border rounded-xl p-6">
+                <div className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-2">
-                        <CreditCard className="w-5 h-5 text-purple-600" />
-                        <p className="text-sm text-gray-600">Credit Transactions</p>
+                        <CreditCard className="w-5 h-5 text-gold-solid" />
+                        <p className="text-sm text-muted-foreground">Credit Transactions</p>
                     </div>
                     <p className="text-3xl font-bold">{creditHistory.length}</p>
                 </div>
             </div>
 
             {/* Tabs */}
-            <div className="border-b border-gray-200">
+            <div className="border-b border-border">
                 <nav className="flex gap-4">
                     <button
                         onClick={() => setActiveTab("overview")}
-                        className={`pb-4 px-2 border-b-2 transition-colors ${
+                        className={`pb-4 px-2 border-b-2 transition-colors font-medium text-sm ${
                             activeTab === "overview"
-                                ? "border-blue-600 text-blue-600"
-                                : "border-transparent text-gray-600 hover:text-gray-900"
+                                ? "border-gold-solid text-gold-solid"
+                                : "border-transparent text-muted-foreground hover:text-foreground"
                         }`}
                     >
                         Overview
                     </button>
                     <button
                         onClick={() => setActiveTab("projects")}
-                        className={`pb-4 px-2 border-b-2 transition-colors ${
+                        className={`pb-4 px-2 border-b-2 transition-colors font-medium text-sm ${
                             activeTab === "projects"
-                                ? "border-blue-600 text-blue-600"
-                                : "border-transparent text-gray-600 hover:text-gray-900"
+                                ? "border-gold-solid text-gold-solid"
+                                : "border-transparent text-muted-foreground hover:text-foreground"
                         }`}
                     >
                         Projects 
                     </button>
                     <button
                         onClick={() => setActiveTab("images")}
-                        className={`pb-4 px-2 border-b-2 transition-colors ${
+                        className={`pb-4 px-2 border-b-2 transition-colors font-medium text-sm ${
                             activeTab === "images"
-                                ? "border-blue-600 text-blue-600"
-                                : "border-transparent text-gray-600 hover:text-gray-900"
+                                ? "border-gold-solid text-gold-solid"
+                                : "border-transparent text-muted-foreground hover:text-foreground"
                         }`}
                     >
                         Images 
                     </button>
                     <button
                         onClick={() => setActiveTab("credits")}
-                        className={`pb-4 px-2 border-b-2 transition-colors ${
+                        className={`pb-4 px-2 border-b-2 transition-colors font-medium text-sm ${
                             activeTab === "credits"
-                                ? "border-blue-600 text-blue-600"
-                                : "border-transparent text-gray-600 hover:text-gray-900"
+                                ? "border-gold-solid text-gold-solid"
+                                : "border-transparent text-muted-foreground hover:text-foreground"
                         }`}
                     >
                         Credit History 
@@ -373,22 +376,22 @@ export default function UserDetailPage({ params }) {
                     <div className="space-y-6">
                         {/* Projects Preview */}
                         <div>
-                            <h2 className="text-xl font-bold mb-4">Recent Projects</h2>
+                            <h2 className="text-xl font-bold mb-4 text-foreground">Recent Projects</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {projects.slice(0, 6).map((project) => (
                                     <div
                                         key={project.id}
                                         onClick={(e) => handleProjectClick(project, e)}
-                                        className="bg-card text-card-foreground border border-border rounded-lg p-4 hover:shadow-md transition-all cursor-pointer"
+                                        className="bg-card text-card-foreground border border-border rounded-lg p-4 hover:shadow-md hover:border-gold-muted transition-all cursor-pointer"
                                     >
-                                        <h3 className="font-semibold mb-2">{project.name}</h3>
-                                        <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                                        <h3 className="font-semibold mb-2 text-foreground">{project.name}</h3>
+                                        <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
                                             {project.about || "No description"}
                                         </p>
-                                        <div className="flex items-center justify-between text-xs text-gray-500">
+                                        <div className="flex items-center justify-between text-xs text-muted-foreground">
                                             <span>{formatDate(project.created_at)}</span>
                                             <span className="flex items-center gap-1">
-                                                <ImageIcon className="w-3 h-3" />
+                                                <ImageIcon className="w-3 h-3 text-gold-solid" />
                                                 {project.totalImages || 0}
                                             </span>
                                         </div>
@@ -396,78 +399,66 @@ export default function UserDetailPage({ params }) {
                                 ))}
                             </div>
                             {projects.length === 0 && (
-                                <p className="text-gray-500 text-center py-8">No projects found</p>
+                                <p className="text-muted-foreground text-center py-8">No projects found</p>
                             )}
                         </div>
 
                         {/* Images Preview */}
-{/* Images Preview */}
-<div>
-  <h2 className="text-xl font-bold mb-4">Recent Images</h2>
+                        <div>
+                            <h2 className="text-xl font-bold mb-4 text-foreground">Recent Images</h2>
 
-  {/* 🔄 Loading state */}
-  {imagesLoading && images.length === 0 && (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <div
-          key={i}
-          className="aspect-square rounded-lg border border-border bg-gray-100 animate-pulse flex items-center justify-center"
-        >
-          <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
-        </div>
-      ))}
-    </div>
-  )}
+                            {/* Loading state */}
+                            {imagesLoading && images.length === 0 && (
+                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                    {Array.from({ length: 6 }).map((_, i) => (
+                                        <div
+                                            key={i}
+                                            className="aspect-square rounded-lg border border-border bg-accent/10 animate-pulse flex items-center justify-center"
+                                        >
+                                            <Loader2 className="w-6 h-6 text-gold-solid animate-spin" />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
 
-  {/* 🖼 Images loaded */}
-  {!imagesLoading && images.length > 0 && (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-      {images.slice(0, 12).map((image) => (
-        <div
-          key={image.id}
-          className="aspect-square rounded-lg overflow-hidden border border-border hover:shadow-md transition-all cursor-pointer"
-        >
-          <img
-            src={getImageSrc(image)}
-            alt={image.prompt || "Generated image"}
-            className="w-full h-full object-cover"
-            loading="lazy"
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = "/placeholder.png";
-            }}
-          />
-        </div>
-      ))}
-    </div>
-  )}
+                            {/* Images loaded */}
+                            {!imagesLoading && images.length > 0 && (
+                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                    {images.slice(0, 12).map((image) => (
+                                        <div
+                                            key={image.id}
+                                            className="aspect-square rounded-lg overflow-hidden border border-border hover:border-gold-muted hover:shadow-md transition-all cursor-pointer"
+                                        >
+                                            <img
+                                                src={getImageSrc(image)}
+                                                alt={image.prompt || "Generated image"}
+                                                className="w-full h-full object-cover"
+                                                loading="lazy"
+                                                onError={(e) => {
+                                                    e.currentTarget.onerror = null;
+                                                    e.currentTarget.src = "/placeholder.png";
+                                                }}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
 
-  {/* ⏳ Not loaded yet */}
-  {!imagesLoading && images.length === 0 && (
-    <button
-      onClick={() => {
-        setActiveTab("images");
-        if (organizationId && userSlug) {
-          fetchImages(organizationId, userSlug, 1, false);
-        }
-      }}
-      className="text-blue-600 hover:underline text-sm"
-    >
-      
-    </button>
-  )}
-
-  {/* ➡️ View all */}
-  {/* {images.length > 12 && (
-    <button
-      onClick={() => setActiveTab("images")}
-      className="mt-4 text-blue-600 hover:underline text-sm"
-    >
-      View all {imagesTotal || images.length} images →
-    </button>
-  )} */}
-</div>
-
+                            {/* Not loaded yet */}
+                            {!imagesLoading && images.length === 0 && (
+                                <button
+                                    onClick={() => {
+                                        setActiveTab("images");
+                                        if (organizationId && userSlug) {
+                                            fetchImages(organizationId, userSlug, 1, false);
+                                        }
+                                    }}
+                                    className="text-gold-solid hover:underline text-sm"
+                                >
+                                    Load images
+                                </button>
+                            )}
+                        </div>
                     </div>
                 )}
 
@@ -478,171 +469,164 @@ export default function UserDetailPage({ params }) {
                                 <div
                                     key={project.id}
                                     onClick={(e) => handleProjectClick(project, e)}
-                                    className="bg-card text-card-foreground border border-border rounded-xl p-6 hover:shadow-lg transition-all cursor-pointer group"
+                                    className="bg-card text-card-foreground border border-border rounded-xl p-6 hover:shadow-lg hover:border-gold-muted transition-all cursor-pointer group"
                                 >
                                     <div className="flex items-start justify-between mb-4">
-                                        <h3 className="text-lg font-bold group-hover:text-blue-600 transition-colors">
+                                        <h3 className="text-lg font-bold group-hover:text-gold-solid transition-colors text-foreground">
                                             {project.name}
                                         </h3>
-                                        <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
+                                        <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-gold-solid transition-colors" />
                                     </div>
-                                    <p className="text-sm text-gray-600 mb-4 line-clamp-3">
+                                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
                                         {project.about || "No description"}
                                     </p>
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-gray-500">
+                                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                                        <span>
                                             {formatDate(project.created_at)}
                                         </span>
-                                        <span className="flex items-center gap-1 text-gray-600">
-                                            <ImageIcon className="w-4 h-4" />
+                                        <span className="flex items-center gap-1">
+                                            <ImageIcon className="w-4 h-4 text-gold-solid" />
                                             {project.totalImages || 0} images
                                         </span>
                                     </div>
                                     {project.status && (
-                                        <Badge className="mt-3" variant="outline">
+                                        <span className="mt-3 text-xs bg-gold-solid/10 text-gold-solid border border-gold-muted px-2 py-0.5 rounded-full inline-block font-medium">
                                             {project.status}
-                                        </Badge>
+                                        </span>
                                     )}
                                 </div>
                             ))}
                         </div>
                         {projects.length === 0 && (
-                            <p className="text-gray-500 text-center py-12">No projects found</p>
+                            <p className="text-muted-foreground text-center py-12">No projects found</p>
                         )}
                     </div>
                 )}
 
-{activeTab === "images" && (
-  <div>
-    {imagesTotal > 0 && (
-      <div className="mb-4 text-sm text-gray-600">
-        {/* Showing {images.length} of {imagesTotal} images */}
-      </div>
-    )}
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-      {images.map((image, index) => {
-        const imageSrc =
-          image.generated_image_url?.trim() ||
-          image.image_url?.trim() ||
-          "/placeholder.png";
-        
-        const isLastImage = index === images.length - 1;
+                {activeTab === "images" && (
+                    <div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                            {images.map((image, index) => {
+                                const imageSrc =
+                                    image.generated_image_url?.trim() ||
+                                    image.image_url?.trim() ||
+                                    "/placeholder.png";
+                                
+                                const isLastImage = index === images.length - 1;
 
-        return (
-          <div
-            key={image.id}
-            ref={isLastImage ? lastImageElementRef : null}
-            className="aspect-square rounded-lg overflow-hidden border border-border hover:shadow-lg transition-all cursor-pointer group relative"
-          >
-            <img
-              src={imageSrc}
-              alt={image.prompt || "Generated image"}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-              loading="lazy"
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src =
-                  "https://via.placeholder.com/300x300?text=No+Image";
-              }}
-            />
+                                return (
+                                    <div
+                                        key={image.id}
+                                        ref={isLastImage ? lastImageElementRef : null}
+                                        className="aspect-square rounded-lg overflow-hidden border border-border hover:shadow-lg hover:border-gold-muted transition-all cursor-pointer group relative"
+                                    >
+                                        <img
+                                            src={imageSrc}
+                                            alt={image.prompt || "Generated image"}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                            loading="lazy"
+                                            onError={(e) => {
+                                                e.currentTarget.onerror = null;
+                                                e.currentTarget.src = "/placeholder.png";
+                                            }}
+                                        />
 
-            {image.prompt && (
-              <div
-                className="
-                  absolute inset-0
-                  pointer-events-none
-                  bg-black/0
-                  group-hover:bg-black/60
-                  transition-colors
-                  p-2
-                  flex items-end
-                "
-              >
-                <p className="text-white text-xs line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  {image.prompt}
-                </p>
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
+                                        {image.prompt && (
+                                            <div
+                                                className="
+                                                    absolute inset-0
+                                                    pointer-events-none
+                                                    bg-black/0
+                                                    group-hover:bg-black/60
+                                                    transition-colors
+                                                    p-2
+                                                    flex items-end
+                                                "
+                                            >
+                                                <p className="text-white text-xs line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    {image.prompt}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
 
-    {imagesLoading && (
-      <div className="text-center py-8">
-        <Loader2 className="w-6 h-6 text-blue-600 animate-spin mx-auto" />
-        <p className="text-sm text-gray-500 mt-2">Loading more images...</p>
-      </div>
-    )}
+                        {imagesLoading && (
+                            <div className="text-center py-8">
+                                <Loader2 className="w-6 h-6 text-gold-solid animate-spin mx-auto" />
+                                <p className="text-sm text-muted-foreground mt-2">Loading more images...</p>
+                            </div>
+                        )}
 
-    {images.length === 0 && !imagesLoading && (
-      <p className="text-gray-500 text-center py-12">No images found</p>
-    )}
+                        {images.length === 0 && !imagesLoading && (
+                            <p className="text-muted-foreground text-center py-12">No images found</p>
+                        )}
 
-    {!imagesHasMore && images.length > 0 && (
-      <p className="text-gray-500 text-center py-4 text-sm">
-        All images loaded ({images.length} total)
-      </p>
-    )}
-  </div>
-)}
-
+                        {!imagesHasMore && images.length > 0 && (
+                            <p className="text-muted-foreground text-center py-4 text-sm">
+                                All images loaded ({images.length} total)
+                            </p>
+                        )}
+                    </div>
+                )}
 
                 {activeTab === "credits" && (
                     <div>
-                        <div className="bg-card text-card-foreground border border-border rounded-xl overflow-hidden">
+                        <div className="bg-card text-card-foreground border border-border rounded-xl overflow-hidden shadow-sm">
                             <div className="overflow-x-auto">
                                 <table className="w-full">
-                                    <thead className="bg-gray-50">
-                                        <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <thead>
+                                        <tr className="bg-accent/20 border-b border-border">
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-foreground uppercase tracking-wider">
                                                 Date
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-foreground uppercase tracking-wider">
                                                 Type
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-foreground uppercase tracking-wider">
                                                 Credits
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-foreground uppercase tracking-wider">
                                                 Balance After
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-foreground uppercase tracking-wider">
                                                 Reason
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
+                                    <tbody className="divide-y divide-border">
                                         {creditHistory.map((entry) => (
-                                            <tr key={entry.id} className="hover:bg-gray-50">
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <tr key={entry.id} className="hover:bg-accent/30 transition-colors">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                                                     {formatDateTime(entry.created_at)}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <Badge
-                                                        variant={
+                                                    <span
+                                                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
                                                             entry.change_type === "deduction"
-                                                                ? "destructive"
-                                                                : "default"
-                                                        }
+                                                                ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                                                                : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                                        }`}
                                                     >
                                                         {entry.change_type}
-                                                    </Badge>
+                                                    </span>
                                                 </td>
                                                 <td
                                                     className={`px-6 py-4 whitespace-nowrap text-sm font-semibold ${
                                                         entry.change_type === "deduction"
-                                                            ? "text-red-600"
-                                                            : "text-green-600"
+                                                            ? "text-red-400"
+                                                            : "text-emerald-400"
                                                     }`}
                                                 >
                                                     {entry.change_type === "deduction" ? "-" : "+"}
                                                     {entry.credits_changed || 0}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground font-semibold">
                                                     {entry.balance_after || 0}
                                                 </td>
-                                                <td className="px-6 py-4 text-sm text-gray-600">
+                                                <td className="px-6 py-4 text-sm text-muted-foreground">
                                                     {entry.reason || "N/A"}
                                                 </td>
                                             </tr>
@@ -652,7 +636,7 @@ export default function UserDetailPage({ params }) {
                             </div>
                         </div>
                         {creditHistory.length === 0 && (
-                            <p className="text-gray-500 text-center py-12">No credit history found</p>
+                            <p className="text-muted-foreground text-center py-12">No credit history found</p>
                         )}
                     </div>
                 )}

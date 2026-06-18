@@ -107,14 +107,14 @@ export default function CreditsHistoryPage() {
 
         const logs = getFilteredLogs();
         const user = members.find((m) => m.id === selectedUser.id);
-
+        console.log(user);
         return (
-            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
-                    <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div className="bg-card border border-border rounded-xl shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col text-foreground animate-scale-in">
+                    <div className="flex items-center justify-between p-6 border-b border-border">
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900">{t("orgPortal.creditUsageHistory")}</h2>
-                            <p className="text-gray-600 mt-1">
+                            <h2 className="text-2xl font-bold text-foreground">{t("orgPortal.creditUsageHistory") || "Credit Usage History"}</h2>
+                            <p className="text-muted-foreground mt-1">
                                 {user?.full_name || user?.email} ({user?.email})
                             </p>
                         </div>
@@ -123,17 +123,17 @@ export default function CreditsHistoryPage() {
                                 setSelectedUser(null);
                                 setDateFilter({ startDate: "", endDate: "" });
                             }}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-2 hover:bg-accent rounded-lg transition-colors"
                         >
-                            <X className="w-6 h-6 text-gray-600" />
+                            <X className="w-6 h-6 text-muted-foreground hover:text-foreground" />
                         </button>
                     </div>
 
-                    <div className="p-6 border-b border-gray-200 bg-gray-50">
-                        <div className="flex items-center gap-4">
+                    <div className="p-6 border-b border-border bg-accent/10">
+                        <div className="flex flex-wrap items-center gap-4">
                             <div className="flex items-center gap-2">
-                                <Calendar className="w-5 h-5 text-gray-400" />
-                                <span className="text-sm font-medium text-gray-700">{t("orgPortal.filterByDate")}:</span>
+                                <Calendar className="w-5 h-5 text-muted-foreground" />
+                                <span className="text-sm font-medium text-foreground">{t("orgPortal.filterByDate") || "Filter by date"}:</span>
                             </div>
                             <input
                                 type="date"
@@ -141,23 +141,23 @@ export default function CreditsHistoryPage() {
                                 onChange={(e) =>
                                     setDateFilter((prev) => ({ ...prev, startDate: e.target.value }))
                                 }
-                                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="px-3 py-2 bg-background border border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                             />
-                            <span className="text-gray-500">{t("orgPortal.to")}</span>
+                            <span className="text-muted-foreground">{t("orgPortal.to") || "to"}</span>
                             <input
                                 type="date"
                                 value={dateFilter.endDate}
                                 onChange={(e) =>
                                     setDateFilter((prev) => ({ ...prev, endDate: e.target.value }))
                                 }
-                                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="px-3 py-2 bg-background border border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                             />
                             {(dateFilter.startDate || dateFilter.endDate) && (
                                 <button
                                     onClick={() => setDateFilter({ startDate: "", endDate: "" })}
-                                    className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                                    className="px-4 py-2 text-sm text-foreground bg-secondary border border-border rounded-lg hover:bg-accent transition-colors"
                                 >
-                                    {t("orgPortal.clearFilter")}
+                                    {t("orgPortal.clearFilter") || "Clear"}
                                 </button>
                             )}
                         </div>
@@ -165,63 +165,61 @@ export default function CreditsHistoryPage() {
 
                     <div className="flex-1 overflow-y-auto p-6">
                         {logs.length > 0 ? (
-                            <div className="overflow-x-auto">
+                            <div className="overflow-x-auto text-foreground">
                                 <table className="w-full">
                                     <thead>
-                                        <tr className="border-b border-gray-200 bg-gray-50">
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">{t("orgPortal.date")}</th>
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">{t("orgPortal.type")}</th>
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">{t("orgPortal.amount")}</th>
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                                                {t("orgPortal.balanceAfter")}
+                                        <tr className="border-b border-border bg-accent/20">
+                                            <th className="text-left py-3 px-4 font-semibold text-foreground">{t("orgPortal.date") || "Date"}</th>
+                                            <th className="text-left py-3 px-4 font-semibold text-foreground">{t("orgPortal.type") || "Type"}</th>
+                                            <th className="text-left py-3 px-4 font-semibold text-foreground">{t("orgPortal.amount") || "Amount"}</th>
+                                            <th className="text-left py-3 px-4 font-semibold text-foreground text-center">
+                                                {t("orgPortal.balanceAfter") || "Balance After"}
                                             </th>
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">{t("orgPortal.reason")}</th>
+                                            <th className="text-left py-3 px-4 font-semibold text-foreground">{t("orgPortal.reason") || "Reason"}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {logs.map((log) => (
                                             <tr
                                                 key={log.id}
-                                                className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                                                className="border-b border-border hover:bg-accent/30 transition-colors"
                                             >
                                                 <td className="py-4 px-4">
                                                     <div className="flex items-center gap-2">
-                                                        <Calendar className="w-4 h-4 text-gray-400" />
-                                                        <span className="text-gray-900">
+                                                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                                                        <span className="text-foreground">
                                                             {log.date ? new Date(log.date).toLocaleDateString() : "N/A"}
                                                         </span>
                                                     </div>
                                                 </td>
                                                 <td className="py-4 px-4">
                                                     <span
-                                                        className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
                                                             log.change_type === "credit"
-                                                                ? "bg-green-100 text-green-800"
-                                                                : "bg-red-100 text-red-800"
+                                                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                                                : "bg-red-500/10 text-red-400 border border-red-500/20"
                                                         }`}
                                                     >
-                                                        {log.change_type === "credit" ? t("orgPortal.credit") : t("orgPortal.debit")}
+                                                        {log.change_type === "credit" ? (t("orgPortal.credit") || "Credit") : (t("orgPortal.debit") || "Debit")}
                                                     </span>
                                                 </td>
-                                                <td className="py-4 px-4">
+                                                <td className="py-4 px-4 font-semibold">
                                                     <span
-                                                        className={`font-semibold ${
+                                                        className={
                                                             log.change_type === "credit"
-                                                                ? "text-green-600"
-                                                                : "text-red-600"
-                                                        }`}
+                                                                ? "text-emerald-400"
+                                                                : "text-red-400"
+                                                        }
                                                     >
                                                         {log.change_type === "credit" ? "+" : "-"}
                                                         {log.credits_changed}
                                                     </span>
                                                 </td>
-                                                <td className="py-4 px-4">
-                                                    <span className="text-gray-900 font-semibold">
-                                                        {log.balance_after}
-                                                    </span>
+                                                <td className="py-4 px-4 text-center font-semibold text-foreground">
+                                                    {log.balance_after}
                                                 </td>
-                                                <td className="py-4 px-4">
-                                                    <span className="text-gray-700">{log.reason || "N/A"}</span>
+                                                <td className="py-4 px-4 text-muted-foreground">
+                                                    {log.reason || "N/A"}
                                                 </td>
                                             </tr>
                                         ))}
@@ -230,7 +228,7 @@ export default function CreditsHistoryPage() {
                             </div>
                         ) : (
                             <div className="text-center py-12">
-                                <p className="text-gray-600">{t("orgPortal.noCreditLogsFound")}</p>
+                                <p className="text-muted-foreground">{t("orgPortal.noCreditLogsFound") || "No credit logs found"}</p>
                             </div>
                         )}
                     </div>
@@ -243,8 +241,8 @@ export default function CreditsHistoryPage() {
         return (
             <div className="p-8 flex items-center justify-center min-h-screen">
                 <div className="text-center">
-                    <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-                    <p className="text-gray-600">{t("orgPortal.loadingCreditHistory")}</p>
+                    <Loader2 className="w-12 h-12 text-gold-solid animate-spin mx-auto mb-4" />
+                    <p className="text-muted-foreground">{t("orgPortal.loadingCreditHistory") || "Loading credit history..."}</p>
                 </div>
             </div>
         );
@@ -253,31 +251,31 @@ export default function CreditsHistoryPage() {
     return (
         <div className="p-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("orgPortal.creditsUsageHistory")}</h1>
-                <p className="text-gray-600">{t("orgPortal.viewIndividualCreditUsage")}</p>
+                <h1 className="text-3xl font-bold text-foreground mb-2">{t("orgPortal.creditsUsageHistory") || "Credits Usage History"}</h1>
+                <p className="text-muted-foreground">{t("orgPortal.viewIndividualCreditUsage") || "View individual credit usage by organization members"}</p>
             </div>
 
             {creditUsage && creditUsage.summary && (
-                <div className="mb-6 bg-white rounded-lg shadow-md p-6 border border-gray-200">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4">{t("orgPortal.summary")}</h2>
+                <div className="mb-6 bg-card rounded-lg shadow-md p-6 border border-border text-foreground">
+                    <h2 className="text-lg font-semibold text-foreground mb-4">{t("orgPortal.summary") || "Summary"}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
-                            <p className="text-sm text-gray-600">{t("orgPortal.totalDebits")}</p>
-                            <p className="text-2xl font-bold text-red-600">{creditUsage.summary.total_debits || 0}</p>
+                            <p className="text-sm text-muted-foreground">{t("orgPortal.totalDebits") || "Total Debits"}</p>
+                            <p className="text-2xl font-bold text-red-400">{creditUsage.summary.total_debits || 0}</p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600">{t("orgPortal.totalCredits")}</p>
-                            <p className="text-2xl font-bold text-green-600">
+                            <p className="text-sm text-muted-foreground">{t("orgPortal.totalCredits") || "Total Credits"}</p>
+                            <p className="text-2xl font-bold text-emerald-400">
                                 {creditUsage.summary.total_credits || 0}
                             </p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600">{t("orgPortal.netUsage")}</p>
-                            <p className="text-2xl font-bold text-gray-900">{creditUsage.summary.net_usage || 0}</p>
+                            <p className="text-sm text-muted-foreground">{t("orgPortal.netUsage") || "Net Usage"}</p>
+                            <p className="text-2xl font-bold text-foreground">{creditUsage.summary.net_usage || 0}</p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600">{t("orgPortal.currentBalance")}</p>
-                            <p className="text-2xl font-bold text-blue-600">
+                            <p className="text-sm text-muted-foreground">{t("orgPortal.currentBalance") || "Current Balance"}</p>
+                            <p className="text-2xl font-bold text-gold-solid">
                                 {creditUsage.organization?.current_balance || 0}
                             </p>
                         </div>
@@ -287,57 +285,57 @@ export default function CreditsHistoryPage() {
 
             <div className="mb-6">
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                     <input
                         type="text"
-                        placeholder={t("orgPortal.searchUsers")}
+                        placeholder={t("orgPortal.searchUsers") || "Search users..."}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-10 pr-4 py-3 bg-card border border-input rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                     />
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+            <div className="bg-card rounded-lg shadow-md border border-border overflow-hidden text-foreground">
                 <div className="overflow-x-auto">
                     <table className="w-full">
-                        <thead className="bg-gray-50 border-b border-gray-200">
+                        <thead className="bg-accent/30 border-b border-border">
                             <tr>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">{t("orgPortal.user")}</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">{t("orgPortal.email")}</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">{t("orgPortal.role")}</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">{t("orgPortal.actions")}</th>
+                                <th className="text-left py-4 px-6 font-semibold text-foreground">{t("orgPortal.user") || "User"}</th>
+                                <th className="text-left py-4 px-6 font-semibold text-foreground">{t("orgPortal.email") || "Email"}</th>
+                                <th className="text-left py-4 px-6 font-semibold text-foreground">{t("orgPortal.role") || "Role"}</th>
+                                <th className="text-left py-4 px-6 font-semibold text-foreground">{t("orgPortal.actions") || "Actions"}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {membersLoading ? (
                                 <tr>
                                     <td colSpan={4} className="py-8 text-center">
-                                        <Loader2 className="w-6 h-6 text-blue-600 animate-spin mx-auto" />
+                                        <Loader2 className="w-6 h-6 text-gold-solid animate-spin mx-auto" />
                                     </td>
                                 </tr>
                             ) : paginatedMembers.length > 0 ? (
                                 paginatedMembers.map((user) => (
                                     <tr
                                         key={user.id}
-                                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                                        className="border-b border-border hover:bg-accent/30 transition-colors cursor-pointer"
                                         onClick={() => setSelectedUser(user)}
                                     >
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
+                                                <div className="w-10 h-10 rounded-full bg-gold-gradient flex items-center justify-center text-primary-foreground font-semibold shadow-sm">
                                                     {(user.full_name || user.email || "U").charAt(0).toUpperCase()}
                                                 </div>
-                                                <span className="font-medium text-gray-900">
+                                                <span className="font-medium text-foreground">
                                                     {user.full_name || user.email}
                                                 </span>
                                             </div>
                                         </td>
                                         <td className="py-4 px-6">
-                                            <span className="text-gray-700">{user.email}</span>
+                                            <span className="text-muted-foreground">{user.email}</span>
                                         </td>
                                         <td className="py-4 px-6">
-                                            <span className="text-gray-700 capitalize">{user.organization_role || "member"}</span>
+                                            <span className="text-muted-foreground capitalize">{user.organization_role || "member"}</span>
                                         </td>
                                         <td className="py-4 px-6">
                                             <button
@@ -345,9 +343,9 @@ export default function CreditsHistoryPage() {
                                                     e.stopPropagation();
                                                     setSelectedUser(user);
                                                 }}
-                                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                                                className="px-4 py-2 bg-gold-gradient text-primary-foreground font-semibold rounded-lg hover:brightness-110 shadow-md transition-all text-sm"
                                             >
-                                                {t("orgPortal.viewCreditLogs")}
+                                                {t("orgPortal.viewCreditLogs") || "View Credit Logs"}
                                             </button>
                                         </td>
                                     </tr>
@@ -355,8 +353,8 @@ export default function CreditsHistoryPage() {
                             ) : (
                                 <tr>
                                     <td colSpan={4} className="text-center py-12">
-                                        <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                                        <p className="text-gray-600">{t("orgPortal.noUsersFound")}</p>
+                                        <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                                        <p className="text-muted-foreground">{t("orgPortal.noUsersFound") || "No users found"}</p>
                                     </td>
                                 </tr>
                             )}
@@ -364,25 +362,25 @@ export default function CreditsHistoryPage() {
                     </table>
                 </div>
                 {filteredMembers.length > ITEMS_PER_PAGE && (
-                    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
-                        <div className="text-sm text-gray-600">
-                            {t("orgPortal.showingUsers").replace("{start}", startIndex + 1).replace("{end}", Math.min(endIndex, filteredMembers.length)).replace("{total}", filteredMembers.length)}
+                    <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-accent/10">
+                        <div className="text-sm text-muted-foreground">
+                            {t("orgPortal.showingUsers")?.replace("{start}", startIndex + 1)?.replace("{end}", Math.min(endIndex, filteredMembers.length))?.replace("{total}", filteredMembers.length) || `Showing ${startIndex + 1}-${Math.min(endIndex, filteredMembers.length)} of ${filteredMembers.length} users`}
                         </div>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                                 disabled={currentPage === 1}
-                                className="p-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="p-2 border border-border rounded-lg hover:bg-accent text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 <ChevronLeft className="w-5 h-5" />
                             </button>
-                            <span className="text-sm text-gray-700">
-                                {t("orgPortal.pageOf").replace("{current}", currentPage).replace("{total}", totalPages)}
+                            <span className="text-sm text-foreground">
+                                {t("orgPortal.pageOf")?.replace("{current}", currentPage)?.replace("{total}", totalPages) || `Page ${currentPage} of ${totalPages}`}
                             </span>
                             <button
                                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                                 disabled={currentPage === totalPages}
-                                className="p-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="p-2 border border-border rounded-lg hover:bg-accent text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 <ChevronRight className="w-5 h-5" />
                             </button>

@@ -8,24 +8,24 @@ export function AdminColorPalette({ collectionData }) {
     return (
         <div className="space-y-4 mb-6">
             <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center">
-                    <Droplet className="w-5 h-5 text-pink-600" />
+                <div className="w-10 h-10 bg-gold-solid/10 rounded-lg flex items-center justify-center">
+                    <Droplet className="w-5 h-5 text-gold-solid" />
                 </div>
                 <div>
-                    <h3 className="font-bold text-gray-900 text-lg">Color Palette</h3>
-                    <p className="text-sm text-gray-600">Selected colors and instructions</p>
+                    <h3 className="font-bold text-foreground text-lg">Color Palette</h3>
+                    <p className="text-sm text-muted-foreground">Selected colors and instructions</p>
                 </div>
             </div>
 
             <div className="space-y-4">
                 {item?.selected_colors && item.selected_colors.length > 0 && (
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Selected Colors</label>
+                        <label className="block text-sm font-semibold text-foreground mb-2">Selected Colors</label>
                         <div className="flex flex-wrap gap-2">
                             {item.selected_colors.map((color, idx) => (
                                 <span
                                     key={idx}
-                                    className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium"
+                                    className="px-3 py-1 bg-secondary text-foreground border border-border rounded-full text-sm font-medium"
                                 >
                                     {color}
                                 </span>
@@ -36,15 +36,15 @@ export function AdminColorPalette({ collectionData }) {
 
                 {item?.picked_colors && item.picked_colors.length > 0 && (
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Color Values</label>
+                        <label className="block text-sm font-semibold text-foreground mb-2">Color Values</label>
                         <div className="flex flex-wrap gap-3">
                             {item.picked_colors.map((color, idx) => (
                                 <div key={idx} className="flex items-center gap-2">
                                     <div
-                                        className="w-12 h-12 rounded-lg border-2 border-gray-200"
+                                        className="w-12 h-12 rounded-lg border-2 border-border shadow-sm"
                                         style={{ backgroundColor: color }}
                                     ></div>
-                                    <span className="text-sm font-mono text-gray-700">{color}</span>
+                                    <span className="text-sm font-mono text-muted-foreground">{color}</span>
                                 </div>
                             ))}
                         </div>
@@ -53,8 +53,8 @@ export function AdminColorPalette({ collectionData }) {
 
                 {item?.color_instructions && (
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Color Instructions</label>
-                        <div className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900">
+                        <label className="block text-sm font-semibold text-foreground mb-2">Color Instructions</label>
+                        <div className="w-full px-4 py-3 border border-border rounded-lg bg-accent/10 text-foreground">
                             {item.color_instructions}
                         </div>
                     </div>

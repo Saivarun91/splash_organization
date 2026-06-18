@@ -221,7 +221,7 @@ export default function PaymentsPage() {
                         : "",
                 },
                 theme: {
-                    color: "#884cff",
+                    color: "#cd9639",
                 },
                 modal: {
                     ondismiss: function () {
@@ -241,31 +241,31 @@ export default function PaymentsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="relative p-4 rounded-xl bg-white dark:bg-card shadow-md border border-gray-200 dark:border-border overflow-hidden">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-tr from-indigo-500 to-purple-500 opacity-10 rounded-full blur-3xl" />
+            <div className="relative p-4 rounded-xl bg-card shadow-md border border-border overflow-hidden">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-tr from-gold-solid/20 to-gold-muted/10 opacity-10 rounded-full blur-3xl" />
                 <div className="relative z-10">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-foreground mb-1">{t("orgPortal.paymentsAndSubscriptions") || "Subscription & Billing"}</h1>
-                    <p className="text-sm text-gray-600 dark:text-muted-foreground">{t("orgPortal.managePaymentsAndPurchaseCredits") || "Purchase credits and manage your subscription"}</p>
+                    <h1 className="text-2xl font-bold text-foreground mb-1">{t("orgPortal.paymentsAndSubscriptions") || "Subscription & Billing"}</h1>
+                    <p className="text-sm text-muted-foreground">{t("orgPortal.managePaymentsAndPurchaseCredits") || "Purchase credits and manage your subscription"}</p>
                 </div>
             </div>
 
-            <div className="p-6 bg-white dark:bg-card rounded-xl shadow-sm border border-gray-200 dark:border-border mb-6">
+            <div className="p-6 bg-card rounded-xl shadow-sm border border-border mb-6 text-foreground">
                 <div className="p-6">
                     <div>
-                            <h2 className="text-xl font-semibold text-gray-900 mb-6">{t("orgPortal.paymentsAndSubscriptions")}</h2>
+                            <h2 className="text-xl font-semibold text-foreground mb-6">{t("orgPortal.paymentsAndSubscriptions")}</h2>
                             
                             {currentPlan && (
-                                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                <div className="mb-6 p-4 bg-gold-solid/10 border border-gold-muted rounded-lg">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="text-sm text-blue-700 font-medium">{t("orgPortal.currentPlan")}</p>
-                                            <p className="text-lg font-bold text-blue-900">{currentPlan.name}</p>
-                                            <p className="text-sm text-blue-600">
+                                            <p className="text-sm text-gold-solid font-medium">{t("orgPortal.currentPlan")}</p>
+                                            <p className="text-lg font-bold text-gold-solid">{currentPlan.name}</p>
+                                            <p className="text-sm text-gold-solid/80">
                                                 {currentPlan.credits_per_month?.toLocaleString() || 0} {t("orgPortal.creditsPerMonth")} • 
                                                 {(currentPlan.currency === 'INR' ? '₹' : '$')}{currentPlan.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/{currentPlan.billing_cycle === 'yearly' ? t("orgPortal.year") : t("orgPortal.month")}
                                             </p>
                                         </div>  
-                                        <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-medium">
+                                        <span className="px-3 py-1 bg-gold-gradient text-primary-foreground rounded-full text-sm font-semibold shadow-md">
                                             {t("orgPortal.active")}
                                         </span>
                                     </div>
@@ -273,21 +273,21 @@ export default function PaymentsPage() {
                             )}
 
                             {!razorpayLoaded && (
-                                <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
-                                    <AlertCircle className="w-5 h-5 text-yellow-600" />
-                                    <p className="text-yellow-700 text-sm">{t("orgPortal.loadingPaymentGateway")}</p>
+                                <div className="mb-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg flex items-center gap-3">
+                                    <AlertCircle className="w-5 h-5 text-amber-400" />
+                                    <p className="text-amber-400 text-sm">{t("orgPortal.loadingPaymentGateway")}</p>
                                 </div>
                             )}
 
                             {plansLoading ? (
                                 <div className="flex items-center justify-center py-12">
-                                    <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-                                    <span className="ml-3 text-gray-600">{t("orgPortal.loadingPlans")}</span>
+                                    <Loader2 className="w-8 h-8 animate-spin text-gold-solid" />
+                                    <span className="ml-3 text-muted-foreground">{t("orgPortal.loadingPlans")}</span>
                                 </div>
                             ) : plans.length === 0 ? (
                                 <div className="text-center py-12">
-                                    <CreditCard className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-600">{t("orgPortal.noPlansAvailable")}</p>
+                                    <CreditCard className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                                    <p className="text-muted-foreground">{t("orgPortal.noPlansAvailable")}</p>
                                 </div>
                             ) : (
                                 <div className="flex justify-center">
@@ -322,81 +322,83 @@ export default function PaymentsPage() {
                                             return (
                                                 <div
                                                     key={plan.id}
-                                                    className={`border-2 rounded-xl p-6 relative ${
+                                                    className={`border-2 rounded-xl p-6 relative flex flex-col justify-between ${
                                                         isPro
-                                                            ? "border-purple-200 bg-gradient-to-b from-purple-50 to-white shadow-lg"
+                                                            ? "border-gold-solid/30 bg-card shadow-lg ring-1 ring-gold-muted/20"
                                                             : isEnterprise
-                                                            ? "border-gray-200 bg-white shadow-lg"
+                                                            ? "border-border bg-card shadow-lg"
                                                             : isCurrentPlan
-                                                            ? "border-green-500 shadow-md"
-                                                            : "border-gray-200 hover:shadow-md"
+                                                            ? "border-emerald-500 shadow-md bg-card"
+                                                            : "border-border bg-card hover:shadow-md"
                                                     }`}
                                                 >
-                                                    {isCurrentPlan && (
-                                                        <div className="absolute top-4 right-4">
-                                                            <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                                                                {t("orgPortal.current")}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                    <div className="text-center mb-6">
-                                                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                                                        {plan.description && (
-                                                            <p className="text-gray-600 mt-1 text-sm">{plan.description}</p>
+                                                    <div>
+                                                        {isCurrentPlan && (
+                                                            <div className="absolute top-4 right-4">
+                                                                <span className="bg-emerald-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                                                                    {t("orgPortal.current")}
+                                                                </span>
+                                                            </div>
                                                         )}
-                                                        <div className="mt-4">
-                                                            {displayAmount !== null ? (
-                                                                <div className="flex items-baseline justify-center gap-2">
-                                                                    <span className="text-4xl font-bold text-gray-900">
-                                                                        {(plan.currency === 'INR' ? '₹' : '$')}{displayAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                                    </span>
-                                                                    {amountLabel && (
-                                                                        <span className="text-gray-600">{amountLabel}</span>
-                                                                    )}
-                                                                </div>
-                                                            ) : (
-                                                                <span className="text-3xl font-bold text-gray-900">{amountLabel}</span>
+                                                        <div className="text-center mb-6">
+                                                            <h3 className="text-2xl font-bold text-foreground mb-2">{plan.name}</h3>
+                                                            {plan.description && (
+                                                                <p className="text-muted-foreground mt-1 text-sm">{plan.description}</p>
                                                             )}
+                                                            <div className="mt-4">
+                                                                {displayAmount !== null ? (
+                                                                    <div className="flex items-baseline justify-center gap-2">
+                                                                        <span className="text-4xl font-bold text-foreground">
+                                                                            {(plan.currency === 'INR' ? '₹' : '$')}{displayAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                                        </span>
+                                                                        {amountLabel && (
+                                                                            <span className="text-muted-foreground">{amountLabel}</span>
+                                                                        )}
+                                                                    </div>
+                                                                ) : (
+                                                                    <span className="text-3xl font-bold text-foreground">{amountLabel}</span>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    
-                                                    {/* Credit options dropdown for Pro plan */}
-                                                    {isPro && creditOptions.length > 0 && (
-                                                        <div className="mb-4">
-                                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                                Choose credits
-                                                            </label>
-                                                            <select
-                                                                value={selectedCreditOption}
-                                                                onChange={(e) => setSelectedCreditOption(Number(e.target.value))}
-                                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                                            >
-                                                                {creditOptions.map((opt, index) => (
-                                                                    <option key={index} value={index}>
-                                                                        ${opt.amount} – {opt.credits} credits
-                                                                    </option>
+                                                        
+                                                        {/* Credit options dropdown for Pro plan */}
+                                                        {isPro && creditOptions.length > 0 && (
+                                                            <div className="mb-6">
+                                                                <label className="block text-sm font-medium text-foreground mb-2">
+                                                                    Choose credits
+                                                                </label>
+                                                                <select
+                                                                    value={selectedCreditOption}
+                                                                    onChange={(e) => setSelectedCreditOption(Number(e.target.value))}
+                                                                    className="w-full px-4 py-2 border border-input rounded-lg bg-background text-foreground focus:ring-2 focus:ring-ring focus:border-transparent cursor-pointer"
+                                                                >
+                                                                    {creditOptions.map((opt, index) => (
+                                                                        <option key={index} value={index} className="bg-card text-foreground">
+                                                                            ${opt.amount} – {opt.credits} credits
+                                                                        </option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+                                                        )}
+                                                        
+                                                        {plan.features && plan.features.length > 0 && (
+                                                            <ul className="space-y-3 mb-6">
+                                                                {plan.features.map((feature, index) => (
+                                                                    <li key={index} className="flex items-start gap-2">
+                                                                        <Check className="w-5 h-5 text-gold-solid flex-shrink-0 mt-0.5" />
+                                                                        <span className="text-muted-foreground">{feature}</span>
+                                                                    </li>
                                                                 ))}
-                                                            </select>
-                                                        </div>
-                                                    )}
-                                                    
-                                                    {plan.features && plan.features.length > 0 && (
-                                                        <ul className="space-y-3 mb-6">
-                                                            {plan.features.map((feature, index) => (
-                                                                <li key={index} className="flex items-start gap-2">
-                                                                    <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                                                                    <span className="text-gray-700">{feature}</span>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    )}
+                                                            </ul>
+                                                        )}
+                                                    </div>
                                                     
                                                     {isEnterprise ? (
                                                         <button
                                                             type="button"
                                                             onClick={() => setShowContactSalesModal(true)}
                                                             disabled={isCurrentPlan}
-                                                            className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 border-2 border-gray-300 text-gray-900 hover:bg-gray-50 ${
+                                                            className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 border border-border text-foreground hover:bg-accent ${
                                                                 isCurrentPlan ? "opacity-50 cursor-not-allowed" : ""
                                                             }`}
                                                         >
@@ -408,10 +410,10 @@ export default function PaymentsPage() {
                                                             disabled={processingPayment || !razorpayLoaded || isCurrentPlan}
                                                             className={`w-full py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
                                                                 isCurrentPlan
-                                                                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                                                                    ? "bg-secondary text-muted-foreground cursor-not-allowed"
                                                                     : isPro
-                                                                    ? "bg-purple-600 text-white hover:bg-purple-700"
-                                                                    : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                                                                    ? "bg-gold-gradient text-primary-foreground hover:brightness-110 shadow-lg"
+                                                                    : "bg-secondary text-foreground hover:bg-accent"
                                                             } disabled:opacity-50 disabled:cursor-not-allowed`}
                                                         >
                                                             {processingPayment ? (
@@ -438,10 +440,10 @@ export default function PaymentsPage() {
             
             {/* Billing Details Modal */}
             {showBillingModal && selectedPlan && (
-                <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50">
-                    <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 space-y-4">
+                <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+                    <div className="bg-card border border-border rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4 text-foreground animate-scale-in">
                         <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-lg font-semibold text-gray-900">
+                            <h3 className="text-lg font-semibold text-foreground">
                                 {t("orgPortal.billingDetails") || "Billing Details"}
                             </h3>
                             <button
@@ -449,19 +451,19 @@ export default function PaymentsPage() {
                                     setShowBillingModal(false);
                                     setProcessingPayment(false);
                                 }}
-                                className="text-gray-500 hover:text-gray-700"
+                                className="text-muted-foreground hover:text-foreground transition-colors"
                             >
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
 
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                             {t("orgPortal.enterBillingDetails") || "Please enter billing details required for GST invoice."}
                         </p>
 
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">
+                                <label className="block text-sm font-medium text-foreground">
                                     {t("orgPortal.billingName") || "Billing Name *"}
                                 </label>
                                 <input
@@ -470,12 +472,12 @@ export default function PaymentsPage() {
                                     onChange={(e) =>
                                         setBillingDetails((prev) => ({ ...prev, billing_name: e.target.value }))
                                     }
-                                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                    className="mt-1 w-full bg-background border border-input rounded-md px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-ring focus:border-transparent"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">
+                                <label className="block text-sm font-medium text-foreground">
                                     {t("orgPortal.billingAddress") || "Billing Address *"}
                                 </label>
                                 <textarea
@@ -484,13 +486,13 @@ export default function PaymentsPage() {
                                     onChange={(e) =>
                                         setBillingDetails((prev) => ({ ...prev, billing_address: e.target.value }))
                                     }
-                                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                    className="mt-1 w-full bg-background border border-input rounded-md px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-ring focus:border-transparent resize-none"
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">
+                                    <label className="block text-sm font-medium text-foreground">
                                         {t("orgPortal.phoneNumber") || "Phone Number *"}
                                     </label>
                                     <input
@@ -499,11 +501,11 @@ export default function PaymentsPage() {
                                         onChange={(e) =>
                                             setBillingDetails((prev) => ({ ...prev, billing_phone: e.target.value }))
                                         }
-                                        className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                        className="mt-1 w-full bg-background border border-input rounded-md px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-ring focus:border-transparent"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">
+                                    <label className="block text-sm font-medium text-foreground">
                                         {t("orgPortal.gstNumber") || "GST Number (optional)"}
                                     </label>
                                     <input
@@ -515,43 +517,45 @@ export default function PaymentsPage() {
                                                 billing_gst_number: e.target.value,
                                             }))
                                         }
-                                        className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                        className="mt-1 w-full bg-background border border-input rounded-md px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-ring focus:border-transparent"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <span className="block text-sm font-medium text-gray-700 mb-1">
+                                <span className="block text-sm font-medium text-foreground mb-1">
                                     {t("orgPortal.billingType") || "Billing Type"}
                                 </span>
                                 <div className="flex gap-4 text-sm">
-                                    <label className="flex items-center gap-2 cursor-pointer">
+                                    <label className="flex items-center gap-2 cursor-pointer text-foreground">
                                         <input
                                             type="radio"
                                             name="billing_type"
                                             value="individual"
-                                            checked={billingDetails.billing_type === "individual" || ""}
+                                            checked={billingDetails.billing_type === "individual"}
                                             onChange={(e) =>
                                                 setBillingDetails((prev) => ({
                                                     ...prev,
                                                     billing_type: e.target.value,
                                                 }))
                                             }
+                                            className="accent-gold-solid cursor-pointer"
                                         />
                                         <span>{t("orgPortal.individual") || "Individual"}</span>
                                     </label>
-                                    <label className="flex items-center gap-2 cursor-pointer">
+                                    <label className="flex items-center gap-2 cursor-pointer text-foreground">
                                         <input
                                             type="radio"
                                             name="billing_type"
                                             value="business"
-                                            checked={billingDetails.billing_type === "business" || ""}
+                                            checked={billingDetails.billing_type === "business"}
                                             onChange={(e) =>
                                                 setBillingDetails((prev) => ({
                                                     ...prev,
                                                     billing_type: e.target.value,
                                                 }))
                                             }
+                                            className="accent-gold-solid cursor-pointer"
                                         />
                                         <span>{t("orgPortal.business") || "Business"}</span>
                                     </label>
@@ -559,11 +563,11 @@ export default function PaymentsPage() {
                             </div>
 
                             {/* GST Summary */}
-                            <div className="mt-2 rounded-md bg-gray-50 border border-gray-200 p-3 text-sm">
-                                <p className="font-semibold text-gray-800 mb-1">
+                            <div className="mt-2 rounded-md bg-background border border-border p-3 text-sm text-foreground">
+                                <p className="font-semibold text-foreground mb-1">
                                     {t("orgPortal.orderSummary") || "Order Summary"}
                                 </p>
-                                <div className="flex justify-between text-gray-700">
+                                <div className="flex justify-between text-muted-foreground">
                                     <span>{t("orgPortal.planAmount") || "Plan amount"}</span>
                                     <span>
                                         ₹{(() => {
@@ -577,7 +581,7 @@ export default function PaymentsPage() {
                                         })()}
                                     </span>
                                 </div>
-                                <div className="flex justify-between text-gray-700 mt-1">
+                                <div className="flex justify-between text-muted-foreground mt-1">
                                     <span>
                                         {t("orgPortal.gst") || "GST"} ({invoiceConfig?.tax_rate ?? 18}%)
                                     </span>
@@ -593,7 +597,7 @@ export default function PaymentsPage() {
                                         })()}
                                     </span>
                                 </div>
-                                <div className="flex justify-between text-gray-900 font-semibold mt-2 border-t border-gray-200 pt-2">
+                                <div className="flex justify-between text-foreground font-bold mt-2 border-t border-border pt-2">
                                     <span>{t("orgPortal.totalPayable") || "Total payable"}</span>
                                     <span>
                                         ₹
@@ -625,7 +629,7 @@ export default function PaymentsPage() {
                             <Button
                                 onClick={startPaymentWithBilling}
                                 disabled={processingPayment}
-                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                                className="bg-gold-gradient text-primary-foreground font-semibold hover:brightness-110 shadow-lg"
                             >
                                 {processingPayment ? (
                                     <>

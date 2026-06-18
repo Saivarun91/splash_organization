@@ -77,12 +77,12 @@ export function AdminWorkflowTab({ project, collectionData }) {
     return (
         <div className="space-y-6">
             {/* Workflow Steps Navigation */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                     {steps.map((step, index) => {
                         const isActive = step.number === activeStep;
                         const isCompleted = isStepCompleted(step.number);
-
+ 
                         return (
                             <div key={step.number} className="flex items-center flex-1">
                                 <div className="flex flex-col items-center flex-1">
@@ -98,28 +98,28 @@ export function AdminWorkflowTab({ project, collectionData }) {
                                         }}
                                         className={`flex items-center justify-center w-10 h-10 rounded-full transition-all ${
                                             isCompleted
-                                                ? "bg-blue-600"
+                                                ? "bg-gold-gradient text-primary-foreground font-bold"
                                                 : isActive
-                                                  ? "bg-blue-600 border-2 border-blue-300"
-                                                  : "bg-gray-200"
+                                                  ? "bg-gold-gradient text-primary-foreground ring-2 ring-gold-muted font-bold"
+                                                  : "bg-secondary border border-border text-muted-foreground"
                                         } cursor-pointer hover:scale-105`}
                                     >
                                         {isCompleted ? (
-                                            <Check className="w-5 h-5 text-white" strokeWidth={3} />
+                                            <Check className="w-5 h-5 text-primary-foreground" strokeWidth={3} />
                                         ) : (
                                             <span
-                                                className={`font-semibold ${isActive ? "text-white text-base" : "text-gray-500 text-sm"}`}
+                                                className={`font-semibold ${isActive ? "text-primary-foreground text-base" : "text-muted-foreground text-sm"}`}
                                             >
                                                 {step.number}
                                             </span>
                                         )}
                                     </div>
-                                    <p className="mt-2 text-sm text-center text-gray-700">{step.title}</p>
+                                    <p className="mt-2 text-sm text-center text-foreground font-medium">{step.title}</p>
                                 </div>
                                 {index !== steps.length - 1 && (
                                     <div
                                         className={`h-0.5 flex-1 mx-2 ${
-                                            step.number < activeStep ? "bg-blue-600" : "bg-gray-300"
+                                            step.number < activeStep ? "bg-gold-solid" : "bg-border"
                                         }`}
                                         style={{ minWidth: "20px" }}
                                     />
@@ -129,18 +129,18 @@ export function AdminWorkflowTab({ project, collectionData }) {
                     })}
                 </div>
             </div>
-
+ 
             {/* Step Content */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
                 {renderStepContent()}
             </div>
-
+ 
             {/* Navigation Buttons */}
             <div className="flex items-center justify-between">
                 <button
                     onClick={() => setActiveStep(Math.max(1, activeStep - 1))}
                     disabled={activeStep === 1}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground bg-secondary/50 hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 >
                     <ChevronLeft size={18} />
                     Previous
@@ -148,7 +148,7 @@ export function AdminWorkflowTab({ project, collectionData }) {
                 <button
                     onClick={() => setActiveStep(Math.min(5, activeStep + 1))}
                     disabled={activeStep === 5}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gold-gradient text-primary-foreground font-semibold hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-md"
                 >
                     Next
                     <ChevronRight size={18} />

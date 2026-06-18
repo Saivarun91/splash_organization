@@ -279,16 +279,16 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
     return (
         <div className="grid grid-cols-2 gap-6">
             {/* Themes */}
-            <div className="border-2 border-dashed border-[#b0bec5] rounded-lg p-6 space-y-4">
+            <div className="border-2 border-dashed border-border rounded-lg p-6 space-y-4 bg-card/30">
                 <div>
-                    <h3 className="font-bold text-[#1a1a1a] mb-1">Themes</h3>
-                    <p className="text-sm text-[#708090]">Define project vision and upload inspiration</p>
+                    <h3 className="font-bold text-foreground mb-1">Themes</h3>
+                    <p className="text-sm text-muted-foreground">Define project vision and upload inspiration</p>
                 </div>
 
                 {showSuggestions && aiSuggestions.themes.length > 0 && (
                     <div className="space-y-3">
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-                            <p className="text-blue-600 text-sm font-medium">AI Suggested Themes</p>
+                        <div className="bg-gold-solid/10 border border-gold-solid/20 rounded-lg p-3 mb-3">
+                            <p className="text-gold-solid text-sm font-medium">AI Suggested Themes</p>
                         </div>
                         <MultiSelect
                             options={aiSuggestions.themes}
@@ -302,7 +302,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
 
                 <div className="space-y-3">
                     {showSuggestions && aiSuggestions.themes.length > 0 && (
-                        <p className="text-sm text-[#708090] text-center">Or</p>
+                        <p className="text-sm text-muted-foreground text-center">Or</p>
                     )}
 
                     {/* Hidden file input */}
@@ -318,7 +318,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
 
                     <Button
                         variant="outline"
-                        className="w-full bg-transparent"
+                        className="w-full border-border text-foreground hover:bg-accent hover:text-foreground bg-transparent"
                         disabled={!canEdit || uploading.themes}
                         onClick={() => triggerFileInput('themes')}
                     >
@@ -329,7 +329,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
                     {/* Uploaded images preview */}
                     {uploadedImages.themes.length > 0 && (
                         <div className="space-y-2">
-                            <p className="text-xs text-[#708090]">
+                            <p className="text-xs text-muted-foreground">
                                 {uploadedImages.themes.length} file(s) selected
                             </p>
                             <div className="grid grid-cols-2 gap-2">
@@ -338,7 +338,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
                                         <img
                                             src={image.url}
                                             alt={image.name}
-                                            className="w-full h-16 object-cover rounded border"
+                                            className="w-full h-16 object-cover rounded border border-border"
                                         />
                                         <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button
@@ -369,16 +369,16 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
             </div>
 
             {/* Backgrounds */}
-            <div className="border-2 border-dashed border-[#b0bec5] rounded-lg p-6 space-y-4">
+            <div className="border-2 border-dashed border-border rounded-lg p-6 space-y-4 bg-card/30">
                 <div>
-                    <h3 className="font-bold text-[#1a1a1a] mb-1">Backgrounds</h3>
-                    <p className="text-sm text-[#708090]">Define project vision and upload inspiration</p>
+                    <h3 className="font-bold text-foreground mb-1">Backgrounds</h3>
+                    <p className="text-sm text-muted-foreground">Define project vision and upload inspiration</p>
                 </div>
 
                 {showSuggestions && aiSuggestions.backgrounds.length > 0 && (
                     <div className="space-y-3">
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-                            <p className="text-blue-600 text-sm font-medium">AI Suggested Backgrounds</p>
+                        <div className="bg-gold-solid/10 border border-gold-solid/20 rounded-lg p-3 mb-3">
+                            <p className="text-gold-solid text-sm font-medium">AI Suggested Backgrounds</p>
                         </div>
                         <MultiSelect
                             options={aiSuggestions.backgrounds}
@@ -392,7 +392,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
 
                 <div className="space-y-3">
                     {showSuggestions && aiSuggestions.backgrounds.length > 0 && (
-                        <p className="text-sm text-[#708090] text-center">Or</p>
+                        <p className="text-sm text-muted-foreground text-center">Or</p>
                     )}
 
                     {/* Hidden file input */}
@@ -408,7 +408,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
 
                     <Button
                         variant="outline"
-                        className="w-full bg-transparent"
+                        className="w-full border-border text-foreground hover:bg-accent hover:text-foreground bg-transparent"
                         disabled={!canEdit || uploading.backgrounds}
                         onClick={() => triggerFileInput('backgrounds')}
                     >
@@ -419,7 +419,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
                     {/* Uploaded images preview */}
                     {uploadedImages.backgrounds.length > 0 && (
                         <div className="space-y-2">
-                            <p className="text-xs text-[#708090]">
+                            <p className="text-xs text-muted-foreground">
                                 {uploadedImages.backgrounds.length} file(s) selected
                             </p>
                             <div className="grid grid-cols-2 gap-2">
@@ -428,7 +428,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
                                         <img
                                             src={image.url}
                                             alt={image.name}
-                                            className="w-full h-16 object-cover rounded border"
+                                            className="w-full h-16 object-cover rounded border border-border"
                                         />
                                         <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button
@@ -459,16 +459,16 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
             </div>
 
             {/* Sample Poses */}
-            <div className="border-2 border-dashed border-[#b0bec5] rounded-lg p-6 space-y-4">
+            <div className="border-2 border-dashed border-border rounded-lg p-6 space-y-4 bg-card/30">
                 <div>
-                    <h3 className="font-bold text-[#1a1a1a] mb-1">Sample Poses</h3>
-                    <p className="text-sm text-[#708090]">Define project vision and upload inspiration</p>
+                    <h3 className="font-bold text-foreground mb-1">Sample Poses</h3>
+                    <p className="text-sm text-muted-foreground">Define project vision and upload inspiration</p>
                 </div>
 
                 {showSuggestions && aiSuggestions.poses.length > 0 && (
                     <div className="space-y-3">
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-                            <p className="text-blue-600 text-sm font-medium">AI Suggested Poses</p>
+                        <div className="bg-gold-solid/10 border border-gold-solid/20 rounded-lg p-3 mb-3">
+                            <p className="text-gold-solid text-sm font-medium">AI Suggested Poses</p>
                         </div>
                         <MultiSelect
                             options={aiSuggestions.poses}
@@ -482,7 +482,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
 
                 <div className="space-y-3">
                     {showSuggestions && aiSuggestions.poses.length > 0 && (
-                        <p className="text-sm text-[#708090] text-center">Or</p>
+                        <p className="text-sm text-muted-foreground text-center">Or</p>
                     )}
 
                     {/* Hidden file input */}
@@ -498,7 +498,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
 
                     <Button
                         variant="outline"
-                        className="w-full bg-transparent"
+                        className="w-full border-border text-foreground hover:bg-accent hover:text-foreground bg-transparent"
                         disabled={!canEdit || uploading.poses}
                         onClick={() => triggerFileInput('poses')}
                     >
@@ -509,7 +509,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
                     {/* Uploaded images preview */}
                     {uploadedImages.poses.length > 0 && (
                         <div className="space-y-2">
-                            <p className="text-xs text-[#708090]">
+                            <p className="text-xs text-muted-foreground">
                                 {uploadedImages.poses.length} file(s) selected
                             </p>
                             <div className="grid grid-cols-2 gap-2">
@@ -518,7 +518,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
                                         <img
                                             src={image.url}
                                             alt={image.name}
-                                            className="w-full h-16 object-cover rounded border"
+                                            className="w-full h-16 object-cover rounded border border-border"
                                         />
                                         <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button
@@ -549,16 +549,16 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
             </div>
 
             {/* Location Inspiration */}
-            <div className="border-2 border-dashed border-[#b0bec5] rounded-lg p-6 space-y-4">
+            <div className="border-2 border-dashed border-border rounded-lg p-6 space-y-4 bg-card/30">
                 <div>
-                    <h3 className="font-bold text-[#1a1a1a] mb-1">Location Inspiration</h3>
-                    <p className="text-sm text-[#708090]">Define project vision and upload inspiration</p>
+                    <h3 className="font-bold text-foreground mb-1">Location Inspiration</h3>
+                    <p className="text-sm text-muted-foreground">Define project vision and upload inspiration</p>
                 </div>
 
                 {showSuggestions && aiSuggestions.locations.length > 0 && (
                     <div className="space-y-3">
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-                            <p className="text-blue-600 text-sm font-medium">AI Suggested Locations</p>
+                        <div className="bg-gold-solid/10 border border-gold-solid/20 rounded-lg p-3 mb-3">
+                            <p className="text-gold-solid text-sm font-medium">AI Suggested Locations</p>
                         </div>
                         <MultiSelect
                             options={aiSuggestions.locations}
@@ -572,7 +572,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
 
                 <div className="space-y-3">
                     {showSuggestions && aiSuggestions.locations.length > 0 && (
-                        <p className="text-sm text-[#708090] text-center">Or</p>
+                        <p className="text-sm text-muted-foreground text-center">Or</p>
                     )}
 
                     {/* Hidden file input */}
@@ -588,7 +588,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
 
                     <Button
                         variant="outline"
-                        className="w-full bg-transparent"
+                        className="w-full border-border text-foreground hover:bg-accent hover:text-foreground bg-transparent"
                         disabled={!canEdit || uploading.locations}
                         onClick={() => triggerFileInput('locations')}
                     >
@@ -599,7 +599,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
                     {/* Uploaded images preview */}
                     {uploadedImages.locations.length > 0 && (
                         <div className="space-y-2">
-                            <p className="text-xs text-[#708090]">
+                            <p className="text-xs text-muted-foreground">
                                 {uploadedImages.locations.length} file(s) selected
                             </p>
                             <div className="grid grid-cols-2 gap-2">
@@ -608,7 +608,7 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
                                         <img
                                             src={image.url}
                                             alt={image.name}
-                                            className="w-full h-16 object-cover rounded border"
+                                            className="w-full h-16 object-cover rounded border border-border"
                                         />
                                         <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button

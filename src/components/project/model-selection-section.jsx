@@ -214,16 +214,16 @@ export function ModelSelectionSection({ project, collectionData, onSave, canEdit
 
 
     return (
-        <div className="mb-12">
+        <div className="mb-12 text-foreground">
             {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 animate-fade-in">
-                    <p className="text-red-600">{error}</p>
+                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-4 animate-fade-in">
+                    <p className="text-red-400">{error}</p>
                 </div>
             )}
 
             {success && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4 animate-fade-in">
-                    <p className="text-green-600">{success}</p>
+                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4 mb-4 animate-fade-in">
+                    <p className="text-emerald-400">{success}</p>
                 </div>
             )}
 
@@ -231,14 +231,14 @@ export function ModelSelectionSection({ project, collectionData, onSave, canEdit
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Human Model Preview Card (Real Models) */}
                 <div
-                    className={`relative bg-white rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${activeTab === 'real'
-                        ? 'border-[#884cff] shadow-md'
-                        : 'border-gray-200 hover:border-gray-300'
+                    className={`relative bg-card rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${activeTab === 'real'
+                        ? 'border-gold-solid shadow-md'
+                        : 'border-border hover:border-gold-muted/50'
                         }`}
                 >
                     {/* Selected Badge */}
                     {activeTab === 'real' && (
-                        <div className="absolute top-4 right-4 bg-[#884cff] text-white text-xs font-semibold px-3 py-1.5 rounded-md z-10 animate-fade-in shadow-sm">
+                        <div className="absolute top-4 right-4 bg-gold-gradient text-primary-foreground text-xs font-semibold px-3 py-1.5 rounded-md z-10 animate-fade-in shadow-sm">
                             Selected
                         </div>
                     )}
@@ -246,17 +246,16 @@ export function ModelSelectionSection({ project, collectionData, onSave, canEdit
                     {/* Card Header - Clickable to switch tab */}
                     <div
                         onClick={() => setActiveTab('real')}
-                        className="p-6 border-b border-gray-100 cursor-pointer"
+                        className="p-6 border-b border-border cursor-pointer"
                     >
                         <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${activeTab === 'real' ? 'bg-[#884cff]' : 'bg-gray-100'
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${activeTab === 'real' ? 'bg-gold-solid/10 text-gold-solid' : 'bg-secondary text-muted-foreground'
                                 }`}>
-                                <Users className={`w-5 h-5 transition-colors ${activeTab === 'real' ? 'text-white' : 'text-gray-600'
-                                    }`} />
+                                <Users className="w-5 h-5" />
                             </div>
                             <div className="flex-1">
-                                <h3 className="text-lg font-semibold text-gray-900">Human Model Preview</h3>
-                                <p className="text-sm text-gray-500 mt-1">
+                                <h3 className="text-lg font-semibold text-foreground">Human Model Preview</h3>
+                                <p className="text-sm text-muted-foreground mt-1">
                                     Upload real model photos for automatic crop, pose detection, and professional guidelines.
                                 </p>
                             </div>
@@ -281,14 +280,14 @@ export function ModelSelectionSection({ project, collectionData, onSave, canEdit
 
                 {/* AI Model Preview Card */}
                 <div
-                    className={`relative bg-white rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${activeTab === 'ai'
-                        ? 'border-amber-400 shadow-md'
-                        : 'border-gray-200 hover:border-gray-300'
+                    className={`relative bg-card rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${activeTab === 'ai'
+                        ? 'border-gold-solid shadow-md'
+                        : 'border-border hover:border-gold-muted/50'
                         }`}
                 >
                     {/* Selected Badge */}
                     {activeTab === 'ai' && (
-                        <div className="absolute top-4 right-4 bg-amber-400 text-white text-xs font-semibold px-3 py-1.5 rounded-md z-10 animate-fade-in shadow-sm">
+                        <div className="absolute top-4 right-4 bg-gold-gradient text-primary-foreground text-xs font-semibold px-3 py-1.5 rounded-md z-10 animate-fade-in shadow-sm">
                             Selected
                         </div>
                     )}
@@ -296,17 +295,16 @@ export function ModelSelectionSection({ project, collectionData, onSave, canEdit
                     {/* Card Header - Clickable to switch tab */}
                     <div
                         onClick={() => setActiveTab('ai')}
-                        className="p-6 border-b border-gray-100 cursor-pointer"
+                        className="p-6 border-b border-border cursor-pointer"
                     >
                         <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${activeTab === 'ai' ? 'bg-amber-400' : 'bg-gray-100'
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${activeTab === 'ai' ? 'bg-gold-solid/10 text-gold-solid' : 'bg-secondary text-muted-foreground'
                                 }`}>
-                                <Sparkles className={`w-5 h-5 transition-colors ${activeTab === 'ai' ? 'text-white' : 'text-gray-600'
-                                    }`} />
+                                <Sparkles className="w-5 h-5" />
                             </div>
                             <div className="flex-1">
-                                <h3 className="text-lg font-semibold text-gray-900">AI Model Preview</h3>
-                                <p className="text-sm text-gray-500 mt-1">
+                                <h3 className="text-lg font-semibold text-foreground">AI Model Preview</h3>
+                                <p className="text-sm text-muted-foreground mt-1">
                                     AI automatically generates diverse models based on your project tone, style, and target audience.
                                 </p>
                             </div>
@@ -390,10 +388,10 @@ function AIModelsTab({
                 <Button
                     onClick={onGenerate}
                     disabled={generating || !canEdit}
-                    className="w-full bg-amber-400 hover:bg-amber-500 text-white gap-2 transition-all duration-200 disabled:opacity-50"
+                    className="w-full bg-gold-gradient text-primary-foreground font-semibold hover:brightness-110 border-0 shadow-lg gap-2 transition-all duration-200 disabled:opacity-50"
                     title={canEdit ? "" : "You need Editor or Owner role to generate models"}
                 >
-                    <Sparkles className="w-4 h-4" />
+                    <Sparkles className="w-4 h-4 text-primary-foreground" />
                     {generating ? 'Generating...' : 'Generate AI Models'}
                 </Button>
             </div>
@@ -401,8 +399,8 @@ function AIModelsTab({
             {generating && (
                 <div className="flex items-center justify-center py-8">
                     <div className="text-center">
-                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-400 mx-auto mb-3"></div>
-                        <p className="text-sm text-gray-600">Generating AI models... This may take a minute</p>
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gold-solid mx-auto mb-3"></div>
+                        <p className="text-sm text-muted-foreground">Generating AI models... This may take a minute</p>
                     </div>
                 </div>
             )}
@@ -410,8 +408,8 @@ function AIModelsTab({
             {/* Show all models (existing + newly generated) with save option when new models are generated */}
             {hasGeneratedModels && !generating && (
                 <div className="space-y-4 animate-fade-in">
-                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                        <p className="text-amber-800 text-xs">
+                    <div className="bg-gold-solid/10 border border-gold-solid/20 rounded-lg p-3">
+                        <p className="text-gold-solid text-xs">
                             💡 <strong>Select which models to keep:</strong> Your existing saved models are pre-selected.
                             Click to add new models or deselect existing ones.
                         </p>
@@ -420,7 +418,7 @@ function AIModelsTab({
                     {/* Existing Saved Models */}
                     {hasSavedModels && (
                         <div className="space-y-3">
-                            <h4 className="text-sm font-semibold text-gray-700">
+                            <h4 className="text-sm font-semibold text-foreground">
                                 Your Existing Models
                             </h4>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -433,8 +431,8 @@ function AIModelsTab({
                                             key={`existing-${index}`}
                                             onClick={() => canEdit && toggleTempSelection(imageUrl)}
                                             className={`group relative border-2 rounded-lg overflow-hidden transition-all cursor-pointer ${isSelected
-                                                ? 'border-amber-400 shadow-lg'
-                                                : 'border-gray-200 hover:border-amber-400/50'
+                                                ? 'border-gold-solid shadow-lg'
+                                                : 'border-border hover:border-gold-solid/50'
                                                 }`}
                                         >
                                             {/* Image */}
@@ -446,8 +444,8 @@ function AIModelsTab({
 
                                             {/* Selected checkmark */}
                                             {isSelected && (
-                                                <div className="absolute top-2 right-2 bg-amber-400 rounded-full p-1 shadow-md z-10">
-                                                    <CheckCircle className="w-4 h-4 text-white" />
+                                                <div className="absolute top-2 right-2 bg-gold-solid rounded-full p-1 shadow-md z-10">
+                                                    <CheckCircle className="w-4 h-4 text-primary-foreground" />
                                                 </div>
                                             )}
 
@@ -480,7 +478,7 @@ function AIModelsTab({
                                                         e.stopPropagation()
                                                         window.open(imageUrl, '_blank')
                                                     }}
-                                                    className="bg-white hover:bg-gray-100 text-amber-500 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all hover:scale-105"
+                                                    className="bg-card hover:bg-accent border border-border text-gold-solid px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all hover:scale-105"
                                                 >
                                                     <Eye className="w-3.5 h-3.5" />
                                                     View
@@ -491,9 +489,9 @@ function AIModelsTab({
                                                             e.stopPropagation()
                                                             toggleTempSelection(imageUrl)
                                                         }}
-                                                        className="bg-amber-400 hover:bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all hover:scale-105"
+                                                        className="bg-gold-gradient text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all hover:scale-105"
                                                     >
-                                                        <CheckCircle className="w-3.5 h-3.5" />
+                                                        <CheckCircle className="w-3.5 h-3.5 text-primary-foreground" />
                                                         {isSelected ? 'Deselect' : 'Select'}
                                                     </button>
                                                 )}
@@ -514,7 +512,7 @@ function AIModelsTab({
 
                     {/* Newly Generated Models */}
                     <div className="space-y-3">
-                        <h4 className="text-sm font-semibold text-gray-700">
+                        <h4 className="text-sm font-semibold text-foreground">
                             Newly Generated Models
                         </h4>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -525,8 +523,8 @@ function AIModelsTab({
                                         key={`new-${index}`}
                                         onClick={() => canEdit && toggleTempSelection(imageUrl)}
                                         className={`group relative border-2 rounded-lg overflow-hidden transition-all cursor-pointer ${isSelected
-                                            ? 'border-amber-400 shadow-lg'
-                                            : 'border-gray-200 hover:border-amber-400/50'
+                                            ? 'border-gold-solid shadow-lg'
+                                            : 'border-border hover:border-gold-solid/50'
                                             }`}
                                     >
                                         <img
@@ -535,8 +533,8 @@ function AIModelsTab({
                                             className="w-full h-40 object-cover"
                                         />
                                         {isSelected && (
-                                            <div className="absolute top-2 right-2 bg-amber-400 rounded-full p-1 z-10 shadow-md">
-                                                <CheckCircle className="w-4 h-4 text-white" />
+                                            <div className="absolute top-2 right-2 bg-gold-solid rounded-full p-1 z-10 shadow-md">
+                                                <CheckCircle className="w-4 h-4 text-primary-foreground" />
                                             </div>
                                         )}
                                         <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded z-10">
@@ -549,7 +547,7 @@ function AIModelsTab({
                                                     e.stopPropagation()
                                                     window.open(imageUrl, '_blank')
                                                 }}
-                                                className="bg-white hover:bg-gray-100 text-amber-500 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all hover:scale-105"
+                                                className="bg-card hover:bg-accent border border-border text-gold-solid px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all hover:scale-105"
                                             >
                                                 <Eye className="w-3.5 h-3.5" />
                                                 View
@@ -560,9 +558,9 @@ function AIModelsTab({
                                                         e.stopPropagation()
                                                         toggleTempSelection(imageUrl)
                                                     }}
-                                                    className="bg-amber-400 hover:bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all hover:scale-105"
+                                                    className="bg-gold-gradient text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all hover:scale-105"
                                                 >
-                                                    <CheckCircle className="w-3.5 h-3.5" />
+                                                    <CheckCircle className="w-3.5 h-3.5 text-primary-foreground" />
                                                     {isSelected ? 'Deselect' : 'Select'}
                                                 </button>
                                             )}
@@ -576,7 +574,7 @@ function AIModelsTab({
                     <Button
                         onClick={handleSaveClick}
                         disabled={loading || tempSelectedModels.length === 0 || !canEdit}
-                        className="w-full bg-amber-400 hover:bg-amber-500 text-white transition-all duration-200 disabled:opacity-50"
+                        className="w-full bg-gold-gradient text-primary-foreground font-semibold hover:brightness-110 border-0 shadow-lg transition-all duration-200 disabled:opacity-50"
                         title={canEdit ? "" : "You need Editor or Owner role to save models"}
                     >
                         {loading ? 'Saving...' : `Save Selected Models (${tempSelectedModels.length} total)`}
@@ -587,7 +585,7 @@ function AIModelsTab({
             {/* Show saved AI models */}
             {hasSavedModels && !hasGeneratedModels && (
                 <div className="space-y-4 animate-fade-in">
-                    <h4 className="text-sm font-semibold text-gray-700">Your AI Models</h4>
+                    <h4 className="text-sm font-semibold text-foreground">Your AI Models</h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {aiModels.map((model, index) => {
                             const imageUrl = model.cloud || model.local
@@ -599,8 +597,8 @@ function AIModelsTab({
                                     key={index}
                                     onClick={() => canEdit && onSelect(model)}
                                     className={`group relative border-2 rounded-lg overflow-hidden transition-all cursor-pointer ${selected
-                                        ? 'border-amber-400 shadow-lg ring-2 ring-amber-400 ring-offset-1'
-                                        : 'border-gray-200 hover:border-amber-400/50'
+                                        ? 'border-gold-solid shadow-lg ring-2 ring-gold-solid ring-offset-1 ring-offset-background'
+                                        : 'border-border hover:border-gold-solid/50'
                                         }`}
                                 >
                                     <img
@@ -609,8 +607,8 @@ function AIModelsTab({
                                         className="w-full h-40 object-cover"
                                     />
                                     {selected && (
-                                        <div className="absolute top-2 right-2 bg-amber-400 rounded-full p-1 shadow-md z-10">
-                                            <CheckCircle className="w-4 h-4 text-white" />
+                                        <div className="absolute top-2 right-2 bg-gold-solid rounded-full p-1 shadow-md z-10">
+                                            <CheckCircle className="w-4 h-4 text-primary-foreground" />
                                         </div>
                                     )}
                                     {/* Hover overlay with View and Select buttons */}
@@ -620,7 +618,7 @@ function AIModelsTab({
                                                 e.stopPropagation()
                                                 window.open(imageUrl, '_blank')
                                             }}
-                                            className="bg-white hover:bg-gray-100 text-amber-500 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all hover:scale-105"
+                                            className="bg-card hover:bg-accent border border-border text-gold-solid px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all hover:scale-105"
                                         >
                                             <Eye className="w-3.5 h-3.5" />
                                             View
@@ -631,9 +629,9 @@ function AIModelsTab({
                                                     e.stopPropagation()
                                                     onSelect(model)
                                                 }}
-                                                className="bg-amber-400 hover:bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all hover:scale-105"
+                                                className="bg-gold-gradient text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all hover:scale-105"
                                             >
-                                                <CheckCircle className="w-3.5 h-3.5" />
+                                                <CheckCircle className="w-3.5 h-3.5 text-primary-foreground" />
                                                 Select
                                             </button>
                                         )}
@@ -646,10 +644,10 @@ function AIModelsTab({
             )}
 
             {!generating && !hasSavedModels && !hasGeneratedModels && (
-                <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
-                    <Sparkles className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-sm text-gray-500 mb-2">No AI models generated yet</p>
-                    <p className="text-xs text-gray-400">
+                <div className="text-center py-8 border-2 border-dashed border-border rounded-lg bg-card/50">
+                    <Sparkles className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground mb-2">No AI models generated yet</p>
+                    <p className="text-xs text-muted-foreground/80">
                         Click "Generate AI Models" to create model images
                     </p>
                 </div>
@@ -684,7 +682,7 @@ function RealModelsTab({
             {/* Upload Model Photo Section */}
             <div className="space-y-4">
                 <div>
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3">Upload Model Photo</h4>
+                    <h4 className="text-sm font-semibold text-foreground mb-3">Upload Model Photo</h4>
                     <input
                         ref={fileInputRef}
                         type="file"
@@ -698,17 +696,17 @@ function RealModelsTab({
                     <button
                         onClick={handleButtonClick}
                         disabled={uploading || !canEdit}
-                        className="w-full bg-gray-100 hover:bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg px-6 py-4 flex flex-col items-center justify-center gap-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-secondary hover:bg-secondary/80 border-2 border-dashed border-border rounded-lg px-6 py-4 flex flex-col items-center justify-center gap-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-foreground"
                         title={canEdit ? "" : "You need Editor or Owner role to upload models"}
                     >
-                        <Upload className="w-5 h-5 text-gray-600" />
-                        <span className="text-sm font-medium text-gray-700">
+                        <Upload className="w-5 h-5 text-muted-foreground" />
+                        <span className="text-sm font-medium text-foreground">
                             {uploading ? 'Uploading...' : 'Upload Model Photo'}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-muted-foreground">
                             JPG, PNG, or HEIC
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-muted-foreground">
                             Max 10MB
                         </span>
                     </button>
@@ -716,22 +714,22 @@ function RealModelsTab({
 
                 {/* Upload Guidelines */}
                 <div>
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3">Upload Guidelines</h4>
-                    <ul className="space-y-2 text-sm text-gray-600">
+                    <h4 className="text-sm font-semibold text-foreground mb-3">Upload Guidelines</h4>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
                         <li className="flex items-start gap-2">
-                            <span className="text-[#884cff] mt-0.5">•</span>
+                            <span className="text-gold-solid mt-0.5">•</span>
                             <span>High-resolution images (minimum 1200px width)</span>
                         </li>
                         <li className="flex items-start gap-2">
-                            <span className="text-[#884cff] mt-0.5">•</span>
+                            <span className="text-gold-solid mt-0.5">•</span>
                             <span>Well-lit with clear facial features</span>
                         </li>
                         <li className="flex items-start gap-2">
-                            <span className="text-[#884cff] mt-0.5">•</span>
+                            <span className="text-gold-solid mt-0.5">•</span>
                             <span>Full body or upper body shots preferred</span>
                         </li>
                         <li className="flex items-start gap-2">
-                            <span className="text-[#884cff] mt-0.5">•</span>
+                            <span className="text-gold-solid mt-0.5">•</span>
                             <span>Neutral background for best results</span>
                         </li>
                     </ul>
@@ -741,15 +739,15 @@ function RealModelsTab({
             {uploading && (
                 <div className="flex items-center justify-center py-8">
                     <div className="text-center">
-                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#884cff] mx-auto mb-3"></div>
-                        <p className="text-sm text-gray-600">Uploading models...</p>
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gold-solid mx-auto mb-3"></div>
+                        <p className="text-sm text-muted-foreground">Uploading models...</p>
                     </div>
                 </div>
             )}
 
             {hasModels && !uploading && (
                 <div className="space-y-4 animate-fade-in">
-                    <h4 className="text-sm font-semibold text-gray-700">Your Uploaded Models</h4>
+                    <h4 className="text-sm font-semibold text-foreground">Your Uploaded Models</h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                         {realModels.map((model, index) => {
                             const imageUrl = model.cloud || model.local
@@ -759,8 +757,8 @@ function RealModelsTab({
                                 <div
                                     key={index}
                                     className={`group relative border-2 rounded-lg overflow-hidden transition-all cursor-pointer ${selected
-                                        ? 'border-[#884cff] shadow-lg ring-2 ring-[#884cff] ring-offset-1'
-                                        : 'border-gray-200 hover:border-[#884cff]/50'
+                                        ? 'border-gold-solid shadow-lg ring-2 ring-gold-solid ring-offset-1 ring-offset-background'
+                                        : 'border-border hover:border-gold-solid/50'
                                         }`}
                                     onClick={() => canEdit && onSelect(model)}
                                 >
@@ -773,8 +771,8 @@ function RealModelsTab({
 
                                     {/* Selected checkmark */}
                                     {selected && (
-                                        <div className="absolute top-2 right-2 bg-[#884cff] rounded-full p-1 z-10 shadow-md">
-                                            <CheckCircle className="w-4 h-4 text-white" />
+                                        <div className="absolute top-2 right-2 bg-gold-solid rounded-full p-1 z-10 shadow-md">
+                                            <CheckCircle className="w-4 h-4 text-primary-foreground" />
                                         </div>
                                     )}
 
@@ -799,7 +797,7 @@ function RealModelsTab({
                                                 e.stopPropagation()
                                                 window.open(imageUrl, '_blank')
                                             }}
-                                            className="bg-white hover:bg-gray-100 text-[#884cff] px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all hover:scale-105"
+                                            className="bg-card hover:bg-accent border border-border text-gold-solid px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all hover:scale-105"
                                         >
                                             <Eye className="w-3.5 h-3.5" />
                                             View
@@ -813,9 +811,9 @@ function RealModelsTab({
             )}
 
             {!uploading && !hasModels && (
-                <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
-                    <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-sm text-gray-500">No models uploaded yet</p>
+                <div className="text-center py-8 border-2 border-dashed border-border rounded-lg bg-card/50">
+                    <ImageIcon className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground">No models uploaded yet</p>
                 </div>
             )}
         </div>

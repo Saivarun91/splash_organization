@@ -69,26 +69,26 @@ export function MultiSelect({
                 onClick={() => !disabled && setIsOpen(!isOpen)}
                 disabled={disabled}
                 className={cn(
-                    "flex w-full items-center justify-between gap-2 rounded-lg border border-[#e6e6e6] bg-white px-3 py-2 text-sm shadow-sm transition-colors",
-                    "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#884cff] focus:border-transparent",
-                    disabled && "cursor-not-allowed opacity-50 bg-gray-50",
-                    isOpen && "ring-2 ring-[#884cff] border-transparent"
+                    "flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm shadow-sm transition-colors text-foreground",
+                    "hover:bg-secondary/50 focus:outline-none focus:ring-2 focus:ring-gold-solid/40 focus:border-transparent",
+                    disabled && "cursor-not-allowed opacity-50 bg-secondary/50",
+                    isOpen && "ring-2 ring-gold-solid/40 border-transparent"
                 )}
             >
                 <div className="flex flex-1 flex-wrap items-center gap-1">
                     {selected.length === 0 ? (
-                        <span className="text-[#708090]">{placeholder}</span>
+                        <span className="text-muted-foreground">{placeholder}</span>
                     ) : (
                         <>
                             {displayedItems.map((item) => (
                                 <Badge
                                     key={item}
                                     variant="secondary"
-                                    className="bg-[#f0e6ff] text-[#884cff] hover:bg-[#e6d9ff] gap-1 px-2 py-0.5"
+                                    className="bg-gold-solid/10 text-gold-solid border border-gold-muted/30 hover:bg-gold-solid/20 gap-1 px-2 py-0.5"
                                 >
                                     <span className="max-w-[150px] truncate">{item}</span>
                                     <X
-                                        className="h-3 w-3 cursor-pointer hover:text-[#6633cc]"
+                                        className="h-3 w-3 cursor-pointer hover:text-gold-solid/80"
                                         onClick={(e) => removeOption(item, e)}
                                     />
                                 </Badge>
@@ -96,7 +96,7 @@ export function MultiSelect({
                             {remainingCount > 0 && (
                                 <Badge
                                     variant="secondary"
-                                    className="bg-[#e6e6e6] text-[#708090] hover:bg-[#d9d9d9]"
+                                    className="bg-secondary text-muted-foreground border border-border hover:bg-secondary/80"
                                 >
                                     +{remainingCount} more
                                 </Badge>
@@ -106,7 +106,7 @@ export function MultiSelect({
                 </div>
                 <ChevronDown
                     className={cn(
-                        "h-4 w-4 text-[#708090] transition-transform",
+                        "h-4 w-4 text-muted-foreground transition-transform",
                         isOpen && "transform rotate-180"
                     )}
                 />
@@ -114,27 +114,27 @@ export function MultiSelect({
 
             {/* Dropdown Content */}
             {isOpen && (
-                <div className="absolute z-50 mt-2 w-full rounded-lg border border-[#e6e6e6] bg-white shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-50 mt-2 w-full rounded-lg border border-border bg-card shadow-lg max-h-60 overflow-y-auto">
                     {options.length === 0 ? (
-                        <div className="px-3 py-6 text-center text-sm text-[#708090]">
+                        <div className="px-3 py-6 text-center text-sm text-muted-foreground">
                             No options available
                         </div>
                     ) : (
                         <div className="p-1">
                             {/* Bulk selection controls */}
                             {options.length > 1 && (
-                                <div className="px-3 py-2 border-b border-[#e6e6e6] mb-1">
+                                <div className="px-3 py-2 border-b border-border mb-1">
                                     <div className="flex items-center justify-between gap-2">
                                         <div className="flex items-center gap-2">
                                             <button
                                                 type="button"
                                                 className={cn(
-                                                    "w-4 h-4 border rounded flex items-center justify-center shrink-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#884cff]",
+                                                    "w-4 h-4 border rounded flex items-center justify-center shrink-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-gold-solid/40 border-border",
                                                     isAllSelected
-                                                        ? "bg-[#884cff] border-[#884cff]"
+                                                        ? "bg-gold-gradient border-gold-solid/50"
                                                         : isPartiallySelected
-                                                            ? "bg-[#884cff] border-[#884cff]"
-                                                            : "border-[#708090]"
+                                                            ? "bg-gold-gradient border-gold-solid/50"
+                                                            : "border-border text-muted-foreground"
                                                 )}
                                                 onClick={isAllSelected ? deselectAll : selectAll}
                                                 onKeyDown={(e) => {
@@ -146,16 +146,16 @@ export function MultiSelect({
                                                 aria-label={isAllSelected ? 'Deselect all options' : 'Select all options'}
                                             >
                                                 {isAllSelected ? (
-                                                    <Check className="w-3 h-3 text-white" />
+                                                    <Check className="w-3 h-3 text-primary-foreground font-bold" />
                                                 ) : isPartiallySelected ? (
-                                                    <div className="w-2 h-0.5 bg-white" />
+                                                    <div className="w-2 h-0.5 bg-primary-foreground" />
                                                 ) : null}
                                             </button>
-                                            <span className="text-sm text-[#1a1a1a]">
+                                            <span className="text-sm text-foreground">
                                                 {isAllSelected ? 'Deselect All' : 'Select All'}
                                             </span>
                                         </div>
-                                        <div className="text-xs text-[#708090]">
+                                        <div className="text-xs text-muted-foreground">
                                             {selected.length}/{options.length} selected
                                         </div>
                                     </div>
@@ -176,9 +176,9 @@ export function MultiSelect({
                                             }
                                         }}
                                         className={cn(
-                                            "flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer transition-colors w-full text-left focus:outline-none focus:ring-2 focus:ring-[#884cff]",
-                                            "hover:bg-[#f9f6f2]",
-                                            isSelected && "bg-[#f0e6ff]"
+                                            "flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer transition-colors w-full text-left focus:outline-none focus:ring-2 focus:ring-gold-solid/40",
+                                            "hover:bg-secondary/50",
+                                            isSelected && "bg-gold-solid/10 text-gold-solid"
                                         )}
                                         aria-pressed={isSelected}
                                         aria-label={`${isSelected ? 'Deselect' : 'Select'} ${option}`}
@@ -187,13 +187,13 @@ export function MultiSelect({
                                             className={cn(
                                                 "w-4 h-4 border rounded flex items-center justify-center shrink-0",
                                                 isSelected
-                                                    ? "bg-[#884cff] border-[#884cff]"
-                                                    : "border-[#708090]"
+                                                    ? "bg-gold-gradient border-gold-solid/50"
+                                                    : "border-border"
                                             )}
                                         >
                                             {isSelected && (
                                                 <svg
-                                                    className="w-3 h-3 text-white"
+                                                    className="w-3 h-3 text-primary-foreground"
                                                     fill="none"
                                                     stroke="currentColor"
                                                     viewBox="0 0 24 24"
@@ -201,13 +201,13 @@ export function MultiSelect({
                                                     <path
                                                         strokeLinecap="round"
                                                         strokeLinejoin="round"
-                                                        strokeWidth={2}
+                                                        strokeWidth={3}
                                                         d="M5 13l4 4L19 7"
                                                     />
                                                 </svg>
                                             )}
                                         </div>
-                                        <span className="text-sm text-[#1a1a1a] flex-1 break-words">
+                                        <span className="text-sm text-foreground flex-1 break-words">
                                             {option}
                                         </span>
                                     </button>

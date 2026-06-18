@@ -140,6 +140,8 @@ export const organizationAPI = {
       method: "DELETE",
     }),
   // User API functions
+  getUserProfile: () =>
+    apiRequest("/api/profile/"),
   getUserBySlug: (organizationId, userSlug) =>
     apiRequest(`/api/organizations/${organizationId}/users/${userSlug}/`),
   getUserImages: (organizationId, userSlug, params = {}) => {
@@ -263,30 +265,18 @@ export const organizationAPI = {
     apiRequest(`/probackendapp/api/collections/${collectionId}/history/`),
   getAllModels: (collectionId) =>
     apiRequest(`/probackendapp/api/collections/${collectionId}/models/`),
-  regenerateProductModelImage: (collectionId, productImagePath, generatedImagePath, prompt, useDifferentModel = false, newModel = null) => {
-    const url = `${API_BASE_URL}/probackendapp/api/collections/${collectionId}/regenerate-product-model-image/`;
-    const token = typeof window !== "undefined" ? localStorage.getItem("org_auth_token") : null;
-    
-    const formData = new FormData();
-    formData.append('product_image_path', productImagePath);
-    formData.append('generated_image_path', generatedImagePath);
-    formData.append('prompt', prompt);
-    formData.append('use_different_model', useDifferentModel);
-    if (newModel) {
-      formData.append('new_model', JSON.stringify(newModel));
-    }
-    
-    return fetch(url, {
+  regenerateProductModelImage: (collectionId, productImagePath, generatedImagePath, prompt, useDifferentModel = false, newModel = null, modelTier = "regular") =>
+    apiRequest(`/probackendapp/api/collections/${collectionId}/regenerate/`, {
       method: 'POST',
-      body: formData,
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-    }).then(response => {
-      checkResponseAuth(response);
-      return response.json();
-    });
-  },
+      body: JSON.stringify({
+        product_image_path: productImagePath,
+        generated_image_path: generatedImagePath,
+        prompt,
+        use_different_model: useDifferentModel,
+        new_model: newModel,
+        model_tier: modelTier,
+      }),
+    }),
   enhanceImage: (imageUrl, collectionId, productImagePath, generatedImagePath) => {
     const url = `${API_BASE_URL}/probackendapp/api/collections/${collectionId}/enhance-image/`;
     const token = typeof window !== "undefined" ? localStorage.getItem("org_auth_token") : null;

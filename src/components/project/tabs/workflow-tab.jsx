@@ -369,11 +369,11 @@ export function WorkflowTab({ project }) {
             <>
                 {/* Role-based access message */}
                 {!canEdit && (
-                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4 flex items-center gap-3">
-                        <Lock className="w-5 h-5 text-amber-600" />
+                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 mb-4 flex items-center gap-3">
+                        <Lock className="w-5 h-5 text-amber-400" />
                         <div>
-                            <p className="text-amber-800 font-medium">View-Only Access</p>
-                            <p className="text-amber-600 text-sm">
+                            <p className="text-amber-300 font-medium">View-Only Access</p>
+                            <p className="text-amber-400/80 text-sm">
                                 You have {userRole} access. Only Editors and Owners can make changes to this project.
                             </p>
                         </div>
@@ -382,20 +382,20 @@ export function WorkflowTab({ project }) {
 
                 {loading && (
                     <div className="flex items-center justify-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7753ff]"></div>
-                        <span className="ml-2">Loading...</span>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold-solid"></div>
+                        <span className="ml-2 text-muted-foreground">Loading...</span>
                     </div>
                 )}
 
                 {error && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                        <p className="text-red-600">Error: {error}</p>
+                    <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-4">
+                        <p className="text-red-400">Error: {error}</p>
                     </div>
                 )}
 
                 {successMessage && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                        <p className="text-green-600">✓ {successMessage}</p>
+                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4 mb-4">
+                        <p className="text-emerald-400">✓ {successMessage}</p>
                     </div>
                 )}
 
@@ -531,10 +531,10 @@ export function WorkflowTab({ project }) {
 
             {renderStepContent()}
 
-            <div className="flex items-center justify-between pt-8 border-t border-[#e6e6e6]">
+            <div className="flex items-center justify-between pt-8 border-t border-border">
                 <Button
                     variant="outline"
-                    className="gap-2 bg-transparent"
+                    className="gap-2 border-border text-foreground hover:bg-accent hover:text-foreground bg-transparent"
                     onClick={() => !isGenerating && setActiveStep(prev => Math.max(prev - 1, 1))}
                     disabled={loading || isGenerating}
                 >
@@ -543,7 +543,7 @@ export function WorkflowTab({ project }) {
                 </Button>
 
                 <Button
-                    className="bg-[#884cff] hover:bg-[#7a3ff0] text-white px-8"
+                    className="bg-gold-gradient text-primary-foreground font-semibold hover:brightness-110 border-0 shadow-lg px-8 hover:text-primary-foreground"
                     onClick={async () => {
                         if (isGenerating) return;
                         try {
@@ -614,7 +614,7 @@ export function WorkflowTab({ project }) {
 
                 <Button
                     variant="ghost"
-                    className="text-[#884cff]"
+                    className="text-gold-solid hover:text-gold-solid hover:bg-gold-solid/10 bg-transparent"
                     onClick={() => {
                         if (isGenerating) return;
                         const nextStep = Math.min(activeStep + 1, 5)

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { Grid, Download, RefreshCw, Eye, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Grid, Download, RefreshCw, Eye, Loader2 } from "lucide-react";
 import { organizationAPI } from "@/lib/api";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -79,8 +79,6 @@ export default function GalleryPage() {
                 } else if (filter === "project") {
                     params.image_type = "project_image";
                 }
-                // Note: "model" filter needs special handling as it includes both model_with_ornament and real_model_with_ornament
-                // We'll filter on the frontend for model type since backend doesn't support OR queries easily
             }
 
             const data = await organizationAPI.getOrganizationImages(orgId, params);
@@ -152,11 +150,11 @@ export default function GalleryPage() {
 
     return (
         <div className="space-y-6">
-            <div className="relative p-4 rounded-xl bg-white dark:bg-card shadow-md border border-gray-200 dark:border-border overflow-hidden">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-tr from-indigo-500 to-purple-500 opacity-10 rounded-full blur-3xl" />
+            <div className="relative p-6 rounded-2xl border border-border bg-card shadow-md overflow-hidden animate-fadeIn">
+                <div className="absolute top-0 right-0 w-48 h-48 md:w-64 md:h-64 bg-gradient-to-tr from-gold-solid/20 to-gold-muted/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="relative z-10">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-foreground mb-1">{t("orgPortal.organizationImages")}</h1>
-                    <p className="text-sm text-gray-600 dark:text-muted-foreground">{t("orgPortal.allImagesGeneratedUnderOrg")}</p>
+                    <h1 className="text-2xl font-bold text-foreground mb-1">{t("orgPortal.organizationImages")}</h1>
+                    <p className="text-sm text-muted-foreground">{t("orgPortal.allImagesGeneratedUnderOrg")}</p>
                 </div>
             </div>
 
@@ -165,10 +163,10 @@ export default function GalleryPage() {
                     <button
                         key={f}
                         onClick={() => setFilter(f)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
+                        className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all capitalize cursor-pointer ${
                             filter === f
-                                ? "bg-indigo-600 text-white shadow-md"
-                                : "bg-gray-100 dark:bg-sidebar-accent/40 text-gray-700 dark:text-foreground hover:bg-gray-200 dark:hover:bg-sidebar-accent/60"
+                                ? "bg-gold-gradient text-primary-foreground shadow-md"
+                                : "bg-secondary text-muted-foreground hover:text-foreground hover:bg-sidebar-accent"
                         }`}
                     >
                         {f === "all" ? t("orgPortal.all") : f === "plain" ? t("orgPortal.plain") : f === "themed" ? t("orgPortal.themed") : f === "model" ? t("orgPortal.model") : f === "campaign" ? t("orgPortal.campaign") : f === "project" ? t("orgPortal.project") : f}
@@ -179,17 +177,17 @@ export default function GalleryPage() {
             {loading ? (
                 <div className="flex items-center justify-center h-64">
                     <div className="text-center">
-                        <Loader2 className="w-12 h-12 text-indigo-600 dark:text-sidebar-primary animate-spin mx-auto mb-4" />
-                        <p className="text-sm text-gray-500 dark:text-muted-foreground">{t("orgPortal.loadingImages")}</p>
+                        <Loader2 className="w-12 h-12 text-gold-solid animate-spin mx-auto mb-4" />
+                        <p className="text-sm text-muted-foreground">{t("orgPortal.loadingImages")}</p>
                     </div>
                 </div>
             ) : filteredImages.length === 0 ? (
-                <div className="p-8 md:p-16 bg-white dark:bg-card rounded-xl shadow-sm border border-gray-200 dark:border-border text-center">
-                    <div className="w-20 h-20 bg-indigo-50 dark:bg-sidebar-accent/40 rounded-xl flex items-center justify-center mx-auto mb-4">
-                        <Grid className="w-10 h-10 text-indigo-600 dark:text-sidebar-primary" />
+                <div className="p-8 md:p-16 bg-card rounded-xl shadow-sm border border-border text-center text-foreground animate-fadeIn">
+                    <div className="w-20 h-20 bg-sidebar-accent rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <Grid className="w-10 h-10 text-gold-solid" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-foreground mb-2">{t("orgPortal.noImagesYet")}</h3>
-                    <p className="text-sm text-gray-500 dark:text-muted-foreground">
+                    <h3 className="text-lg font-semibold text-foreground mb-2">{t("orgPortal.noImagesYet")}</h3>
+                    <p className="text-sm text-muted-foreground">
                         {filter === "all"
                             ? t("orgPortal.noImagesGeneratedYet")
                             : t("orgPortal.noImagesFoundForFilter")}
@@ -204,7 +202,7 @@ export default function GalleryPage() {
                                     ref={index === filteredImages.length - 1 ? lastImageElementRef : null}
                                     className="group cursor-pointer"
                                 >
-                                    <div className="relative aspect-square bg-gray-100 dark:bg-sidebar-accent/30 rounded-xl overflow-hidden mb-2 border border-gray-200 dark:border-border">
+                                    <div className="relative aspect-square bg-sidebar-accent/30 rounded-xl overflow-hidden mb-2 border border-border">
                                         <img
                                             src={image.image_url}
                                             alt={getImageCategory(image.image_type, t)}
@@ -215,8 +213,8 @@ export default function GalleryPage() {
                                                 e.target.nextSibling.style.display = "flex";
                                             }}
                                         />
-                                        <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center hidden">
-                                            <Grid className="w-12 h-12 text-gray-400" />
+                                        <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center hidden">
+                                            <Grid className="w-12 h-12 text-muted-foreground" />
                                         </div>
                                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300"></div>
                                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 bg-black/40">
@@ -225,28 +223,28 @@ export default function GalleryPage() {
                                                     e.stopPropagation();
                                                     handleView(image);
                                                 }}
-                                                className="p-2.5 bg-white rounded-full hover:bg-gray-100 transition-all shadow-lg"
+                                                className="p-2.5 bg-card/90 border border-border rounded-full hover:bg-card hover:text-gold-solid text-foreground transition-all shadow-lg"
                                                 title={t("orgPortal.viewInNewTab")}
                                             >
-                                                <Eye size={16} className="text-gray-700" />
+                                                <Eye size={16} />
                                             </button>
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleDownload(image);
                                                 }}
-                                                className="p-2.5 bg-white rounded-full hover:bg-gray-100 transition-all shadow-lg"
+                                                className="p-2.5 bg-card/90 border border-border rounded-full hover:bg-card hover:text-gold-solid text-foreground transition-all shadow-lg"
                                                 title={t("orgPortal.download")}
                                             >
-                                                <Download size={16} className="text-gray-700" />
+                                                <Download size={16} />
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl p-3 shadow-sm">
-                                        <p className="text-sm font-medium text-gray-900 dark:text-foreground mb-1">
+                                    <div className="bg-card border border-border rounded-xl p-3 shadow-sm text-foreground">
+                                        <p className="text-sm font-semibold text-foreground mb-1">
                                             {getImageCategory(image.image_type, t)}
                                         </p>
-                                        <p className="text-xs text-gray-500 dark:text-muted-foreground">
+                                        <p className="text-xs text-muted-foreground">
                                             {t("orgPortal.generated")} {getDaysAgo(image.created_at, t)}
                                         </p>
                                     </div>
@@ -255,11 +253,11 @@ export default function GalleryPage() {
                         </div>
                         {loadingMore && (
                             <div className="flex justify-center items-center py-8">
-                                <Loader2 className="w-8 h-8 text-indigo-600 dark:text-sidebar-primary animate-spin" />
+                                <Loader2 className="w-8 h-8 text-gold-solid animate-spin" />
                             </div>
                         )}
                         {!hasMore && filteredImages.length > 0 && (
-                            <div className="text-center py-8 text-sm text-gray-500 dark:text-muted-foreground">
+                            <div className="text-center py-8 text-sm text-muted-foreground">
                                 <p>{t("orgPortal.allImagesLoaded").replace("{count}", totalCount)}</p>
                             </div>
                         )}

@@ -14,29 +14,29 @@ export function WorkflowContent({ project }) {
     return (
         <div className="flex-1 overflow-auto">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <div className="border-b border-[#e6e6e6] bg-white sticky top-0 z-10">
-                    <TabsList className="w-full justify-start rounded-none bg-transparent p-0 h-auto border-b border-[#e6e6e6]">
+                <div className="border-b border-border bg-card sticky top-0 z-10">
+                    <TabsList className="w-full justify-start rounded-none bg-transparent p-0 h-auto border-b border-border">
                         <TabsTrigger
                             value="workflow"
-                            className="rounded-none cursor-pointer border-b-2 border-transparent px-6 py-4 data-[state=active]:border-[#884cff] data-[state=active]:bg-[#f0e6ff]"
+                            className="rounded-none cursor-pointer border-b-2 border-transparent px-6 py-4 text-muted-foreground data-[state=active]:border-gold-solid data-[state=active]:bg-gold-solid/10 data-[state=active]:text-gold-solid hover:text-foreground hover:bg-gold-solid/5 transition-all"
                         >
                             Workflow
                         </TabsTrigger>
                         <TabsTrigger
                             value="overview"
-                            className="rounded-none cursor-pointer border-b-2 border-transparent px-6 py-4 data-[state=active]:border-[#884cff] data-[state=active]:bg-[#f0e6ff]"
+                            className="rounded-none cursor-pointer border-b-2 border-transparent px-6 py-4 text-muted-foreground data-[state=active]:border-gold-solid data-[state=active]:bg-gold-solid/10 data-[state=active]:text-gold-solid hover:text-foreground hover:bg-gold-solid/5 transition-all"
                         >
                             Overview
                         </TabsTrigger>
                         <TabsTrigger
                             value="results"
-                            className="rounded-none cursor-pointer border-b-2 border-transparent px-6 py-4 data-[state=active]:border-[#884cff] data-[state=active]:bg-[#f0e6ff]"
+                            className="rounded-none cursor-pointer border-b-2 border-transparent px-6 py-4 text-muted-foreground data-[state=active]:border-gold-solid data-[state=active]:bg-gold-solid/10 data-[state=active]:text-gold-solid hover:text-foreground hover:bg-gold-solid/5 transition-all"
                         >
                             Results
                         </TabsTrigger>
                         <TabsTrigger
                             value="collaborators"
-                            className="rounded-none cursor-pointer border-b-2 border-transparent px-6 py-4 data-[state=active]:border-[#884cff] data-[state=active]:bg-[#f0e6ff]"
+                            className="rounded-none cursor-pointer border-b-2 border-transparent px-6 py-4 text-muted-foreground data-[state=active]:border-gold-solid data-[state=active]:bg-gold-solid/10 data-[state=active]:text-gold-solid hover:text-foreground hover:bg-gold-solid/5 transition-all"
                         >
                             Collaborators
                         </TabsTrigger>

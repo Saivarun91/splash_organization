@@ -11,96 +11,64 @@ export default function HelpCenterPage() {
     const categories = [
         {
             icon: Zap,
-            title: t("orgPortal.gettingStarted"),
-            description: t("orgPortal.learnBasicsAndSetup"),
+            title: t("orgPortal.gettingStarted") || "Getting Started",
+            description: t("orgPortal.learnBasicsAndSetup") || "Learn the basics and setup your account",
             articles: 12,
         },
         {
             icon: Book,
-            title: t("orgPortal.imageGeneration"),
-            description: t("orgPortal.masterAllTypes"),
+            title: t("orgPortal.imageGeneration") || "Image Generation",
+            description: t("orgPortal.masterAllTypes") || "Master all image generation workflows",
             articles: 18,
         },
         {
             icon: CreditCard,
-            title: t("orgPortal.billingCredits"),
-            description: t("orgPortal.manageSubscriptionAndCredits"),
+            title: t("orgPortal.billingCredits") || "Billing & Credits",
+            description: t("orgPortal.manageSubscriptionAndCredits") || "Manage subscription and credit purchases",
             articles: 8,
         },
         {
             icon: Shield,
-            title: t("orgPortal.accountSecurity"),
-            description: t("orgPortal.keepAccountSafe"),
+            title: t("orgPortal.accountSecurity") || "Account Security",
+            description: t("orgPortal.keepAccountSafe") || "Keep your organization and account safe",
             articles: 10,
         },
     ];
 
     const faqs = [
         {
-            question: t("orgPortal.faq1Question"),
-            answer: t("orgPortal.faq1Answer"),
+            question: t("orgPortal.faq1Question") || "How do I invite members to my organization?",
+            answer: t("orgPortal.faq1Answer") || "You can invite members by navigating to the Users tab, clicking 'Add User', and entering their email address. They will receive an email invitation to join.",
         },
         {
-            question: t("orgPortal.faq2Question"),
-            answer: t("orgPortal.faq2Answer"),
+            question: t("orgPortal.faq2Question") || "What are generation credits?",
+            answer: t("orgPortal.faq2Answer") || "Credits are consumed whenever you generate images. The cost varies by model and options. Check the credits tab to view usage breakdown.",
         },
         {
-            question: t("orgPortal.faq3Question"),
-            answer: t("orgPortal.faq3Answer"),
+            question: t("orgPortal.faq3Question") || "How does billing work?",
+            answer: t("orgPortal.faq3Answer") || "Subscriptions are billed monthly. Credit purchases are processed instantly. You can manage cards and view past invoices under Settings > Payments.",
         },
         {
-            question: t("orgPortal.faq4Question"),
-            answer: t("orgPortal.faq4Answer"),
+            question: t("orgPortal.faq4Question") || "Can I limit member credit usage?",
+            answer: t("orgPortal.faq4Answer") || "Yes, organization owners can define quotas or allocate specific credit balances for each team member via the Users page.",
         },
     ];
 
     return (
-        <div
-            style={{
-                color: "hsl(0, 0%, 15%)",
-                backgroundColor: "hsl(0, 0%, 98%)",
-                fontFamily: "Inter, sans-serif",
-            }}
-            className="space-y-8 animate-fade-in p-8"
-        >
+        <div className="space-y-8 animate-fade-in p-8 text-foreground bg-transparent">
             {/* Header Section */}
-            <div style={{ textAlign: "center", maxWidth: "42rem", margin: "0 auto" }}>
-                <h1
-                    style={{
-                        fontSize: "2.25rem",
-                        fontWeight: 700,
-                        color: "hsl(0, 0%, 15%)",
-                        marginBottom: "1rem",
-                    }}
-                >
-                    {t("orgPortal.howCanWeHelp")}
+            <div className="text-center max-w-2xl mx-auto">
+                <h1 className="text-4xl font-bold text-foreground mb-4">
+                    {t("orgPortal.howCanWeHelp") || "How can we help you?"}
                 </h1>
-                <p style={{ color: "hsl(0, 0%, 40%)", marginBottom: "1.5rem" }}>
-                    {t("orgPortal.searchKnowledgeBase")}
+                <p className="text-muted-foreground mb-6">
+                    {t("orgPortal.searchKnowledgeBase") || "Search our knowledge base for answers, tutorials, and support details."}
                 </p>
-                <div style={{ position: "relative" }}>
-                    <Search
-                        style={{
-                            position: "absolute",
-                            left: "1rem",
-                            top: "50%",
-                            transform: "translateY(-50%)",
-                            width: "1.25rem",
-                            height: "1.25rem",
-                            color: "hsl(0, 0%, 50%)",
-                        }}
-                    />
+                <div className="relative max-w-lg mx-auto">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                     <Input
-                        placeholder={t("orgPortal.searchArticlesGuides")}
-                        className="pl-12 h-12 text-base"
-                        style={{
-                            paddingLeft: "3rem",
-                            height: "3rem",
-                            fontSize: "1rem",
-                            borderColor: "hsl(0, 0%, 85%)",
-                            backgroundColor: "white",
-                            borderRadius: "0.75rem",
-                        }}
+                        placeholder={t("orgPortal.searchArticlesGuides") || "Search articles, guides..."}
+                        className="pl-12 h-12 text-base bg-card border-border text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-gold-solid/40 focus:border-transparent rounded-xl"
                     />
                 </div>
             </div>
@@ -110,43 +78,20 @@ export default function HelpCenterPage() {
                 {categories.map((category, idx) => (
                     <Card
                         key={idx}
-                        className="transition-all duration-300 hover:-translate-y-1 cursor-pointer group"
-                        style={{
-                            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.08)",
-                            borderRadius: "0.75rem",
-                            backgroundColor: "white",
-                            transition: "all 0.3s ease",
-                        }}
+                        className="bg-card border border-border shadow-md rounded-xl transition-all duration-300 hover:-translate-y-1 hover:border-gold-muted cursor-pointer group"
                     >
-                        <CardContent
-                            style={{
-                                padding: "1.5rem",
-                                textAlign: "left",
-                            }}
-                        >
-                            <div
-                                style={{
-                                    width: "3rem",
-                                    height: "3rem",
-                                    borderRadius: "0.75rem",
-                                    background: "linear-gradient(to bottom right, hsl(180, 45%, 45%), hsl(180, 45%, 55%))",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    marginBottom: "1rem",
-                                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.08)",
-                                }}
-                            >
-                                <category.icon style={{ width: "1.5rem", height: "1.5rem", color: "white" }} />
+                        <CardContent className="p-6 text-left">
+                            <div className="w-12 h-12 rounded-xl bg-gold-gradient flex items-center justify-center mb-4 shadow-md">
+                                <category.icon className="w-6 h-6 text-primary-foreground" />
                             </div>
-                            <h3 style={{ fontWeight: 600, color: "hsl(0, 0%, 15%)", marginBottom: "0.5rem" }}>
+                            <h3 className="font-semibold text-lg text-foreground mb-2 group-hover:text-gold-solid transition-colors">
                                 {category.title}
                             </h3>
-                            <p style={{ fontSize: "0.875rem", color: "hsl(0, 0%, 40%)", marginBottom: "0.75rem" }}>
+                            <p className="text-sm text-muted-foreground mb-4">
                                 {category.description}
                             </p>
-                            <p style={{ fontSize: "0.75rem", color: "hsl(180, 45%, 45%)", fontWeight: 500 }}>
-                                {category.articles} {t("orgPortal.articles")}
+                            <p className="text-xs text-gold-solid font-semibold">
+                                {category.articles} {t("orgPortal.articles") || "articles"}
                             </p>
                         </CardContent>
                     </Card>
@@ -154,48 +99,28 @@ export default function HelpCenterPage() {
             </div>
 
             {/* FAQ Section */}
-            <Card
-                style={{
-                    boxShadow: "0 8px 30px -8px rgba(71, 71, 71, 0.15)",
-                    borderRadius: "0.75rem",
-                    backgroundColor: "white",
-                }}
-            >
+            <Card className="bg-card border border-border shadow-md rounded-xl">
                 <CardHeader>
-                    <CardTitle style={{ color: "hsl(0, 0%, 15%)" }}>{t("orgPortal.frequentlyAskedQuestions")}</CardTitle>
-                    <CardDescription style={{ color: "hsl(0, 0%, 40%)" }}>
-                        {t("orgPortal.quickAnswersToCommonQuestions")}
+                    <CardTitle className="text-foreground">{t("orgPortal.frequentlyAskedQuestions") || "Frequently Asked Questions"}</CardTitle>
+                    <CardDescription className="text-muted-foreground">
+                        {t("orgPortal.quickAnswersToCommonQuestions") || "Quick answers to questions you might have about Splash AI."}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {faqs.map((faq, idx) => (
                         <div
                             key={idx}
-                            style={{
-                                paddingBottom: "1.5rem",
-                                borderBottom: idx !== faqs.length - 1 ? "1px solid hsl(0, 0%, 90%)" : "none",
-                            }}
+                            className={`pb-6 ${idx !== faqs.length - 1 ? "border-b border-border" : ""}`}
                         >
-                            <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
-                                <div
-                                    style={{
-                                        width: "2rem",
-                                        height: "2rem",
-                                        borderRadius: "0.5rem",
-                                        backgroundColor: "hsla(180, 45%, 45%, 0.1)",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        marginTop: "0.25rem",
-                                    }}
-                                >
-                                    <HelpCircle style={{ width: "1rem", height: "1rem", color: "hsl(180, 45%, 45%)" }} />
+                            <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-lg bg-gold-solid/10 flex items-center justify-center mt-1">
+                                    <HelpCircle className="w-5 h-5 text-gold-solid" />
                                 </div>
-                                <div style={{ flex: 1 }}>
-                                    <h4 style={{ fontWeight: 600, color: "hsl(0, 0%, 15%)", marginBottom: "0.5rem" }}>
+                                <div className="flex-1">
+                                    <h4 className="font-semibold text-foreground text-lg mb-2">
                                         {faq.question}
                                     </h4>
-                                    <p style={{ fontSize: "0.875rem", color: "hsl(0, 0%, 40%)" }}>{faq.answer}</p>
+                                    <p className="text-sm text-muted-foreground">{faq.answer}</p>
                                 </div>
                             </div>
                         </div>
@@ -204,38 +129,16 @@ export default function HelpCenterPage() {
             </Card>
 
             {/* Support Card */}
-            <Card
-                style={{
-                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.08)",
-                    borderRadius: "0.75rem",
-                    background: "linear-gradient(to bottom right, hsla(180, 45%, 45%, 0.05), transparent)",
-                    border: "1px solid hsla(180, 45%, 45%, 0.2)",
-                }}
-            >
-                <CardContent style={{ padding: "2rem", textAlign: "center" }}>
-                    <h3
-                        style={{
-                            fontSize: "1.25rem",
-                            fontWeight: 600,
-                            color: "hsl(0, 0%, 15%)",
-                            marginBottom: "0.5rem",
-                        }}
-                    >
-                        {t("orgPortal.stillNeedHelp")}
+            <Card className="bg-card/40 border border-gold-muted shadow-md rounded-xl bg-gradient-to-br from-gold-solid/5 to-transparent">
+                <CardContent className="p-8 text-center">
+                    <h3 className="text-xl font-bold text-foreground mb-2">
+                        {t("orgPortal.stillNeedHelp") || "Still need help?"}
                     </h3>
-                    <p style={{ color: "hsl(0, 0%, 40%)", marginBottom: "1rem" }}>
-                        {t("orgPortal.supportTeamHere")}
+                    <p className="text-muted-foreground mb-6">
+                        {t("orgPortal.supportTeamHere") || "Our support team is here to help you solve any issues or questions."}
                     </p>
-                    <Button
-                        style={{
-                            background: "linear-gradient(to right, hsl(180, 45%, 45%), hsl(180, 45%, 55%))",
-                            color: "white",
-                            padding: "0.75rem 1.5rem",
-                            borderRadius: "0.5rem",
-                            fontWeight: 500,
-                        }}
-                    >
-                        {t("orgPortal.contactSupport")}
+                    <Button className="bg-gold-gradient text-primary-foreground font-semibold hover:brightness-110 px-6 py-2.5 rounded-lg shadow-md border-0 transition-all">
+                        {t("orgPortal.contactSupport") || "Contact Support"}
                     </Button>
                 </CardContent>
             </Card>

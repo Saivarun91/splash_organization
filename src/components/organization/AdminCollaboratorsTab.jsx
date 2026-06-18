@@ -27,13 +27,13 @@ export function AdminCollaboratorsTab({ project }) {
     const getRoleBadgeColor = (role) => {
         switch (role) {
             case "owner":
-                return "bg-purple-100 text-purple-800";
+                return "bg-gold-solid/10 text-gold-solid border border-gold-solid/20";
             case "editor":
-                return "bg-blue-100 text-blue-800";
+                return "bg-secondary text-foreground border border-border";
             case "viewer":
-                return "bg-gray-100 text-gray-800";
+                return "bg-muted/50 text-muted-foreground border border-border";
             default:
-                return "bg-gray-100 text-gray-800";
+                return "bg-muted/30 text-muted-foreground border border-border";
         }
     };
 
@@ -63,53 +63,53 @@ export function AdminCollaboratorsTab({ project }) {
     return (
         <div className="space-y-6">
             <div className="mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Project Collaborators</h3>
-                <p className="text-gray-600">View all team members and their access levels</p>
+                <h3 className="text-2xl font-bold text-foreground mb-2">Project Collaborators</h3>
+                <p className="text-muted-foreground">View all team members and their access levels</p>
             </div>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="p-6 border-gray-200 hover:shadow-lg transition-shadow">
+                <Card className="p-6 border-border hover:shadow-lg transition-shadow bg-card text-foreground">
                     <div className="flex items-start justify-between mb-4">
-                        <span className="text-gray-600 text-sm font-medium">Total Members</span>
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                            <Users className="w-4 h-4 text-blue-600" />
+                        <span className="text-muted-foreground text-sm font-medium">Total Members</span>
+                        <div className="w-8 h-8 rounded-lg bg-sidebar-accent flex items-center justify-center">
+                            <Users className="w-4 h-4 text-gold-solid" />
                         </div>
                     </div>
-                    <div className="text-4xl font-bold text-blue-600">{teamMembers.length}</div>
+                    <div className="text-4xl font-bold text-gold-solid">{teamMembers.length}</div>
                 </Card>
 
-                <Card className="p-6 border-gray-200 hover:shadow-lg transition-shadow">
+                <Card className="p-6 border-border hover:shadow-lg transition-shadow bg-card text-foreground">
                     <div className="flex items-start justify-between mb-4">
-                        <span className="text-gray-600 text-sm font-medium">Created On</span>
-                        <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600">
+                        <span className="text-muted-foreground text-sm font-medium">Created On</span>
+                        <div className="w-8 h-8 rounded-lg bg-sidebar-accent flex items-center justify-center text-gold-solid">
                             📅
                         </div>
                     </div>
-                    <div className="text-2xl font-bold text-purple-600">
+                    <div className="text-2xl font-bold text-gold-solid">
                         {new Date(project.created_at).toLocaleDateString()}
                     </div>
                 </Card>
 
-                <Card className="p-6 border-gray-200 hover:shadow-lg transition-shadow">
+                <Card className="p-6 border-border hover:shadow-lg transition-shadow bg-card text-foreground">
                     <div className="flex items-start justify-between mb-4">
-                        <span className="text-gray-600 text-sm font-medium">Pending Invites</span>
-                        <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
-                            <Mail className="w-4 h-4 text-orange-600" />
+                        <span className="text-muted-foreground text-sm font-medium">Pending Invites</span>
+                        <div className="w-8 h-8 rounded-lg bg-sidebar-accent flex items-center justify-center">
+                            <Mail className="w-4 h-4 text-gold-solid" />
                         </div>
                     </div>
-                    <div className="text-4xl font-bold text-orange-600">{pendingInvites.length}</div>
+                    <div className="text-4xl font-bold text-gold-solid">{pendingInvites.length}</div>
                 </Card>
             </div>
 
             {/* Team Members */}
             <div>
-                <h4 className="text-lg font-bold text-gray-900 mb-4">Team Members</h4>
+                <h4 className="text-lg font-bold text-foreground mb-4">Team Members</h4>
                 <div className="space-y-3">
                     {teamMembers.length === 0 ? (
-                        <Card className="p-8 border-gray-200 text-center">
-                            <Users className="w-12 h-12 text-gray-400 mx-auto mb-3 opacity-50" />
-                            <p className="text-gray-600">No team members yet</p>
+                        <Card className="p-8 border-border bg-card text-center">
+                            <Users className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-50" />
+                            <p className="text-muted-foreground">No team members yet</p>
                         </Card>
                     ) : (
                         teamMembers.map((member) => {
@@ -118,21 +118,21 @@ export function AdminCollaboratorsTab({ project }) {
                             return (
                                 <Card
                                     key={member.user_id}
-                                    className="p-4 border-gray-200 hover:shadow-md transition-shadow"
+                                    className="p-4 border-border bg-card hover:shadow-md transition-shadow text-foreground"
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <Avatar className="w-10 h-10">
+                                            <Avatar className="w-10 h-10 border border-border">
                                                 <AvatarImage
                                                     src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${member.user_email}`}
                                                 />
                                                 <AvatarFallback>{getInitials(member.user_name || member.user_email)}</AvatarFallback>
                                             </Avatar>
                                             <div>
-                                                <p className="font-medium text-gray-900">
+                                                <p className="font-medium text-foreground">
                                                     {member.user_name || member.full_name || "Unknown User"}
                                                 </p>
-                                                <p className="text-xs text-gray-600">{member.user_email || member.email}</p>
+                                                <p className="text-xs text-muted-foreground">{member.user_email || member.email}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
@@ -140,7 +140,7 @@ export function AdminCollaboratorsTab({ project }) {
                                                 <RoleIcon className="w-3 h-3 mr-1" />
                                                 {member.role}
                                             </Badge>
-                                            <Badge variant="outline" className="border-green-500 text-green-700 bg-green-50">
+                                            <Badge variant="outline" className="border-green-500/20 text-green-400 bg-green-500/10">
                                                 Active
                                             </Badge>
                                             {member.role === "owner" && (
@@ -157,50 +157,50 @@ export function AdminCollaboratorsTab({ project }) {
 
             {/* Role Permissions */}
             <div>
-                <h4 className="text-lg font-bold text-gray-900 mb-4">Role Permissions</h4>
+                <h4 className="text-lg font-bold text-foreground mb-4">Role Permissions</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Card className="p-6 border-gray-200 hover:shadow-lg transition-shadow">
+                    <Card className="p-6 border-border bg-card hover:shadow-lg transition-shadow text-foreground">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
-                                <Crown className="w-5 h-5 text-purple-600" />
+                            <div className="w-10 h-10 rounded-lg bg-gold-solid/10 flex items-center justify-center">
+                                <Crown className="w-5 h-5 text-gold-solid" />
                             </div>
-                            <h5 className="font-bold text-gray-900">Owner</h5>
+                            <h5 className="font-bold text-foreground">Owner</h5>
                         </div>
                         <ul className="space-y-3">
-                            <li className="text-gray-600 text-sm">• Full project access</li>
-                            <li className="text-gray-600 text-sm">• Manage team members</li>
-                            <li className="text-gray-600 text-sm">• Delete project</li>
-                            <li className="text-gray-600 text-sm">• Change project settings</li>
+                            <li className="text-muted-foreground text-sm">• Full project access</li>
+                            <li className="text-muted-foreground text-sm">• Manage team members</li>
+                            <li className="text-muted-foreground text-sm">• Delete project</li>
+                            <li className="text-muted-foreground text-sm">• Change project settings</li>
                         </ul>
                     </Card>
 
-                    <Card className="p-6 border-gray-200 hover:shadow-lg transition-shadow">
+                    <Card className="p-6 border-border bg-card hover:shadow-lg transition-shadow text-foreground">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                                <Edit3 className="w-5 h-5 text-blue-600" />
+                            <div className="w-10 h-10 rounded-lg bg-sidebar-accent flex items-center justify-center">
+                                <Edit3 className="w-5 h-5 text-gold-solid" />
                             </div>
-                            <h5 className="font-bold text-gray-900">Editor</h5>
+                            <h5 className="font-bold text-foreground">Editor</h5>
                         </div>
                         <ul className="space-y-3">
-                            <li className="text-gray-600 text-sm">• Edit project content</li>
-                            <li className="text-gray-600 text-sm">• Upload and manage images</li>
-                            <li className="text-gray-600 text-sm">• Modify workflows</li>
-                            <li className="text-gray-600 text-sm">• Cannot manage team</li>
+                            <li className="text-muted-foreground text-sm">• Edit project content</li>
+                            <li className="text-muted-foreground text-sm">• Upload and manage images</li>
+                            <li className="text-muted-foreground text-sm">• Modify workflows</li>
+                            <li className="text-muted-foreground text-sm">• Cannot manage team</li>
                         </ul>
                     </Card>
 
-                    <Card className="p-6 border-gray-200 hover:shadow-lg transition-shadow">
+                    <Card className="p-6 border-border bg-card hover:shadow-lg transition-shadow text-foreground">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                                <Eye className="w-5 h-5 text-gray-600" />
+                            <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                                <Eye className="w-5 h-5 text-muted-foreground" />
                             </div>
-                            <h5 className="font-bold text-gray-900">Viewer</h5>
+                            <h5 className="font-bold text-foreground">Viewer</h5>
                         </div>
                         <ul className="space-y-3">
-                            <li className="text-gray-600 text-sm">• View project details</li>
-                            <li className="text-gray-600 text-sm">• View all images</li>
-                            <li className="text-gray-600 text-sm">• Cannot make changes</li>
-                            <li className="text-gray-600 text-sm">• Cannot invite others</li>
+                            <li className="text-muted-foreground text-sm">• View project details</li>
+                            <li className="text-muted-foreground text-sm">• View all images</li>
+                            <li className="text-muted-foreground text-sm">• Cannot make changes</li>
+                            <li className="text-muted-foreground text-sm">• Cannot invite others</li>
                         </ul>
                     </Card>
                 </div>

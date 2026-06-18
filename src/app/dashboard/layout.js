@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
 import { Topbar } from "@/components/Topbar";
 
 export default function DashboardLayout({ children }) {
+    const router = useRouter();
     const [collapsed, setCollapsed] = useState(true);
     const [hovered, setHovered] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
@@ -33,8 +35,8 @@ export default function DashboardLayout({ children }) {
                     const decodedToken = decodeURIComponent(tokenFromUrl);
                     const decodedUser = userFromUrl ? JSON.parse(decodeURIComponent(userFromUrl)) : null;
 
-                    // Verify user is organization owner
-                    if (decodedUser && decodedUser.organization_role === "owner") {
+                    // Verify user has organization role
+                    if (decodedUser && decodedUser.organization_role) {
                         localStorage.setItem("org_auth_token", decodedToken);
                         localStorage.setItem("org_user", JSON.stringify(decodedUser));
                         localStorage.setItem("org_user_id", decodedUser.id || "");
@@ -51,8 +53,8 @@ export default function DashboardLayout({ children }) {
                         setLoading(false);
                         return;
                     } else {
-                        // Not an owner, redirect to login
-                        router.push("/login?error=not_owner");
+                        // Not a member, redirect to login
+                        router.push("/login?error=not_member");
                         return;
                     }
                 } catch (error) {
@@ -78,8 +80,11 @@ export default function DashboardLayout({ children }) {
 
     if (loading) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 via-purple-50/30 to-pink-50/20">
-                <p className="text-foreground">Loading...</p>
+            <div className="dark flex min-h-screen items-center justify-center bg-surface-gradient">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-solid mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">Loading...</p>
+                </div>
             </div>
         );
     }
@@ -89,7 +94,7 @@ export default function DashboardLayout({ children }) {
     }
 
     return (
-        <div className="flex h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-pink-50/20">
+        <div className="dark flex h-screen min-h-screen bg-surface-gradient">
             <Sidebar
                 collapsed={collapsed}
                 hovered={hovered}

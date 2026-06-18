@@ -74,17 +74,17 @@ export function Header({ project, onProjectUpdate }) {
     const getStatusStyle = () => {
         if (isCompleted) {
             return {
-                border: "border-green-500",
-                bg: "bg-green-50",
-                dot: "bg-green-500",
-                text: "text-green-700",
+                border: "border-emerald-500/20",
+                bg: "bg-emerald-500/10",
+                dot: "bg-emerald-400",
+                text: "text-emerald-400",
             }
         }
         return {
-            border: "border-amber-500",
-            bg: "bg-amber-50",
-            dot: "bg-amber-500",
-            text: "text-amber-700",
+            border: "border-amber-500/20",
+            bg: "bg-amber-500/10",
+            dot: "bg-amber-400",
+            text: "text-amber-400",
         }
     }
 
@@ -92,7 +92,7 @@ export function Header({ project, onProjectUpdate }) {
 
     // Human-readable display label
     const displayStatus =
-        projectData.status === "progress" ? t("images.inProgress") : t("images.completed")
+        projectData.status === "progress" ? (t("images.inProgress") || "In Progress") : (t("images.completed") || "Completed")
 
     // Handle edit button click
     const handleEditClick = () => {
@@ -107,7 +107,7 @@ export function Header({ project, onProjectUpdate }) {
     // Handle save project changes
     const handleSaveProject = async () => {
         if (!editName.trim()) {
-            toast.error(t("images.projectNameRequired"))
+            toast.error(t("images.projectNameRequired") || "Project name is required")
             return
         }
 
@@ -130,11 +130,11 @@ export function Header({ project, onProjectUpdate }) {
                     status: response.status || projectData.status,
                 })
                 setIsEditModalOpen(false)
-                toast.success(t("images.projectUpdated"))
+                toast.success(t("images.projectUpdated") || "Project updated successfully")
             }
         } catch (error) {
             console.error("Error updating project:", error)
-            toast.error(t("images.failedToUpdate"))
+            toast.error(t("images.failedToUpdate") || "Failed to update project")
         } finally {
             setIsSaving(false)
         }
@@ -142,7 +142,7 @@ export function Header({ project, onProjectUpdate }) {
 
     // Handle delete project
     const handleDeleteProject = async () => {
-        if (!confirm(t("images.deleteConfirm"))) {
+        if (!confirm(t("images.deleteConfirm") || "Are you sure you want to delete this project?")) {
             return
         }
 
@@ -161,17 +161,17 @@ export function Header({ project, onProjectUpdate }) {
     }
 
     return (
-        <div className="border-b border-[#e6e6e6] bg-white px-8 py-6">
+        <div className="border-b border-border bg-card px-8 py-6 text-foreground">
             <div className="flex items-center justify-between">
                 {/* Left section: Title + Status */}
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-[#884cff] rounded-full flex items-center justify-center">
-                            <span className="text-white text-sm font-bold">
+                        <div className="w-8 h-8 bg-gold-gradient rounded-full flex items-center justify-center text-primary-foreground shadow-sm">
+                            <span className="text-sm font-bold">
                                 {getInitial(projectData.title)}
                             </span>
                         </div>
-                        <h1 className="text-2xl font-bold text-[#1a1a1a]">
+                        <h1 className="text-2xl font-bold text-foreground">
                             {projectData.title}
                         </h1>
                     </div>
@@ -182,10 +182,10 @@ export function Header({ project, onProjectUpdate }) {
                             className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border ${statusStyle.border} ${statusStyle.bg}`}
                         >
                             <div
-                                className={`w-2 h-2 ${statusStyle.dot} rounded-full ${isCompleted ? "" : "animate-pulse"
+                                className={`w-2.5 h-2.5 ${statusStyle.dot} rounded-full ${isCompleted ? "" : "animate-pulse"
                                     }`}
                             ></div>
-                            <span className={`text-sm font-medium ${statusStyle.text}`}>
+                            <span className={`text-sm font-semibold ${statusStyle.text}`}>
                                 {displayStatus}
                             </span>
                         </span>
@@ -198,9 +198,9 @@ export function Header({ project, onProjectUpdate }) {
                         <Button
                             variant="outline"
                             size="sm"
-                            className={`gap-2 ${isCompleted
-                                ? "border-green-500 text-green-700 hover:bg-green-50"
-                                : "border-amber-500 text-amber-700 hover:bg-amber-50"
+                            className={`gap-2 border-0 font-semibold ${isCompleted
+                                ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                                : "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
                                 }`}
                             onClick={handleStatusToggle}
                             disabled={updating}
@@ -208,12 +208,12 @@ export function Header({ project, onProjectUpdate }) {
                             {isCompleted ? (
                                 <>
                                     <Clock className="w-4 h-4" />
-                                    {updating ? t("common.loading") : t("images.markAsInProgress")}
+                                    {updating ? (t("common.loading") || "Loading...") : (t("images.markAsInProgress") || "Mark as In Progress")}
                                 </>
                             ) : (
                                 <>
                                     <CheckCircle className="w-4 h-4" />
-                                    {updating ? t("common.loading") : t("images.markAsCompleted")}
+                                    {updating ? (t("common.loading") || "Loading...") : (t("images.markAsCompleted") || "Mark as Completed")}
                                 </>
                             )}
                         </Button>
@@ -221,7 +221,7 @@ export function Header({ project, onProjectUpdate }) {
                         <Button
                             variant="outline"
                             size="sm"
-                            className="gap-2 bg-transparent"
+                            className="gap-2 border-border text-foreground hover:bg-accent bg-transparent"
                             onClick={handleEditClick}
                         >
                             <Edit2 className="w-4 h-4" />
@@ -230,19 +230,19 @@ export function Header({ project, onProjectUpdate }) {
 
                         <Button
                             size="sm"
-                            className="gap-2 bg-[#f05656] hover:bg-[#e04545] text-white"
+                            className="gap-2 bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors"
                             onClick={handleDeleteProject}
                             disabled={isDeleting}
                         >
                             {isDeleting ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                    {t("images.deleting")}
+                                    {(t("images.deleting") || "Deleting...")}
                                 </>
                             ) : (
                                 <>
                                     <Trash2 className="w-4 h-4" />
-                                    {t("images.deleteProject")}
+                                    {(t("images.deleteProject") || "Delete Project")}
                                 </>
                             )}
                         </Button>
@@ -252,37 +252,39 @@ export function Header({ project, onProjectUpdate }) {
 
             {/* Edit Project Modal */}
             <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-                <DialogContent className="sm:max-w-[500px]">
+                <DialogContent className="sm:max-w-[500px] bg-card border-border text-foreground shadow-2xl">
                     <DialogHeader>
-                        <DialogTitle>Edit Project</DialogTitle>
-                        <DialogDescription>
-                            {t("images.updateProjectDetails")}
+                        <DialogTitle className="text-foreground">Edit Project</DialogTitle>
+                        <DialogDescription className="text-muted-foreground">
+                            {t("images.updateProjectDetails") || "Update details of your project below."}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
-                            <label htmlFor="project-name" className="text-sm font-medium">
-                                {t("images.projectName")}
+                            <label htmlFor="project-name" className="text-sm font-semibold text-foreground">
+                                {t("images.projectName") || "Project Name"}
                             </label>
                             <Input
                                 id="project-name"
                                 value={editName}
                                 onChange={(e) => setEditName(e.target.value)}
-                                placeholder={t("images.enterProjectName")}
+                                placeholder={t("images.enterProjectName") || "Enter project name"}
                                 disabled={isSaving}
+                                className="bg-background border-border text-foreground focus:ring-2 focus:ring-gold-solid/40"
                             />
                         </div>
                         <div className="grid gap-2">
-                            <label htmlFor="project-description" className="text-sm font-medium">
-                                {t("images.projectDescription")}
+                            <label htmlFor="project-description" className="text-sm font-semibold text-foreground">
+                                {t("images.projectDescription") || "Project Description"}
                             </label>
                             <Textarea
                                 id="project-description"
                                 value={editDescription}
                                 onChange={(e) => setEditDescription(e.target.value)}
-                                placeholder={t("images.enterProjectDescription")}
+                                placeholder={t("images.enterProjectDescription") || "Enter description"}
                                 rows={4}
                                 disabled={isSaving}
+                                className="bg-background border-border text-foreground focus:ring-2 focus:ring-gold-solid/40"
                             />
                         </div>
                     </div>
@@ -291,20 +293,22 @@ export function Header({ project, onProjectUpdate }) {
                             variant="outline"
                             onClick={() => setIsEditModalOpen(false)}
                             disabled={isSaving}
+                            className="border-border hover:bg-accent text-foreground hover:text-foreground bg-transparent"
                         >
-                            {t("images.cancel")}
+                            {t("images.cancel") || "Cancel"}
                         </Button>
                         <Button
                             onClick={handleSaveProject}
                             disabled={isSaving || !editName.trim()}
+                            className="bg-gold-gradient text-primary-foreground font-semibold hover:brightness-110 border-0 shadow-md"
                         >
                             {isSaving ? (
                                 <>
                                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    {t("profile.saving")}
+                                    {t("profile.saving") || "Saving..."}
                                 </>
                             ) : (
-                                t("images.saveChanges")
+                                t("images.saveChanges") || "Save changes"
                             )}
                         </Button>
                     </DialogFooter>

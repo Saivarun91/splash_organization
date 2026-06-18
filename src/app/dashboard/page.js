@@ -161,15 +161,15 @@ export default function Dashboard() {
     // ⬆️ NO CHANGES REQUIRED — KEEP EXACTLY SAME CODE
 
     /* ---------------- STAT CARD (UNCHANGED) ---------------- */
-    const StatCard = ({ icon: Icon, title, value, color }) => (
-        <div className="p-4 bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl shadow-sm hover:shadow-lg transition-all duration-300">
-            <div className="flex justify-between items-center pb-2">
-                <span className="text-sm font-medium text-gray-500 dark:text-muted-foreground">{title}</span>
-                <Icon className="w-6 h-6 text-gray-700 dark:text-foreground" />
+    const StatCard = ({ icon: Icon, title, value }) => (
+        <div className="p-5 bg-card border border-border rounded-xl shadow-sm hover:border-gold-muted hover:shadow-md transition-all duration-300">
+            <div className="flex justify-between items-center pb-3">
+                <span className="text-sm font-medium text-muted-foreground">{title}</span>
+                <Icon className="w-6 h-6 text-gold-solid shrink-0" />
             </div>
             <div>
-                <div className="text-2xl font-bold text-gray-900 dark:text-foreground">{value.toLocaleString()}</div>
-                <p className="text-xs text-gray-500 dark:text-muted-foreground mt-1">{title}</p>
+                <div className="text-3xl font-bold text-gold-solid tabular-nums">{value.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground mt-2">{title}</p>
             </div>
         </div>
     );
@@ -178,7 +178,7 @@ export default function Dashboard() {
     if (pageLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+                <Loader2 className="w-12 h-12 text-gold-solid animate-spin" />
             </div>
         );
     }
@@ -188,11 +188,11 @@ export default function Dashboard() {
         <div className="space-y-6">
 
             {/* Welcome / Header – same as frontend */}
-            <div className="relative p-4 rounded-xl bg-white shadow-md border border-gray-200 dark:bg-card dark:border-border overflow-hidden">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-tr from-indigo-500 to-purple-500 opacity-10 rounded-full blur-3xl" />
+            <div className="relative p-6 rounded-2xl border border-border bg-card shadow-md overflow-hidden animate-fadeIn">
+                <div className="absolute top-0 right-0 w-48 h-48 md:w-64 md:h-64 bg-gradient-to-tr from-gold-solid/20 to-gold-muted/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="relative z-10">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-foreground">{t("dashboard.dashboard")}</h1>
-                    <p className="text-sm text-gray-600 dark:text-muted-foreground mt-1">
+                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">{t("dashboard.dashboard")}</h1>
+                    <p className="text-sm md:text-base text-muted-foreground mt-2 max-w-xl">
                         Welcome to {organizationName || t("dashboard.user")} {t("dashboard.dashboard").toLowerCase()}
                     </p>
                 </div>
@@ -200,10 +200,10 @@ export default function Dashboard() {
 
             {/* STATS – same card style as frontend */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-                <StatCard title={t("dashboard.totalUsers")} value={stats.totalUsers} icon={ Users } color="bg-blue-500" />
-                <StatCard title={t("dashboard.totalCredits")} value={stats.totalCredits} icon={ Coins } color="bg-green-500" />
-                <StatCard title={t("dashboard.totalProjects")} value={stats.totalProjects} icon={ FolderKanban } color="bg-purple-500" />
-                <StatCard title={t("dashboard.imagesGenerated")} value={stats.imagesGenerated} icon={ ImageIcon } color="bg-orange-500" />
+                <StatCard title={t("dashboard.totalUsers")} value={stats.totalUsers} icon={ Users } />
+                <StatCard title={t("dashboard.totalCredits")} value={stats.totalCredits} icon={ Coins } />
+                <StatCard title={t("dashboard.totalProjects")} value={stats.totalProjects} icon={ FolderKanban } />
+                <StatCard title={t("dashboard.imagesGenerated")} value={stats.imagesGenerated} icon={ ImageIcon } />
             </div>
 
             {/* GRAPHS (ONLY LOADER ADDED) */}
@@ -211,10 +211,10 @@ export default function Dashboard() {
                 {/* CREDIT GRAPH */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 {/* Credit Consumption Graph */}
-                <div className="p-6 bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl shadow-sm">
+                <div className="p-6 bg-card border border-border rounded-xl shadow-sm">
                     <div className="mb-6">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-foreground mb-1">{t("dashboard.creditConsumptionAnalytics")}</h2>
-                        <p className="text-sm text-gray-500 dark:text-muted-foreground">{t("dashboard.trackCreditUsage")}</p>
+                        <h2 className="text-lg font-semibold text-foreground mb-1">{t("dashboard.creditConsumptionAnalytics")}</h2>
+                        <p className="text-sm text-muted-foreground">{t("dashboard.trackCreditUsage")}</p>
                     </div>
                     <div className="flex items-center gap-2 mb-6">
                         <button
@@ -292,7 +292,7 @@ export default function Dashboard() {
                                         <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" />
                                 <XAxis 
                                     dataKey="date" 
                                     stroke="#888"
@@ -306,11 +306,14 @@ export default function Dashboard() {
                                 />
                                 <Tooltip 
                                     contentStyle={{ 
-                                        backgroundColor: 'white', 
-                                        border: '1px solid #e5e7eb',
+                                        backgroundColor: '#1e1c19', 
+                                        border: '1px solid rgba(205, 150, 57, 0.12)',
                                         borderRadius: '8px',
-                                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                                        color: '#f5f2eb'
                                     }}
+                                    itemStyle={{ color: '#f5f2eb' }}
+                                    labelStyle={{ color: '#8a8478' }}
                                 />
                                 <Legend 
                                     wrapperStyle={{ paddingTop: '20px' }}
@@ -350,10 +353,10 @@ export default function Dashboard() {
                 </div>
 
                 {/* Images Generated Graph */}
-                <div className="p-6 bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl shadow-sm">
+                <div className="p-6 bg-card border border-border rounded-xl shadow-sm">
                     <div className="mb-6">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-foreground mb-1">{t("dashboard.imagesGeneratedAnalytics")}</h2>
-                        <p className="text-sm text-gray-500 dark:text-muted-foreground">{t("dashboard.trackImageGeneration")}</p>
+                        <h2 className="text-lg font-semibold text-foreground mb-1">{t("dashboard.imagesGeneratedAnalytics")}</h2>
+                        <p className="text-sm text-muted-foreground">{t("dashboard.trackImageGeneration")}</p>
                     </div>
                     <div className="flex items-center gap-2 mb-6">
                         <button
@@ -423,11 +426,11 @@ export default function Dashboard() {
                             <AreaChart data={imageGraphData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="colorImages" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                        <stop offset="5%" stopColor="#cd9639" stopOpacity={0.8}/>
+                                        <stop offset="95%" stopColor="#cd9639" stopOpacity={0}/>
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" />
                                 <XAxis 
                                     dataKey="date" 
                                     stroke="#888"
@@ -441,11 +444,14 @@ export default function Dashboard() {
                                 />
                                 <Tooltip 
                                     contentStyle={{ 
-                                        backgroundColor: 'white', 
-                                        border: '1px solid #e5e7eb',
+                                        backgroundColor: '#1e1c19', 
+                                        border: '1px solid rgba(205, 150, 57, 0.12)',
                                         borderRadius: '8px',
-                                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                                        color: '#f5f2eb'
                                     }}
+                                    itemStyle={{ color: '#f5f2eb' }}
+                                    labelStyle={{ color: '#8a8478' }}
                                 />
                                 <Legend 
                                     wrapperStyle={{ paddingTop: '20px' }}
@@ -454,7 +460,7 @@ export default function Dashboard() {
                                 <Area 
                                     type="monotone" 
                                     dataKey="count" 
-                                    stroke="#3b82f6" 
+                                    stroke="#cd9639" 
                                     fillOpacity={1} 
                                     fill="url(#colorImages)" 
                                     strokeWidth={2.5}

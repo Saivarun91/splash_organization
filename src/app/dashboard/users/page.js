@@ -36,14 +36,14 @@ const getRoleIcon = (role) => {
 const getRoleColor = (role) => {
   switch (role?.toLowerCase()) {
     case "owner":
-      return "border-purple-200 text-purple-700 bg-purple-50";
+      return "border-gold-solid/30 text-gold-solid bg-gold-solid/10";
     case "chief_editor":
     case "creative_head":
-      return "border-blue-200 text-blue-700 bg-blue-50";
+      return "border-gold-solid/20 text-gold-solid bg-sidebar-accent";
     case "member":
-      return "border-green-200 text-green-700 bg-green-50";
+      return "border-border text-foreground bg-secondary";
     default:
-      return "border-gray-200 text-gray-700 bg-gray-50";
+      return "border-border text-muted-foreground bg-muted";
   }
 };
 
@@ -68,6 +68,7 @@ export default function UsersPage() {
   const router = useRouter();
   const { t } = useLanguage();
   const [organizationProjectsCount, setOrganizationProjectsCount] = useState(0);
+  const [currentUserRole, setCurrentUserRole] = useState("member");
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRoles, setSelectedRoles] = useState([]);
@@ -83,6 +84,18 @@ export default function UsersPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [deletingUserId, setDeletingUserId] = useState(null);
+
+  useEffect(() => {
+    const userData = localStorage.getItem("org_user");
+    if (userData) {
+      try {
+        const parsed = JSON.parse(userData);
+        setCurrentUserRole(parsed.organization_role || "member");
+      } catch (e) {
+        console.error("Error parsing user data:", e);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -184,6 +197,7 @@ export default function UsersPage() {
   const UserCard = ({ user }) => {
     const isOwner = user.organization_role === "owner";
     const isDeleting = deletingUserId === user.id;
+    const isOwnerOrAdmin = currentUserRole === "owner" || currentUserRole === "admin";
 
     return (
       <div
@@ -217,11 +231,11 @@ export default function UsersPage() {
             {getRoleDisplayName(user.organization_role, t)}
           </Badge>
 
-          {!isOwner && (
+          {!isOwner && isOwnerOrAdmin && (
           <button
             onClick={(e) => handleDeleteUser(user.id, user.email, e)}
             disabled={isDeleting}
-            className="rounded-full bg-red-500 p-2 hover:bg-red-700 text-white"
+            className="rounded-full bg-red-500 p-2 hover:bg-red-700 text-white cursor-pointer"
           >
             <Trash2 className="w-4 h-4 text-white" />
            
@@ -238,7 +252,7 @@ export default function UsersPage() {
               {t("orgPortal.projects")}
             </p>
             <p className="text-lg font-semibold">
-            {organizationProjectsCount || 0}
+            {user.projects_count || 0}
             </p>
           </div>
           <div className="text-center">
@@ -284,17 +298,19 @@ export default function UsersPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => setShowAddUserModal(true)}
-          className="
-            inline-flex items-center gap-2 rounded-lg
-            bg-primary px-5 py-2.5 text-sm font-medium
-            text-primary-foreground hover:bg-primary/90
-          "
-        >
-          <UserPlus className="w-4 h-4" />
-          {t("orgPortal.addUser")}
-        </button>
+        {(currentUserRole === "owner" || currentUserRole === "admin") && (
+          <button
+            onClick={() => setShowAddUserModal(true)}
+            className="
+              inline-flex items-center gap-2 rounded-lg
+              bg-gold-gradient px-5 py-2.5 text-sm font-semibold
+              text-primary-foreground hover:brightness-110 shadow-md transition-all cursor-pointer
+            "
+          >
+            <UserPlus className="w-4 h-4" />
+            {t("orgPortal.addUser")}
+          </button>
+        )}
       </div>
 
       {/* Search */}
@@ -350,35 +366,35 @@ export default function UsersPage() {
         </div>
       )}
       {showAddUserModal && (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-xl w-full max-w-md">
+  <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm">
+    <div className="bg-card border border-border p-6 rounded-xl w-full max-w-md text-foreground">
     <button
         onClick={() => setShowAddUserModal(false)}
-        className="float-right text-sm text-black hover:text-red-700 rounded-full p-2 hover:bg-gray-100"
+        className="float-right text-sm text-muted-foreground hover:text-foreground rounded-full p-2 hover:bg-sidebar-accent"
       >
-        <X className="w-4 h-4 font-bold text-black hover:text-red-700" />
+        <X className="w-4 h-4 font-bold" />
       </button>
       <form onSubmit={handleAddUser} className="space-y-4">
       
       <h2 className="text-lg font-semibold mb-4">Add User</h2>
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium text-gray-700">User Email</label>
+        <label className="text-sm font-medium text-muted-foreground">User Email</label>
         <input
           type="email"
           placeholder="user@example.com"
           value={newUserEmail}
           onChange={(e) => setNewUserEmail(e.target.value)}
           required
-          className="w-full border rounded-lg px-3 py-2"
+          className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 focus:ring-2 focus:ring-ring focus:border-transparent outline-none"
         />
       </div>
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium text-gray-700">Role</label>
+        <label className="text-sm font-medium text-muted-foreground">Role</label>
         <select
           value={newUserRole}
           onChange={(e) => setNewUserRole(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2"
+          className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 focus:ring-2 focus:ring-ring focus:border-transparent outline-none"
         >
           <option value="member">Member</option>
           <option value="chief_editor">Chief Editor</option>
@@ -389,7 +405,7 @@ export default function UsersPage() {
   <button
     type="submit"
     disabled={addingUser}
-    className="w-full bg-primary text-white py-2 rounded-lg"
+    className="w-full bg-gold-gradient text-primary-foreground hover:brightness-110 font-semibold py-2.5 rounded-lg transition-all shadow-md mt-4"
   >
     {addingUser ? "Adding..." : "Add User"}
   </button>

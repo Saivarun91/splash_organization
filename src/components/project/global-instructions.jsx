@@ -28,21 +28,21 @@ export function GlobalInstructions({
     }, [instructions, onInstructionsChange])
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 text-foreground">
             <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-[#884cff]" />
-                <h3 className="font-bold text-[#1a1a1a] text-lg">{t("images.additionalInstructions")}</h3>
+                <FileText className="w-5 h-5 text-gold-solid" />
+                <h3 className="font-bold text-foreground text-lg">{t("images.additionalInstructions")}</h3>
             </div>
 
             <div className="space-y-3">
-                <p className="text-sm text-[#708090]">
+                <p className="text-sm text-muted-foreground">
                     Provide specific instructions for how the uploaded content and selections should be used in the generated images:
                 </p>
                 <textarea
                     placeholder="e.g., 'Use the uploaded theme images as primary inspiration', 'Apply the selected colors as accent colors', 'Make sure the model poses match the uploaded reference images', 'Use the background images to create similar atmospheres'"
                     value={instructions}
                     onChange={(e) => setInstructions(e.target.value)}
-                    className="w-full h-24 px-4 py-3 border border-[#e6e6e6] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#884cff] focus:border-transparent resize-none disabled:bg-gray-50 disabled:cursor-not-allowed"
+                    className="w-full h-24 px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-solid/40 focus:border-transparent resize-none disabled:bg-secondary disabled:text-muted-foreground disabled:cursor-not-allowed placeholder:text-muted-foreground/60"
                     disabled={!canEdit}
                 />
             </div>

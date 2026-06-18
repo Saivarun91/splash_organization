@@ -4,6 +4,7 @@ import { WorkflowContent } from "@/components/project/workflow-content"
 import Link from "next/link"
 import { useState, useEffect, use } from "react"
 import { organizationAPI } from "@/lib/api"
+import { Loader2 } from "lucide-react"
 
 export default function ProjectPageBySlug({ params }) {
     // Unwrap params Promise using React.use()
@@ -95,10 +96,10 @@ export default function ProjectPageBySlug({ params }) {
 
     if (loading) {
         return (
-            <div className="flex h-screen bg-[#fcfcfc] items-center justify-center">
+            <div className="flex h-screen bg-transparent items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7753ff] mx-auto mb-4"></div>
-                    <p className="text-lg text-[#1a1a1a]">Loading project...</p>
+                    <Loader2 className="w-12 h-12 text-gold-solid animate-spin mx-auto mb-4" />
+                    <p className="text-lg text-muted-foreground">Loading project...</p>
                 </div>
             </div>
         )
@@ -106,15 +107,15 @@ export default function ProjectPageBySlug({ params }) {
 
     if (error || !project) {
         return (
-            <div className="flex h-screen bg-[#fcfcfc] items-center justify-center">
+            <div className="flex h-screen bg-transparent items-center justify-center text-foreground">
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold text-[#1a1a1a] mb-4">
+                    <h1 className="text-2xl font-bold text-foreground mb-4">
                         {error ? 'Error loading project' : 'Project not found'}
                     </h1>
                     {error && (
-                        <p className="text-red-600 mb-4">{error}</p>
+                        <p className="text-red-400 mb-4">{error}</p>
                     )}
-                    <Link href="/dashboard/projects" className="text-[#7753ff] hover:underline">
+                    <Link href="/dashboard/projects" className="text-gold-solid hover:underline">
                         Back to Projects
                     </Link>
                 </div>
@@ -137,7 +138,7 @@ export default function ProjectPageBySlug({ params }) {
     }
 
     return (
-        <div className="flex h-screen bg-[#fcfcfc]">
+        <div className="flex h-screen bg-transparent text-foreground">
             <div className="flex-1 flex flex-col overflow-hidden">
                 <Header project={transformedProject} onProjectUpdate={handleProjectUpdate} />
                 <WorkflowContent project={transformedProject} />

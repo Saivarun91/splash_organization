@@ -142,15 +142,15 @@ export function GenerateSection({ project, collectionData, onGenerate, canEdit, 
     }, [selections])
 
     return (
-        <div className="mb-8">
-            <div className="flex items-center justify-between py-6 px-6 bg-[#f9f6f2] rounded-lg">
+        <div className="mb-8 text-foreground">
+            <div className="flex items-center justify-between py-6 px-6 bg-secondary border border-border rounded-lg">
                 <div>
-                    <h3 className="font-semibold text-[#1a1a1a] mb-1">Generate Final Images</h3>
-                    <p className="text-sm text-[#737373]">
+                    <h3 className="font-semibold text-foreground mb-1">Generate Final Images</h3>
+                    <p className="text-sm text-muted-foreground">
                         Combine products with AI models to create final images
                     </p>
                     {hasProducts && hasModelSelected && (
-                        <p className="text-xs text-green-600 mt-1">
+                        <p className="text-xs text-emerald-400 mt-1">
                             {totalSelectedImages !== null && totalSelectedImages > 0 ? (
                                 <>✓ Ready to generate {totalSelectedImages} image{totalSelectedImages !== 1 ? 's' : ''} ({totalSelectedImages} credits required)</>
                             ) : (
@@ -162,40 +162,40 @@ export function GenerateSection({ project, collectionData, onGenerate, canEdit, 
                 <Button
                     onClick={handleGenerate}
                     disabled={generating || !hasProducts || !hasModelSelected || !isOwner || (totalSelectedImages !== null && totalSelectedImages === 0)}
-                    className="bg-[#884cff] hover:bg-[#7a3ff0] text-white gap-2"
+                    className="bg-gold-gradient text-primary-foreground font-semibold hover:brightness-110 border-0 shadow-lg gap-2"
                     title={
                         !isOwner ? "You need Owner role to generate images" :
                         (totalSelectedImages === 0 ? "Please select at least one image type in Step 3" : "")
                     }
                 >
-                    <Sparkles className="w-4 h-4" />
+                    <Sparkles className="w-4 h-4 text-primary-foreground" />
                     {generating ? 'Generating...' : 'Generate Product Images'}
                 </Button>
             </div>
 
             {error && (
-                <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-2">
-                    <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                    <p className="text-red-600 text-sm">{error}</p>
+                <div className="mt-4 bg-red-500/10 border border-red-500/20 rounded-lg p-4 flex items-start gap-2">
+                    <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-red-400 text-sm">{error}</p>
                 </div>
             )}
 
             {success && (
-                <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
-                    <p className="text-green-600 text-sm">✓ {success}</p>
+                <div className="mt-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4">
+                    <p className="text-emerald-400 text-sm">✓ {success}</p>
                 </div>
             )}
 
             {generating && (
-                <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="mt-4 bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
                     <div className="flex items-center gap-3">
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400"></div>
                         <div className="flex-1">
-                            <p className="text-blue-600 text-sm">
+                            <p className="text-blue-400 text-sm">
                                 Generating images... This may take several minutes depending on the number of products.
                             </p>
                             {generationProgress && (
-                                <p className="text-blue-500 text-xs mt-1">
+                                <p className="text-blue-400/80 text-xs mt-1">
                                     Processing product {generationProgress.current} of {generationProgress.total}...
                                 </p>
                             )}
@@ -205,8 +205,8 @@ export function GenerateSection({ project, collectionData, onGenerate, canEdit, 
             )}
 
             {(!hasProducts || !hasModelSelected) && !error && (
-                <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <p className="text-yellow-700 text-sm">
+                <div className="mt-4 bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
+                    <p className="text-amber-400 text-sm">
                         {!hasModelSelected && '⚠️ Please select a model (AI or Real) in Step 2'}
                         {!hasProducts && hasModelSelected && '⚠️ Please upload product images in Step 3'}
                     </p>

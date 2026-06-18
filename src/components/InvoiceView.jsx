@@ -182,15 +182,15 @@ export function InvoiceView({ transactionId, onClose, paymentData }) {
     }, []);
 
     return (
-        <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-background text-foreground overflow-y-auto">
             {/* Header Bar with Actions */}
-            <div className="invoice-header-bar sticky top-0 z-10 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm">
-                <h2 className="text-2xl font-bold text-gray-900">Invoice</h2>
+            <div className="invoice-header-bar sticky top-0 z-10 bg-card border-b border-border px-6 py-4 flex items-center justify-between shadow-sm">
+                <h2 className="text-2xl font-bold text-foreground">Invoice</h2>
                 <div className="flex items-center gap-3">
                     <Button
                         onClick={downloadPDF}
                         disabled={downloading || loading || !invoiceData}
-                        className="bg-[#8f6ae1] hover:bg-[#7a5bc7] text-white"
+                        className="bg-gold-gradient text-primary-foreground font-semibold hover:brightness-110 shadow-md border-0"
                     >
                         {downloading ? (
                             <>
@@ -204,18 +204,11 @@ export function InvoiceView({ transactionId, onClose, paymentData }) {
                             </>
                         )}
                     </Button>
-                    {/* <Button
-                        onClick={() => window.print()}
-                        disabled={loading || !invoiceData}
-                        className="bg-[#8f6ae1] hover:bg-[#7a5bc7] text-white"
-                    >
-                        <Printer className="w-4 h-4 mr-2" />
-                        Print Invoice
-                    </Button> */}
                     <Button
                         onClick={onClose}
                         variant="outline"
                         size="icon"
+                        className="border-border hover:bg-accent hover:text-foreground text-foreground"
                     >
                         <X className="w-4 h-4" />
                     </Button>
@@ -223,15 +216,15 @@ export function InvoiceView({ transactionId, onClose, paymentData }) {
             </div>
 
             {/* Invoice Content */}
-            <div className="flex justify-center py-8 px-4">
+            <div className="flex justify-center py-8 px-4 bg-background">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
-                        <Loader2 className="w-8 h-8 animate-spin text-[#8f6ae1]" />
+                        <Loader2 className="w-8 h-8 animate-spin text-gold-solid" />
                     </div>
                 ) : error ? (
                     <div className="text-center py-12">
-                        <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                        <p className="text-red-600">{error}</p>
+                        <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                        <p className="text-red-500">{error}</p>
                     </div>
                 ) : invoiceData ? (
                     <div ref={invoiceRef} style={styles.page}>
@@ -352,7 +345,7 @@ const styles = {
 
     purpleLine: {
         height: "10px",
-        background: "#8f6ae1",
+        background: "#cd9639",
         margin: "20px 0",
     },
 
@@ -366,7 +359,7 @@ const styles = {
     },
 
     th: {
-        background: "#8f6ae1",
+        background: "#cd9639",
         color: "#fff",
         padding: "10px",
     },
@@ -378,7 +371,7 @@ const styles = {
 
     totalBox: {
         marginTop: "20px",
-        background: "#8f6ae1",
+        background: "#cd9639",
         color: "#fff",
         width: "260px",
         padding: "12px",

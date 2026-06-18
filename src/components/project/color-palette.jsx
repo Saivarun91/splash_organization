@@ -190,8 +190,8 @@ export function ColorPalette({ showSuggestions = false, collectionData, project,
     const hasSuggestions = showSuggestions && aiColorSuggestions.length > 0
 
     return (
-        <div className="space-y-4">
-            <h3 className="font-bold text-[#1a1a1a] text-lg">Color Palette</h3>
+        <div className="space-y-4 text-foreground">
+            <h3 className="font-bold text-foreground text-lg">Color Palette</h3>
 
             {hasSuggestions ? (
                 // Layout when suggestions are present: AI suggestions + color picker in row, upload section below
@@ -199,8 +199,8 @@ export function ColorPalette({ showSuggestions = false, collectionData, project,
                     <div className="flex gap-6">
                         {/* AI Suggested Color Palettes Section */}
                         <div className="flex-1 w-2/3 space-y-3">
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-                                <p className="text-blue-600 text-sm text-center font-medium">AI Suggested Color Palettes</p>
+                            <div className="bg-gold-solid/10 border border-gold-solid/20 rounded-lg p-3 mb-3">
+                                <p className="text-gold-solid text-sm text-center font-medium">AI Suggested Color Palettes</p>
                             </div>
                             <MultiSelect
                                 options={aiColorSuggestions}
@@ -213,7 +213,7 @@ export function ColorPalette({ showSuggestions = false, collectionData, project,
 
                         {/* Color Picker Section */}
                         <div className="flex-1 w-1/2 space-y-3">
-                            <p className="text-sm text-[#708090]">Or pick specific colors:</p>
+                            <p className="text-sm text-muted-foreground">Or pick specific colors:</p>
                             <ColorPicker
                                 selectedColors={pickedColors}
                                 onColorsChange={setPickedColors}
@@ -223,14 +223,14 @@ export function ColorPalette({ showSuggestions = false, collectionData, project,
                             {/* Display picked colors */}
                             {pickedColors.length > 0 && (
                                 <div className="space-y-2">
-                                    <p className="text-xs text-[#708090]">
+                                    <p className="text-xs text-muted-foreground">
                                         {pickedColors.length} color(s) selected
                                     </p>
                                     <div className="flex flex-wrap gap-2">
                                         {pickedColors.map((color, index) => (
                                             <div key={index} className="relative group">
                                                 <div
-                                                    className="w-8 h-8 rounded border border-gray-300"
+                                                    className="w-8 h-8 rounded border border-border"
                                                     style={{
                                                         background: color.includes('gradient') ? color : undefined,
                                                         backgroundColor: color.includes('gradient') ? 'transparent' : color
@@ -246,10 +246,10 @@ export function ColorPalette({ showSuggestions = false, collectionData, project,
                     </div>
 
                     {/* Upload Color Images Section */}
-                    <div className="border-2 border-dashed border-[#b0bec5] rounded-lg p-6 space-y-4">
+                    <div className="border-2 border-dashed border-border rounded-lg p-6 space-y-4 bg-card/30">
                         <div>
-                            <h4 className="font-bold text-[#1a1a1a] mb-1">Upload Color Images</h4>
-                            <p className="text-sm text-[#708090]">Upload inspiration images for color palette</p>
+                            <h4 className="font-bold text-foreground mb-1">Upload Color Images</h4>
+                            <p className="text-sm text-muted-foreground">Upload inspiration images for color palette</p>
                         </div>
 
                         <div className="space-y-3">
@@ -266,7 +266,7 @@ export function ColorPalette({ showSuggestions = false, collectionData, project,
 
                             <Button
                                 variant="outline"
-                                className="w-full bg-transparent"
+                                className="w-full border-border text-foreground hover:bg-accent hover:text-foreground bg-transparent"
                                 disabled={!canEdit || uploading}
                                 onClick={triggerFileInput}
                             >
@@ -277,7 +277,7 @@ export function ColorPalette({ showSuggestions = false, collectionData, project,
                             {/* Uploaded images preview */}
                             {uploadedImages.length > 0 && (
                                 <div className="space-y-2">
-                                    <p className="text-xs text-[#708090]">
+                                    <p className="text-xs text-muted-foreground">
                                         {uploadedImages.length} file(s) selected
                                     </p>
                                     <div className="grid grid-cols-2 gap-2">
@@ -286,7 +286,7 @@ export function ColorPalette({ showSuggestions = false, collectionData, project,
                                                 <img
                                                     src={image.url}
                                                     alt={image.name}
-                                                    className="w-full h-16 object-cover rounded border"
+                                                    className="w-full h-16 object-cover rounded border border-border"
                                                 />
                                                 <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button
@@ -320,10 +320,10 @@ export function ColorPalette({ showSuggestions = false, collectionData, project,
                 // Layout when suggestions are NOT present: Color picker and upload section side by side in grid
                 <div className="grid grid-cols-2 gap-6">
                     {/* Color Picker Section */}
-                    <div className="border-2 border-dashed border-[#b0bec5] rounded-lg p-6 space-y-4">
+                    <div className="border-2 border-dashed border-border rounded-lg p-6 space-y-4 bg-card/30">
                         <div>
-                            <h4 className="font-bold text-[#1a1a1a] mb-1">Pick Specific Colors</h4>
-                            <p className="text-sm text-[#708090]">Choose colors for your palette</p>
+                            <h4 className="font-bold text-foreground mb-1">Pick Specific Colors</h4>
+                            <p className="text-sm text-muted-foreground">Choose colors for your palette</p>
                         </div>
                         <ColorPicker
                             selectedColors={pickedColors}
@@ -334,14 +334,14 @@ export function ColorPalette({ showSuggestions = false, collectionData, project,
                         {/* Display picked colors */}
                         {pickedColors.length > 0 && (
                             <div className="space-y-2">
-                                <p className="text-xs text-[#708090]">
+                                <p className="text-xs text-muted-foreground">
                                     {pickedColors.length} color(s) selected
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {pickedColors.map((color, index) => (
                                         <div key={index} className="relative group">
                                             <div
-                                                className="w-8 h-8 rounded border border-gray-300"
+                                                className="w-8 h-8 rounded border border-border"
                                                 style={{
                                                     background: color.includes('gradient') ? color : undefined,
                                                     backgroundColor: color.includes('gradient') ? 'transparent' : color
@@ -356,10 +356,10 @@ export function ColorPalette({ showSuggestions = false, collectionData, project,
                     </div>
 
                     {/* Upload Color Images Section */}
-                    <div className="border-2 border-dashed border-[#b0bec5] rounded-lg p-6 space-y-4">
+                    <div className="border-2 border-dashed border-border rounded-lg p-6 space-y-4 bg-card/30">
                         <div>
-                            <h4 className="font-bold text-[#1a1a1a] mb-1">Upload Color Images</h4>
-                            <p className="text-sm text-[#708090]">Upload inspiration images for color palette</p>
+                            <h4 className="font-bold text-foreground mb-1">Upload Color Images</h4>
+                            <p className="text-sm text-muted-foreground">Upload inspiration images for color palette</p>
                         </div>
 
                         <div className="space-y-3">
@@ -376,7 +376,7 @@ export function ColorPalette({ showSuggestions = false, collectionData, project,
 
                             <Button
                                 variant="outline"
-                                className="w-full bg-transparent"
+                                className="w-full border-border text-foreground hover:bg-accent hover:text-foreground bg-transparent"
                                 disabled={!canEdit || uploading}
                                 onClick={triggerFileInput}
                             >
@@ -387,7 +387,7 @@ export function ColorPalette({ showSuggestions = false, collectionData, project,
                             {/* Uploaded images preview */}
                             {uploadedImages.length > 0 && (
                                 <div className="space-y-2">
-                                    <p className="text-xs text-[#708090]">
+                                    <p className="text-xs text-muted-foreground">
                                         {uploadedImages.length} file(s) selected
                                     </p>
                                     <div className="grid grid-cols-2 gap-2">
@@ -396,7 +396,7 @@ export function ColorPalette({ showSuggestions = false, collectionData, project,
                                                 <img
                                                     src={image.url}
                                                     alt={image.name}
-                                                    className="w-full h-16 object-cover rounded border"
+                                                    className="w-full h-16 object-cover rounded border border-border"
                                                 />
                                                 <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button

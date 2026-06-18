@@ -79,7 +79,7 @@ export function ColorPicker({ selectedColors = [], onColorsChange, disabled = fa
             <Button
                 type="button"
                 variant="outline"
-                className="w-full bg-transparent justify-start"
+                className="w-full bg-transparent justify-start border-border text-foreground hover:bg-secondary hover:text-foreground cursor-pointer"
                 onClick={() => setIsOpen(!isOpen)}
                 disabled={disabled}
             >
@@ -88,17 +88,17 @@ export function ColorPicker({ selectedColors = [], onColorsChange, disabled = fa
             </Button>
 
             {isOpen && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4">
+                <div className="absolute top-full left-0 mt-2 w-80 bg-card border border-border rounded-lg shadow-lg z-50 p-4 text-foreground">
                     <div className="space-y-4">
                         {/* Selected Colors Display */}
                         {tempColors.length > 0 && (
                             <div>
-                                <p className="text-sm font-medium text-gray-700 mb-2">Selected Colors:</p>
+                                <p className="text-sm font-medium text-muted-foreground mb-2">Selected Colors:</p>
                                 <div className="flex flex-wrap gap-2">
                                     {tempColors.map((color, index) => (
                                         <div key={index} className="relative group">
                                             <div
-                                                className="w-8 h-8 rounded border border-gray-300 cursor-pointer"
+                                                className="w-8 h-8 rounded border border-border cursor-pointer"
                                                 style={{
                                                     background: color.includes('gradient') ? color : undefined,
                                                     backgroundColor: color.includes('gradient') ? 'transparent' : color
@@ -120,14 +120,14 @@ export function ColorPicker({ selectedColors = [], onColorsChange, disabled = fa
 
                         {/* Predefined Colors Grid */}
                         <div>
-                            <p className="text-sm font-medium text-gray-700 mb-2">Choose Colors:</p>
+                            <p className="text-sm font-medium text-muted-foreground mb-2">Choose Colors:</p>
                             <div className="grid grid-cols-8 gap-2">
                                 {predefinedColors.map((color, index) => (
                                     <button
                                         key={index}
-                                        className={`w-8 h-8 rounded border-2 transition-all ${tempColors.includes(color)
-                                            ? 'border-blue-500 ring-2 ring-blue-200'
-                                            : 'border-gray-300 hover:border-gray-400'
+                                        className={`w-8 h-8 rounded border-2 transition-all cursor-pointer ${tempColors.includes(color)
+                                            ? 'border-gold-solid ring-2 ring-gold-muted'
+                                            : 'border-border hover:border-gold-muted/50'
                                             }`}
                                         style={{ backgroundColor: color }}
                                         onClick={() => handleColorSelect(color)}
@@ -140,12 +140,12 @@ export function ColorPicker({ selectedColors = [], onColorsChange, disabled = fa
 
                         {/* Custom Color Input */}
                         <div>
-                            <p className="text-sm font-medium text-gray-700 mb-2">Add Custom Color:</p>
+                            <p className="text-sm font-medium text-muted-foreground mb-2">Add Custom Color:</p>
                             <div className="flex gap-2">
                                 <input
                                     ref={colorInputRef}
                                     type="color"
-                                    className="w-8 h-8 rounded border border-gray-300 cursor-pointer"
+                                    className="w-8 h-8 rounded border border-border cursor-pointer bg-transparent"
                                     disabled={disabled}
                                 />
                                 <Button
@@ -153,6 +153,7 @@ export function ColorPicker({ selectedColors = [], onColorsChange, disabled = fa
                                     size="sm"
                                     onClick={handleCustomColorAdd}
                                     disabled={disabled}
+                                    className="bg-gold-gradient hover:brightness-110 text-primary-foreground font-semibold cursor-pointer"
                                 >
                                     Add
                                 </Button>
@@ -162,13 +163,14 @@ export function ColorPicker({ selectedColors = [], onColorsChange, disabled = fa
                         {/* Gradient Color Picker */}
                         <div>
                             <div className="flex items-center justify-between mb-2">
-                                <p className="text-sm font-medium text-gray-700">Add Gradient:</p>
+                                <p className="text-sm font-medium text-muted-foreground">Add Gradient:</p>
                                 <Button
                                     type="button"
                                     size="sm"
                                     variant="outline"
                                     onClick={() => setShowGradientPicker(!showGradientPicker)}
                                     disabled={disabled}
+                                    className="border-border text-foreground hover:bg-secondary cursor-pointer"
                                 >
                                     <Layers className="w-3 h-3 mr-1" />
                                     {showGradientPicker ? 'Hide' : 'Show'}
@@ -176,7 +178,7 @@ export function ColorPicker({ selectedColors = [], onColorsChange, disabled = fa
                             </div>
 
                             {showGradientPicker && (
-                                <div className="space-y-3 p-3 border border-gray-200 rounded-lg bg-gray-50">
+                                <div className="space-y-3 p-3 border border-border rounded-lg bg-secondary/50">
                                     <div className="flex gap-2">
                                         {gradientColors.map((color, index) => (
                                             <div key={index} className="flex flex-col items-center gap-1">
@@ -184,17 +186,17 @@ export function ColorPicker({ selectedColors = [], onColorsChange, disabled = fa
                                                     type="color"
                                                     value={color}
                                                     onChange={(e) => handleGradientColorChange(index, e.target.value)}
-                                                    className="w-8 h-8 rounded border border-gray-300 cursor-pointer"
+                                                    className="w-8 h-8 rounded border border-border cursor-pointer bg-transparent"
                                                     disabled={disabled}
                                                 />
-                                                <span className="text-xs text-gray-500">{index + 1}</span>
+                                                <span className="text-xs text-muted-foreground">{index + 1}</span>
                                             </div>
                                         ))}
                                     </div>
 
                                     {/* Preview gradient */}
                                     <div
-                                        className="w-full h-8 rounded border border-gray-300"
+                                        className="w-full h-8 rounded border border-border"
                                         style={{
                                             background: `linear-gradient(45deg, ${gradientColors.join(', ')})`
                                         }}
@@ -205,7 +207,7 @@ export function ColorPicker({ selectedColors = [], onColorsChange, disabled = fa
                                         size="sm"
                                         onClick={handleGradientAdd}
                                         disabled={disabled}
-                                        className="w-full"
+                                        className="w-full bg-gold-gradient hover:brightness-110 text-primary-foreground font-semibold cursor-pointer"
                                     >
                                         Add Gradient
                                     </Button>
@@ -214,13 +216,13 @@ export function ColorPicker({ selectedColors = [], onColorsChange, disabled = fa
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex gap-2 pt-2 border-t">
+                        <div className="flex gap-2 pt-2 border-t border-border">
                             <Button
                                 type="button"
                                 size="sm"
                                 onClick={handleApply}
                                 disabled={disabled}
-                                className="flex-1"
+                                className="flex-1 bg-gold-gradient hover:brightness-110 text-primary-foreground font-semibold cursor-pointer"
                             >
                                 Apply
                             </Button>
@@ -230,7 +232,7 @@ export function ColorPicker({ selectedColors = [], onColorsChange, disabled = fa
                                 variant="outline"
                                 onClick={handleCancel}
                                 disabled={disabled}
-                                className="flex-1"
+                                className="flex-1 border-border text-foreground hover:bg-secondary cursor-pointer"
                             >
                                 Cancel
                             </Button>

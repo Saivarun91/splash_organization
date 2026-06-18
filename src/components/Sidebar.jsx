@@ -105,39 +105,36 @@ export function Sidebar({ collapsed, setCollapsed, hovered, setHovered }) {
 
     return (
         <aside
-            className={`fixed left-0 top-0 z-40 h-screen border-r border-gray-700 backdrop-blur-md bg-gray-900 text-white transition-all duration-300 font-sans text-base
+            className={`fixed left-0 top-0 z-40 h-screen border-r border-sidebar-border backdrop-blur-md bg-sidebar text-sidebar-foreground transition-all duration-300 font-sans text-base
                 ${isExpanded ? "w-64" : "w-20"}
             `}
             onMouseEnter={() => setHovered && setHovered(true)}
             onMouseLeave={() => setHovered && setHovered(false)}
         >
             {/* Header - same as frontend */}
-            <div className="flex items-center h-16 px-3 border-b border-gray-800">
+            <div className="flex items-center h-16 px-3 border-b border-sidebar-border">
                 <Link href="/dashboard" className="flex items-center gap-2 flex-1 group">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-105">
-                            {collapsed && !hovered && (
-                                <img src="/images/favicon.png" alt="Splash AI Studio" className="w-full h-full object-contain"  />
-                            ) }
-                            
-                            {/* <img src="/images/favicon.png" alt="Splash AI Studio" className="w-full h-full object-contain"  /> */}
-                        </div>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-105">
+                        {collapsed && !hovered && (
+                            <img src="/images/favicon.png" alt="Splash AI Studio" className="w-full h-full object-contain" />
+                        )}
+                    </div>
                     {isExpanded && (
                         <div className="flex items-center justify-center gap-2 group" >
                             <Link href="/dashboard" className="flex items-center justify-center gap-2 group" >
                                 <img
-                                    src="/images/sidebar.png"
+                                    src="/images/SplashLogoPNG.png"
                                     alt="Splash AI Studio"
-                                    className="h-32 lg:h-40 w-auto object-contain hover:scale-105 transition-transform duration-300 translate-y-2 mb-px"
+                                    className="h-25 lg:h-25 w-auto object-contain hover:scale-105 transition-transform duration-300 translate-y-2 mb-px"
                                 />
                             </Link>
-                           
-                </div>
+                        </div>
                     )}
                 </Link>
 
                 <button
                     onClick={() => setCollapsed && setCollapsed(!collapsed)}
-                    className="ml-2 flex items-center justify-center w-9 h-9 rounded-lg bg-gray-800 hover:bg-gray-700 transition"
+                    className="ml-2 flex items-center justify-center w-9 h-9 rounded-lg bg-secondary hover:bg-sidebar-accent transition"
                 >
                     {collapsed ? (
                         <ChevronRight className="w-6 h-6 text-white" />
@@ -156,10 +153,10 @@ export function Sidebar({ collapsed, setCollapsed, hovered, setHovered }) {
                                 <button
                                     onClick={() => isExpanded && toggleExpanded(item.label)}
                                     className={`w-full flex items-center cursor-pointer ${isExpanded ? "gap-3" : "justify-center"} 
-              px-3 py-2 rounded-md text-sm font-medium transition-colors 
-              ${isActive(item.path, true)
-                                            ? "bg-white/10 backdrop-blur-md border border-white/10 text-white shadow-md"
-                                            : "text-gray-300 hover:bg-white/10 hover:text-white"
+                                        px-3 py-2 rounded-md text-sm font-medium transition-colors 
+                                        ${isActive(item.path, true)
+                                            ? "bg-sidebar-accent border border-sidebar-border text-gold-solid shadow-md"
+                                            : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
                                         }`}
                                 >
                                     <item.icon className={`${isExpanded ? "w-5 h-5" : "w-7 h-7"} transition-all`} />
@@ -183,10 +180,10 @@ export function Sidebar({ collapsed, setCollapsed, hovered, setHovered }) {
                                                 key={child.path}
                                                 href={child.path}
                                                 className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors
-                                                        ${isActive(child.path)
-                                                            ? "bg-white/10 backdrop-blur-md border border-white/10 text-white shadow-md"
-                                                            : "text-gray-400 hover:text-white hover:bg-white/10"
-                                                        }`}
+                                                    ${isActive(child.path)
+                                                        ? "bg-sidebar-accent border border-sidebar-border text-gold-solid shadow-md"
+                                                        : "text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent"
+                                                    }`}
                                             >
                                                 <child.icon className="w-4 h-4" />
                                                 <span>{child.label}</span>
@@ -199,11 +196,11 @@ export function Sidebar({ collapsed, setCollapsed, hovered, setHovered }) {
                             <Link
                                 href={item.path}
                                 className={`flex items-center ${isExpanded ? "gap-3" : "justify-center my-3"} 
-                                        px-3 py-2 rounded-md text-sm font-medium transition-colors my-3
-                                        ${isActive(item.path)
-                                            ? "bg-white/10 backdrop-blur-md border border-white/10 text-white shadow-md"
-                                            : "text-gray-300 hover:bg-white/10 hover:text-white"
-                                        }`}
+                                    px-3 py-2 rounded-md text-sm font-medium transition-colors my-3
+                                    ${isActive(item.path)
+                                        ? "bg-sidebar-accent border border-sidebar-border text-gold-solid shadow-md"
+                                        : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                                    }`}
                             >
                                 <item.icon className={`transition-all w-5 h-5 ${isExpanded ? "" : "my-3"}`} />
                                 {isExpanded && <span>{item.label}</span>}
@@ -214,33 +211,33 @@ export function Sidebar({ collapsed, setCollapsed, hovered, setHovered }) {
             </nav>
 
             {/* Footer - same as frontend (Switch User + Logout + icons) */}
-            <div className="absolute bottom-0 left-0 w-full border-t border-gray-800 bg-gray-900/80 backdrop-blur-md">
+            <div className="absolute bottom-0 left-0 w-full border-t border-sidebar-border bg-sidebar/80 backdrop-blur-md">
                 <div className="flex flex-col items-center justify-center gap-2 py-3 px-4">
                     {/* Switch User */}
                     <button
                         onClick={switchToFrontendPortal}
                         className={`flex items-center ${isExpanded ? "gap-3 w-full text-left" : "justify-center"} 
-                            text-gray-300 hover:text-white px-3 py-2 rounded-md hover:bg-white/10 transition`}
+                            text-muted-foreground hover:text-sidebar-foreground px-3 py-2 rounded-md hover:bg-sidebar-accent transition`}
                         title={t("dashboard.switchToUserPortal")}
                     >
                         <User className="w-5 h-5" />
                         {isExpanded && <span>{t("dashboard.switchToUserPortal")}</span>}
                     </button>
                     {/* Logout */}
-                    
+                    {/* (Optional logout button can be here if desired, otherwise switcher is sufficient) */}
 
                     {/* Footer icons (hidden when collapsed) - same as frontend */}
                     {isExpanded && (
                         <div className="flex justify-around w-full mt-2">
-                            <button type="button" className="p-2 rounded-md hover:bg-white/10">
-                                <MessageCircle className="w-5 h-5 text-gray-300 hover:text-white" />
+                            <button type="button" className="p-2 rounded-md hover:bg-sidebar-accent">
+                                <MessageCircle className="w-5 h-5 text-muted-foreground hover:text-sidebar-foreground" />
                             </button>
-                            <button type="button" className="p-2 rounded-md hover:bg-white/10 relative">
-                                <Bell className="w-5 h-5 text-gray-300 hover:text-white" />
-                                <span className="absolute top-2 right-2 w-2 h-2 bg-amber-400 rounded-full" />
+                            <button type="button" className="p-2 rounded-md hover:bg-sidebar-accent relative">
+                                <Bell className="w-5 h-5 text-muted-foreground hover:text-sidebar-foreground" />
+                                <span className="absolute top-2 right-2 w-2 h-2 bg-gold-solid rounded-full" />
                             </button>
-                            <button type="button" className="p-2 rounded-md hover:bg-white/10">
-                                <Settings className="w-5 h-5 text-gray-300 hover:text-white" />
+                            <button type="button" className="p-2 rounded-md hover:bg-sidebar-accent">
+                                <Settings className="w-5 h-5 text-muted-foreground hover:text-sidebar-foreground" />
                             </button>
                         </div>
                     )}
