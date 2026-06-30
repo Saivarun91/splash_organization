@@ -720,7 +720,7 @@ export const ProductUploadPage = React.forwardRef(({ project, collectionData, on
                                                     </button>
                                                     {selections[index]?.model ? (
                                                         <ProductModelTierSelect
-                                                            value={selections[index]?.modelTiers?.model || "premium"}
+                                                            value={selections[index]?.modelTiers?.model || "regular"}
                                                             onChange={(tier) => updateModelTier(index, "model", tier)}
                                                             context="model"
                                                             disabled={!canEdit}
@@ -751,7 +751,7 @@ export const ProductUploadPage = React.forwardRef(({ project, collectionData, on
                                                     </button>
                                                     {selections[index]?.campaign ? (
                                                         <ProductModelTierSelect
-                                                            value={selections[index]?.modelTiers?.campaign || "premium"}
+                                                            value={selections[index]?.modelTiers?.campaign || "regular"}
                                                             onChange={(tier) => updateModelTier(index, "campaign", tier)}
                                                             context="campaign"
                                                             disabled={!canEdit}

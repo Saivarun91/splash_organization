@@ -5,14 +5,17 @@ import { CheckIcon, ChevronDownIcon } from "lucide-react"
 
 const OPTIONS = [
     { value: "regular", label: "Regular" },
-    { value: "premium", label: "Premium" },
+    // { value: "premium", label: "Premium" }, // Disabled for now
 ]
 
 const RECOMMENDED_BY_CONTEXT = {
     themed: "regular",
-    model: "premium",
-    campaign: "premium",
+    model: "regular",
+    campaign: "regular",
 }
+
+// Generation model selector hidden; regular tier is applied by default in the background.
+const SHOW_GENERATION_MODEL_UI = false
 
 export function ProductModelTierSelect({ value, onChange, context, disabled = false }) {
     const [open, setOpen] = useState(false)
@@ -56,6 +59,8 @@ export function ProductModelTierSelect({ value, onChange, context, disabled = fa
         onChange(nextValue)
         setOpen(false)
     }
+
+    if (!SHOW_GENERATION_MODEL_UI) return null
 
     return (
         <div ref={containerRef} className="relative w-[108px] mx-auto">
@@ -122,20 +127,24 @@ export function defaultProductRowSelection() {
         modelTiers: {
             plainBg: "regular",
             bgReplace: "regular",
-            model: "premium",
-            campaign: "premium",
+            model: "regular",
+            campaign: "regular",
         },
     }
 }
 
 export function mergeProductRowSelection(saved = {}) {
     const defaults = defaultProductRowSelection()
+    const mergedModelTiers = {
+        ...defaults.modelTiers,
+        ...(saved.modelTiers || {}),
+    }
+
     return {
         ...defaults,
         ...saved,
-        modelTiers: {
-            ...defaults.modelTiers,
-            ...(saved.modelTiers || {}),
-        },
+        modelTiers: Object.fromEntries(
+            Object.keys(mergedModelTiers).map((key) => [key, "regular"])
+        ),
     }
 }

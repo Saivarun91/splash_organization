@@ -6,19 +6,22 @@ import { useLanguage } from "@/context/LanguageContext"
 
 export const MODEL_TIER = {
     REGULAR: "regular",
-    PREMIUM: "premium",
+    // PREMIUM: "premium", // Disabled for now
 }
 
 export const MODEL_TIER_DEFAULTS = {
     themed: MODEL_TIER.REGULAR,
-    model: MODEL_TIER.PREMIUM,
-    campaign: MODEL_TIER.PREMIUM,
+    model: MODEL_TIER.REGULAR,
+    campaign: MODEL_TIER.REGULAR,
 }
 
 const OPTIONS = [
     { value: MODEL_TIER.REGULAR, label: "Regular" },
-    { value: MODEL_TIER.PREMIUM, label: "Premium" },
+    // { value: MODEL_TIER.PREMIUM, label: "Premium" }, // Disabled for now
 ]
+
+// Generation model selector hidden; pages still use MODEL_TIER_DEFAULTS ("regular").
+const SHOW_GENERATION_MODEL_UI = false
 
 function OptionLabel({ label, recommended = false }) {
     return (
@@ -84,6 +87,8 @@ export function ModelTierSelector({
         }
         setOpen((prev) => !prev)
     }
+
+    if (!SHOW_GENERATION_MODEL_UI) return null
 
     return (
         <div ref={containerRef} className={`relative ${className}`}>

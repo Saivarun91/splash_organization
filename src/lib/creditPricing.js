@@ -1,21 +1,23 @@
 export const DEFAULT_TIER_BY_IMAGE_TYPE = {
     plainBg: "regular",
     bgReplace: "regular",
-    model: "premium",
-    campaign: "premium",
+    model: "regular",
+    campaign: "regular",
     white_background: "regular",
     background_change: "regular",
     background_replace: "regular",
-    model_with_ornament: "premium",
-    real_model_with_ornament: "premium",
-    campaign_shot_advanced: "premium",
-    model_image: "premium",
-    campaign_image: "premium",
+    model_with_ornament: "regular",
+    real_model_with_ornament: "regular",
+    campaign_shot_advanced: "regular",
+    model_image: "regular",
+    campaign_image: "regular",
 }
 
 export function normalizeTier(tier, fallback = "regular") {
-    const value = (tier || fallback || "regular").toLowerCase()
-    if (value === "premium") return "premium"
+    void tier
+    void fallback
+    // Premium tier is disabled for now.
+    // if (value === "premium") return "premium"
     return "regular"
 }
 
@@ -50,16 +52,19 @@ export function buildDefaultModelTiers() {
     return {
         plainBg: "regular",
         bgReplace: "regular",
-        model: "premium",
-        campaign: "premium",
+        model: "regular",
+        campaign: "regular",
     }
 }
 
 export function mergeModelTiers(existing = {}) {
-    return {
+    const merged = {
         ...buildDefaultModelTiers(),
         ...existing,
     }
+    return Object.fromEntries(
+        Object.entries(merged).map(([key, value]) => [key, normalizeTier(value)])
+    )
 }
 
 export function estimateProductUploadCredits(selections, settings) {
