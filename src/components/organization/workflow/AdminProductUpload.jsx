@@ -1,6 +1,8 @@
 "use client";
 
 import { Upload } from "lucide-react";
+import SmartImage from "@/utils/SmartImage";
+import { getProductImageSources } from "@/components/images/GeneratedSmartImage";
 
 export function AdminProductUpload({ collectionData }) {
     const item = collectionData?.items?.[0];
@@ -22,11 +24,15 @@ export function AdminProductUpload({ collectionData }) {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {productImages.map((product, idx) => (
                         <div key={idx} className="border border-border rounded-lg overflow-hidden bg-card shadow-sm">
-                            <img
-                                src={product.uploaded_image_url || product.uploaded_image_path || "/placeholder.jpg"}
-                                alt={`Product ${idx + 1}`}
-                                className="w-full h-48 object-cover"
-                            />
+                            <div className="relative h-48">
+                                <SmartImage
+                                    {...getProductImageSources(product)}
+                                    fill
+                                    sizes="(max-width: 768px) 50vw, 33vw"
+                                    alt={`Product ${idx + 1}`}
+                                    className="object-cover"
+                                />
+                            </div>
                             <div className="p-3 bg-secondary/50 border-t border-border">
                                 <p className="text-sm font-medium text-foreground">Product {idx + 1}</p>
                                 {product.generated_images && (

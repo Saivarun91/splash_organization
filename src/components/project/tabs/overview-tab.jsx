@@ -238,6 +238,8 @@ import { useState, useEffect } from "react"
 import { CircleDot, Clock, Calendar, FileText, Image as ImageIcon, Package, User, CheckCircle, Palette, MapPin, Camera, Sparkles } from "lucide-react"
 import { ProductImagesDisplay } from "../product-images-display"
 import { organizationAPI } from "@/lib/api"
+import SmartImage from "@/utils/SmartImage"
+import { getModelImageSources, getMoodboardImageSources } from "@/components/images/GeneratedSmartImage"
 
 export default function OverviewTab({ project }) {
     console.log("project", project);
@@ -466,12 +468,15 @@ export default function OverviewTab({ project }) {
                                     <p className="text-sm text-muted-foreground mb-2">Uploaded Color Images:</p>
                                     <div className="grid grid-cols-4 gap-4">
                                         {item.uploaded_color_images.map((img, idx) => (
-                                            <img
-                                                key={idx}
-                                                src={img.cloud_url || img.local_url}
-                                                alt={`Color ${idx + 1}`}
-                                                className="w-full h-24 object-cover rounded-lg border border-border"
-                                            />
+                                            <div key={idx} className="relative aspect-[4/3]">
+                                                <SmartImage
+                                                    {...getMoodboardImageSources(img)}
+                                                    fill
+                                                    sizes="(max-width: 768px) 50vw, 25vw"
+                                                    alt={`Color ${idx + 1}`}
+                                                    className="object-cover rounded-lg border border-border"
+                                                />
+                                            </div>
                                         ))}
                                     </div>
                                 </div>
@@ -502,8 +507,10 @@ export default function OverviewTab({ project }) {
                     {item.selected_model ? (
                         <div className="space-y-3">
                             <div className="flex items-center gap-3">
-                                <img
-                                    src={item.selected_model.cloud || item.selected_model.local}
+                                <SmartImage
+                                    {...getModelImageSources(item.selected_model)}
+                                    width={80}
+                                    height={80}
                                     alt="Selected Model"
                                     className="w-20 h-20 object-cover rounded-lg border-2 border-gold-solid"
                                 />
@@ -649,12 +656,15 @@ const SelectionSection = ({ title, icon, selected, uploadedImages }) => (
                 <p className="text-sm text-muted-foreground mb-2">Uploaded {title} Images:</p>
                 <div className="grid grid-cols-4 gap-4">
                     {uploadedImages.map((img, idx) => (
-                        <img
-                            key={idx}
-                            src={img.cloud_url || img.local_url}
-                            alt={`${title} ${idx + 1}`}
-                            className="w-full h-24 object-cover rounded-lg border border-border"
-                        />
+                        <div key={idx} className="relative aspect-[4/3]">
+                            <SmartImage
+                                {...getMoodboardImageSources(img)}
+                                fill
+                                sizes="(max-width: 768px) 50vw, 25vw"
+                                alt={`${title} ${idx + 1}`}
+                                className="object-cover rounded-lg border border-border"
+                            />
+                        </div>
                     ))}
                 </div>
             </div>

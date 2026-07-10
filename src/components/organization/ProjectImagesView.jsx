@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FolderKanban, Image as ImageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import GeneratedSmartImage from "@/components/images/GeneratedSmartImage";
 
 export function ProjectImagesView({ project, collectionData }) {
     const [selectedImage, setSelectedImage] = useState(null);
@@ -28,9 +29,11 @@ export function ProjectImagesView({ project, collectionData }) {
                         productIndex: productIdx,
                         imageIndex: imgIdx,
                         type: genImage.type,
-                        imageUrl: genImage.image_url || genImage.local_path || genImage.cloud_url,
+                        imageUrl: genImage.image_url || genImage.cloud_url,
+                        imageLocalPath: genImage.local_path,
                         prompt: genImage.prompt,
-                        productImage: product.uploaded_image_url || product.uploaded_image_path,
+                        productImage: product.uploaded_image_url,
+                        productImagePath: product.uploaded_image_path,
                         collectionData: collectionData,
                     });
                 });
@@ -102,10 +105,12 @@ export function ProjectImagesView({ project, collectionData }) {
                                 onClick={() => setSelectedImage(image)}
                                 className="relative aspect-square rounded-lg overflow-hidden border-2 border-border bg-card cursor-pointer hover:border-gold-solid transition-all hover:shadow-lg group"
                             >
-                                <img
-                                    src={image.imageUrl || "/placeholder.jpg"}
+                                <GeneratedSmartImage
+                                    image={{ local_path: image.imageLocalPath, image_url: image.imageUrl, id: image.id }}
+                                    fill
+                                    sizes="(max-width: 768px) 50vw, 25vw"
                                     alt={`${image.type} image`}
-                                    className="w-full h-full object-cover"
+                                    className="object-cover"
                                 />
                                 <div className="absolute top-2 right-2">
                                     <span className={`${getImageTypeBadge(image.type)} text-xs px-2 py-0.5 rounded-full font-semibold border`}>

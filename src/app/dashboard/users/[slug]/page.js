@@ -17,6 +17,7 @@ import { organizationAPI } from "@/lib/api";
 import { useLanguage } from "@/context/LanguageContext";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import GeneratedSmartImage from "@/components/images/GeneratedSmartImage";
 
 const getRoleColor = (role) => {
     switch (role?.toLowerCase()) {
@@ -180,14 +181,7 @@ export default function UserDetailPage({ params }) {
         }
       }, [organizationId, userSlug]);
       
-    const getImageSrc = (image) => {
-        const url =
-          image.generated_image_url?.trim() ||
-          image.image_url?.trim();
-      
-        return url || "/placeholder.png";
-      };
-      
+
     const handleProjectClick = (project, e) => {
         e?.preventDefault();
         const projectSlug = project.slug || project.id;
@@ -427,17 +421,14 @@ export default function UserDetailPage({ params }) {
                                     {images.slice(0, 12).map((image) => (
                                         <div
                                             key={image.id}
-                                            className="aspect-square rounded-lg overflow-hidden border border-border hover:border-gold-muted hover:shadow-md transition-all cursor-pointer"
+                                            className="aspect-square rounded-lg overflow-hidden border border-border hover:border-gold-muted hover:shadow-md transition-all cursor-pointer relative"
                                         >
-                                            <img
-                                                src={getImageSrc(image)}
+                                            <GeneratedSmartImage
+                                                image={image}
+                                                fill
+                                                sizes="(max-width: 768px) 50vw, 16vw"
                                                 alt={image.prompt || "Generated image"}
-                                                className="w-full h-full object-cover"
-                                                loading="lazy"
-                                                onError={(e) => {
-                                                    e.currentTarget.onerror = null;
-                                                    e.currentTarget.src = "/placeholder.png";
-                                                }}
+                                                className="object-cover"
                                             />
                                         </div>
                                     ))}
@@ -507,11 +498,6 @@ export default function UserDetailPage({ params }) {
                     <div>
                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                             {images.map((image, index) => {
-                                const imageSrc =
-                                    image.generated_image_url?.trim() ||
-                                    image.image_url?.trim() ||
-                                    "/placeholder.png";
-                                
                                 const isLastImage = index === images.length - 1;
 
                                 return (
@@ -520,15 +506,12 @@ export default function UserDetailPage({ params }) {
                                         ref={isLastImage ? lastImageElementRef : null}
                                         className="aspect-square rounded-lg overflow-hidden border border-border hover:shadow-lg hover:border-gold-muted transition-all cursor-pointer group relative"
                                     >
-                                        <img
-                                            src={imageSrc}
+                                        <GeneratedSmartImage
+                                            image={image}
+                                            fill
+                                            sizes="(max-width: 768px) 50vw, 16vw"
                                             alt={image.prompt || "Generated image"}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                                            loading="lazy"
-                                            onError={(e) => {
-                                                e.currentTarget.onerror = null;
-                                                e.currentTarget.src = "/placeholder.png";
-                                            }}
+                                            className="object-cover group-hover:scale-105 transition-transform"
                                         />
 
                                         {image.prompt && (

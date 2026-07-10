@@ -12,6 +12,8 @@ import {
     mergeProductRowSelection,
 } from "./ProductModelTierSelect"
 import { estimateProductUploadCredits } from "@/lib/creditPricing"
+import SmartImage from "@/utils/SmartImage"
+import { getProductImageSources } from "@/components/images/GeneratedSmartImage"
 
 export const ProductUploadPage = React.forwardRef(({ project, collectionData, onSave, canEdit = true }, ref) => {
     const [selectedFiles, setSelectedFiles] = useState([])
@@ -609,10 +611,12 @@ export const ProductUploadPage = React.forwardRef(({ project, collectionData, on
                                             <td className="px-4 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="relative group w-20 h-20 flex-shrink-0">
-                                                        <img
-                                                            src={product.uploaded_image_url}
+                                                        <SmartImage
+                                                            {...getProductImageSources(product)}
+                                                            fill
+                                                            sizes="80px"
                                                             alt={`Product ${index + 1}`}
-                                                            className="w-full h-full object-contain bg-white border border-border rounded-lg"
+                                                            className="object-contain bg-white border border-border rounded-lg"
                                                         />
                                                         <button
                                                             onClick={(e) => {

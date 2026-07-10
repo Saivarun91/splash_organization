@@ -4,6 +4,8 @@ import { MultiSelect } from "@/components/ui/multi-select"
 import { useState, useEffect, useRef } from "react"
 import { organizationAPI } from "@/lib/api"
 import { useAuth } from "@/context/AuthContext"
+import SmartImage from "@/utils/SmartImage"
+import { getMoodboardImageSources } from "@/components/images/GeneratedSmartImage"
 
 export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, project, onSave, onSelectionsChange, onImagesChange, canEdit = true }) {
     const { token } = useAuth()
@@ -335,8 +337,10 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
                             <div className="grid grid-cols-2 gap-2">
                                 {uploadedImages.themes.map((image) => (
                                     <div key={image.id} className="relative group">
-                                        <img
-                                            src={image.url}
+                                        <SmartImage
+                                            {...getMoodboardImageSources(image)}
+                                            width={100}
+                                            height={64}
                                             alt={image.name}
                                             className="w-full h-16 object-cover rounded border border-border"
                                         />
@@ -425,8 +429,10 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
                             <div className="grid grid-cols-2 gap-2">
                                 {uploadedImages.backgrounds.map((image) => (
                                     <div key={image.id} className="relative group">
-                                        <img
-                                            src={image.url}
+                                        <SmartImage
+                                            {...getMoodboardImageSources(image)}
+                                            width={100}
+                                            height={64}
                                             alt={image.name}
                                             className="w-full h-16 object-cover rounded border border-border"
                                         />
@@ -515,8 +521,10 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
                             <div className="grid grid-cols-2 gap-2">
                                 {uploadedImages.poses.map((image) => (
                                     <div key={image.id} className="relative group">
-                                        <img
-                                            src={image.url}
+                                        <SmartImage
+                                            {...getMoodboardImageSources(image)}
+                                            width={100}
+                                            height={64}
                                             alt={image.name}
                                             className="w-full h-16 object-cover rounded border border-border"
                                         />
@@ -605,8 +613,10 @@ export function ThemesAndBackgrounds({ showSuggestions = false, collectionData, 
                             <div className="grid grid-cols-2 gap-2">
                                 {uploadedImages.locations.map((image) => (
                                     <div key={image.id} className="relative group">
-                                        <img
-                                            src={image.url}
+                                        <SmartImage
+                                            {...getMoodboardImageSources(image)}
+                                            width={100}
+                                            height={64}
                                             alt={image.name}
                                             className="w-full h-16 object-cover rounded border border-border"
                                         />

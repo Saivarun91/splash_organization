@@ -1,12 +1,12 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import Image from "next/image"
 import { Download, Image as ImageIcon, Calendar, Clock, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ProductImagesDisplay } from "../product-images-display"
 import { organizationAPI } from "@/lib/api"
 import { dataCache, cacheKeys } from "@/lib/data-cache"
+import GeneratedSmartImage from "@/components/images/GeneratedSmartImage"
 
 export default function ResultsTab({ project }) {
 
@@ -786,14 +786,13 @@ export default function ResultsTab({ project }) {
                                 <div className="grid grid-cols-4 gap-4 mb-6">
                                     {paginatedImages.map((image, index) => (
                                         <div key={image.id || index} className="group relative aspect-square rounded-xl overflow-hidden bg-secondary border border-border shadow-sm hover:shadow-md transition-all">
-                                            <Image
-                                                src={image.image_url}
-                                                alt="Generated"
+                                            <GeneratedSmartImage
+                                                image={image}
                                                 fill
+                                                sizes="(max-width: 768px) 50vw, 25vw"
+                                                alt="Generated"
                                                 className="object-cover cursor-pointer"
                                                 onClick={() => window.open(image.image_url, "_blank")}
-                                                sizes="(max-width: 768px) 50vw, 25vw"
-                                                unoptimized={image.image_url?.includes('cloudinary') || image.image_url?.includes('imagekit')}
                                             />
                                             {/* Hover Overlay */}
                                             <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">

@@ -1,6 +1,8 @@
 "use client";
 
 import { User } from "lucide-react";
+import SmartImage from "@/utils/SmartImage";
+import { getModelImageSources } from "@/components/images/GeneratedSmartImage";
 
 export function AdminModelSelection({ collectionData }) {
     const item = collectionData?.items?.[0];
@@ -27,14 +29,16 @@ export function AdminModelSelection({ collectionData }) {
                         </div>
                     </div>
 
-                    {selectedModel.cloud_url && (
+                    {(selectedModel.cloud_url || selectedModel.local_url) && (
                         <div>
                             <label className="block text-sm font-semibold text-foreground mb-2">Model Preview</label>
-                            <div className="border border-border rounded-lg overflow-hidden">
-                                <img
-                                    src={selectedModel.cloud_url || selectedModel.local_url || "/placeholder.jpg"}
+                            <div className="border border-border rounded-lg overflow-hidden relative h-64">
+                                <SmartImage
+                                    {...getModelImageSources(selectedModel)}
+                                    fill
+                                    sizes="100vw"
                                     alt="Model preview"
-                                    className="w-full h-64 object-cover"
+                                    className="object-cover"
                                 />
                             </div>
                         </div>

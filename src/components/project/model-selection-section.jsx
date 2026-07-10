@@ -5,6 +5,8 @@ import { Users, Sparkles, CheckCircle, Upload, Image as ImageIcon, X, Eye } from
 import { Button } from "@/components/ui/button"
 import { organizationAPI } from "@/lib/api"
 import { useAuth } from "@/context/AuthContext"
+import SmartImage from "@/utils/SmartImage"
+import { getModelImageSources } from "@/components/images/GeneratedSmartImage"
 export function ModelSelectionSection({ project, collectionData, onSave, canEdit = true, onModelSelectionChange }) {
     const [activeTab, setActiveTab] = useState("ai") // 'ai' or 'real'
     const { token } = useAuth()
@@ -436,8 +438,10 @@ function AIModelsTab({
                                                 }`}
                                         >
                                             {/* Image */}
-                                            <img
-                                                src={imageUrl}
+                                            <SmartImage
+                                                {...getModelImageSources(model)}
+                                                width={160}
+                                                height={160}
                                                 alt={`Existing Model ${index + 1}`}
                                                 className="w-full h-40 object-cover group-hover:scale-[1.03] transition-transform duration-300"
                                             />
@@ -527,8 +531,10 @@ function AIModelsTab({
                                             : 'border-border hover:border-gold-solid/50'
                                             }`}
                                     >
-                                        <img
-                                            src={imageUrl}
+                                        <SmartImage
+                                            {...getModelImageSources(model)}
+                                            width={160}
+                                            height={160}
                                             alt={`New Model ${index + 1}`}
                                             className="w-full h-40 object-cover"
                                         />
@@ -601,8 +607,10 @@ function AIModelsTab({
                                         : 'border-border hover:border-gold-solid/50'
                                         }`}
                                 >
-                                    <img
-                                        src={imageUrl}
+                                    <SmartImage
+                                        {...getModelImageSources(model)}
+                                        width={160}
+                                        height={160}
                                         alt={`AI Model ${index + 1}`}
                                         className="w-full h-40 object-cover"
                                     />
@@ -763,8 +771,10 @@ function RealModelsTab({
                                     onClick={() => canEdit && onSelect(model)}
                                 >
                                     {/* Model image */}
-                                    <img
-                                        src={imageUrl}
+                                    <SmartImage
+                                        {...getModelImageSources(model)}
+                                        width={160}
+                                        height={160}
                                         alt={`Real Model ${index + 1}`}
                                         className="w-full h-40 object-cover group-hover:scale-[1.03] transition-transform duration-300"
                                     />

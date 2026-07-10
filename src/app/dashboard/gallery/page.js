@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Grid, Download, RefreshCw, Eye, Loader2 } from "lucide-react";
 import { organizationAPI } from "@/lib/api";
 import { useLanguage } from "@/context/LanguageContext";
+import GeneratedSmartImage from "@/components/images/GeneratedSmartImage";
 
 const getImageCategory = (imageType, t) => {
     if (imageType === "white_background") return t("orgPortal.plain");
@@ -203,15 +204,12 @@ export default function GalleryPage() {
                                     className="group cursor-pointer"
                                 >
                                     <div className="relative aspect-square bg-sidebar-accent/30 rounded-xl overflow-hidden mb-2 border border-border">
-                                        <img
-                                            src={image.image_url}
+                                        <GeneratedSmartImage
+                                            image={image}
+                                            fill
+                                            sizes="(max-width: 768px) 50vw, 16vw"
                                             alt={getImageCategory(image.image_type, t)}
-                                            className="w-full h-full object-cover"
-                                            loading="lazy"
-                                            onError={(e) => {
-                                                e.target.style.display = "none";
-                                                e.target.nextSibling.style.display = "flex";
-                                            }}
+                                            className="object-cover"
                                         />
                                         <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center hidden">
                                             <Grid className="w-12 h-12 text-muted-foreground" />

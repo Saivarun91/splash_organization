@@ -7,6 +7,8 @@ import { organizationAPI } from "@/lib/api"
 import { useAuth } from "@/context/AuthContext"
 import { ModelTierSelector } from "@/components/images/ModelTierSelector"
 import { resolveRegenerationTier } from "@/lib/creditPricing"
+import SmartImage from "@/utils/SmartImage"
+import { getModelImageSources, getProductImageSources } from "@/components/images/GeneratedSmartImage"
 
 function getProjectRegenContext(imageType) {
     if (imageType === "campaign_image") return "campaign"
@@ -266,11 +268,14 @@ export function ProductImagesDisplay({
                                 <div className="md:col-span-1">
                                     <div className="space-y-3">
                                         <div className="relative group">
-                                            <div className="aspect-square rounded-xl overflow-hidden bg-accent/10 border-2 border-gold-solid shadow-sm">
-                                                <img
-                                                    src={product.uploaded_image_url}
+                                            <div className="aspect-square rounded-xl overflow-hidden bg-accent/10 border-2 border-gold-solid shadow-sm relative">
+                                                <SmartImage
+                                                    {...getProductImageSources(product)}
+                                                    fill
+                                                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                                    priority={productIndex === 0}
                                                     alt={`Product ${productIndex + 1}`}
-                                                    className="w-full h-full object-cover cursor-zoom-in transition-transform hover:scale-105"
+                                                    className="object-cover cursor-zoom-in transition-transform hover:scale-105"
                                                     onClick={() => setZoomedImage(product.uploaded_image_url)}
                                                 />
                                             </div>
@@ -313,10 +318,14 @@ export function ProductImagesDisplay({
                                                     <div key={imgIndex} className="group">
                                                         <div className="space-y-3">
                                                             <div className="relative aspect-square rounded-xl overflow-hidden bg-accent/10 border border-border shadow-sm hover:shadow-md hover:border-gold-muted transition-all">
-                                                                <img
-                                                                    src={imageToShow.cloud_url}
+                                                                <SmartImage
+                                                                    src={imageToShow.local_path}
+                                                                    fallbackSrc={imageToShow.cloud_url}
+                                                                    fill
+                                                                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                                                                    priority={imgIndex === 0}
                                                                     alt={`${imageToShow.type} ${imgIndex + 1}`}
-                                                                    className="w-full h-full object-cover cursor-zoom-in transition-transform hover:scale-105"
+                                                                    className="object-cover cursor-zoom-in transition-transform hover:scale-105"
                                                                     onClick={() => setZoomedImage(imageToShow.cloud_url)}
                                                                 />
 
@@ -536,8 +545,10 @@ export function ProductImagesDisplay({
                                     Original Product
                                 </label>
                                 <div className="border-2 border-gold-solid rounded-xl overflow-hidden shadow-sm">
-                                    <img
-                                        src={showPromptModal.product.uploaded_image_url}
+                                    <SmartImage
+                                        {...getProductImageSources(showPromptModal.product)}
+                                        width={400}
+                                        height={192}
                                         alt="Original Product"
                                         className="w-full h-48 object-cover"
                                     />
@@ -603,10 +614,12 @@ export function ProductImagesDisplay({
                                                             : 'border-border hover:border-gold-muted'
                                                             }`}
                                                     >
-                                                        <img
-                                                            src={model.cloud}
+                                                        <SmartImage
+                                                            {...getModelImageSources(model)}
+                                                            fill
+                                                            sizes="25vw"
                                                             alt="AI Model"
-                                                            className="w-full h-full object-cover"
+                                                            className="object-cover"
                                                         />
                                                         {selectedModel?.local === model.local && (
                                                             <div className="absolute inset-0 bg-gold-solid/20 flex items-center justify-center">
@@ -636,10 +649,12 @@ export function ProductImagesDisplay({
                                                             : 'border-border hover:border-emerald-500/50'
                                                             }`}
                                                     >
-                                                        <img
-                                                            src={model.cloud}
+                                                        <SmartImage
+                                                            {...getModelImageSources(model)}
+                                                            fill
+                                                            sizes="25vw"
                                                             alt="Real Model"
-                                                            className="w-full h-full object-cover"
+                                                            className="object-cover"
                                                         />
                                                         {selectedModel?.local === model.local && (
                                                             <div className="absolute inset-0 bg-emerald-500/20 flex items-center justify-center">
